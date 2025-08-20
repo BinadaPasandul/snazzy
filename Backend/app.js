@@ -5,15 +5,14 @@ console.log("welcome to Snazzy")
 
 const express = require("express");
 const mongoose = require("mongoose");
+const router = require("./Routes/UserRoutes");
 
 const app = express();
 
 //middleware
-app.use("/",(requestAnimationFrame, resizeBy, next)=>
-{
-    res.send("It is working")
-}
-)
+app.use(express.json());
+
+app.use("/user", router);
 
 //database connection link
 //link - mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/
