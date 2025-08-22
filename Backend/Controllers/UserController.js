@@ -58,7 +58,7 @@ const addUsers = async (req, res, next) => {
 
 const getAllUsers = async (req, res, next) => {
     try {
-        const users = await Register.find(); // Use Register instead of User
+        const users = await Register.find().select("-password");
         if (!users || users.length === 0) {
             return res.status(404).json({ message: "No users found" });
         }
@@ -69,5 +69,22 @@ const getAllUsers = async (req, res, next) => {
     }
 };
 
+const getById = async (req, res, next) => {
+    const id = req.params.id;
+
+    let user;
+    try {
+        user = await Register.findById(id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ user });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while fetching user" });
+    }
+};
+
 exports.addUsers = addUsers;
 exports.getAllUsers = getAllUsers;
+exports.getById = getById;
