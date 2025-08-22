@@ -1,5 +1,6 @@
 const Register = require("../Models/UserModel");
 const bcrypt = require("bcrypt");
+const mongoose = require("mongoose");
 
 const addUsers = async (req, res, next) => {
     // Check if req.body exists
@@ -85,6 +86,78 @@ const getById = async (req, res, next) => {
     }
 };
 
+const updateUser = async (req, res, next) => {
+    const id = req.params.id;
+    
+    // Check if req.body exists
+    if (!req.body) {
+        return res.status(400).json({ message: "Request body is missing" });
+    }
+
+    const { name, gmail, age, password } = req.body;
+
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    let user;
+    try {
+        // Check for duplicate email (excluding the current user)
+        if (gmail) {
+            const existingUser = await Register.findOne({ gmail, _id: { $ne: id } });
+            if (existingUser) {
+                return res.status(400).json({ message: "Email already exists" });
+            }
+        }
+
+        // Prepare update fields
+        const updateFields = { name, gmail, age };
+        if (password) {
+            updateFields.password = await bcrypt.hash(password, 10);
+        }
+
+        // Update user
+        user = await Register.findByIdAndUpdate(
+            id,
+            updateFields,
+            { new: true, runValidators: true }
+        ).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        return res.status(200).json({ user });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while updating user" });
+    }
+};
+
+const deleteUser = async (req, res, next) => {
+    const id = req.params.id;
+
+    // Validate ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ message: "Invalid user ID" });
+    }
+
+    let user;
+    try {
+        user = await Register.findByIdAndDelete(id).select("-password");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        return res.status(200).json({ message: "User deleted successfully", user });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while deleting user" });
+    }
+};
+
 exports.addUsers = addUsers;
 exports.getAllUsers = getAllUsers;
 exports.getById = getById;
+exports.updateUser = updateUser;
+exports.deleteUser = deleteUser;
