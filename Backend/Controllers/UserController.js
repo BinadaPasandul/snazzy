@@ -156,8 +156,43 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
+const loginUser = async (req, res, next) => {
+    if (!req.body) {
+        return res.status(400).json({ status: "error", err: "Request body is missing" });
+    }
+
+    const { gmail, password } = req.body;
+
+    if (!gmail || !password) {
+        return res.status(400).json({ status: "error", err: "Email and password are required" });
+    }
+
+    try {
+        const user = await Register.findOne({ gmail }).select("+password");
+        if (!user) {
+            return res.status(401).json({ status: "error", err: "Invalid email or password" });
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ status: "error", err: "Invalid email or password" });
+        }
+
+        return res.status(200).json({
+            status: "ok",
+            name: user.name,
+            role: user.role
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ status: "error", err: "Server error while logging in" });
+    }
+};
+
 exports.addUsers = addUsers;
 exports.getAllUsers = getAllUsers;
 exports.getById = getById;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
+exports.loginUser = loginUser;
+
