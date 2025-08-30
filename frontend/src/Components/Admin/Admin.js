@@ -3,43 +3,30 @@ import Nav from '../Navbar/nav';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const Signup = () => {
-    const navigate = useNavigate();
+function Admin() {
+    const history = useNavigate();
     const [user, setUser] = useState({
         name: "",
         gmail: "",
         password: "",
         age: "",
-        role: "customer" // Default role
+        role: "" // Default role set to staff
     });
-    const [error, setError] = useState(null);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUser((prevUser) => ({ ...prevUser, [name]: value }));
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = (e) => {
         e.preventDefault();
-        setError(null);
 
-        // Validate inputs
-        if (!user.name || !user.gmail || !user.password || !user.age) {
-            setError("All fields are required");
-            return;
-        }
-
-        try {
-            const response = await sendRequest();
-            if (response.message === "ok") {
-                alert("Signup Success");
-                navigate("/login");
-            } else {
-                setError(response.err || "Signup failed");
-            }
-        } catch (err) {
-            setError(err.message || "Error during signup");
-        }
+        sendRequest().then(() => {
+            alert("Staff Member Added Successfully");
+            history("/admin"); // Redirect to admin for consistency
+        }).catch((err) => {
+            alert("Error: " + err.message);
+        });
     };
 
     const sendRequest = async () => {
@@ -48,18 +35,18 @@ const Signup = () => {
             gmail: String(user.gmail),
             password: String(user.password),
             age: Number(user.age),
-            role: String(user.role)
+            role: String(user.role) // Send role as "staff"
         }).then((res) => res.data);
     };
 
     return (
         <div>
             <Nav />
-            <h1>Sign Up</h1>
+            <h1>Add Staff Member</h1>
             <form className="user-form" onSubmit={handleSubmit}>
-                <h2>User Information</h2>
+                <h2>Staff Information</h2>
 
-                <div className="form-group">
+<div className="form-group">
                     <label htmlFor="name">Full Name:</label>
                     <input
                         type="text"
@@ -112,16 +99,30 @@ const Signup = () => {
                     />
                 </div>
 
-              
+                <div className="form-group">
+                    <label htmlFor="role">Role:</label>
+                    <select
+                        id="role"
+                        name="role"
+                        onChange={handleInputChange}
+                        value={user.role}
+                        required
+                    >
+                       
+                        <option value="product_manager">Product Manager</option>
+                        <option value="order_manager">Order Manager</option>
+                        <option value="promotion_manager">Promotion Manager</option>
+                        <option value="financial_manager">Financial Manager</option>
+                    </select>
+                </div>
 
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-
+                {/* Role is not shown in the form as it's set by default */}
                 <button type="submit" className="submit-btn">
-                    Sign Up
+                    Add Member
                 </button>
             </form>
         </div>
     );
-};
+}
 
-export default Signup;
+export default Admin;
