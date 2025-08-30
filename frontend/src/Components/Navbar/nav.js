@@ -26,7 +26,7 @@ function Nav() {
                     <>
                      
                         <li>
-                            <NavLink to="/regi" activeClassName="active">
+                            <NavLink to="/signup" activeClassName="active">
                                 <button className="nav-btn">Register</button>
                             </NavLink>
                         </li>

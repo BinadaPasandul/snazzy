@@ -3,19 +3,16 @@ const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 
 const addUsers = async (req, res, next) => {
-    // Check if req.body exists
     if (!req.body) {
         return res.status(400).json({ message: "Request body is missing" });
     }
 
     const { name, gmail, password, age, role } = req.body;
 
-    // Validate required fields
     if (!name || !gmail || !password || !age || !role) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Validate role against allowed values
     const validRoles = [
         "customer",
         "admin",
@@ -33,28 +30,19 @@ const addUsers = async (req, res, next) => {
 
     let user;
     try {
-        // Check for duplicate email
         const existingUser = await Register.findOne({ gmail });
         if (existingUser) {
             return res.status(400).json({ message: "Email already exists" });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create and save user
         user = new Register({ name, gmail, password: hashedPassword, age, role });
         await user.save();
+        return res.status(201).json({ message: "ok", user }); // Changed to message: "ok"
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Server error while adding user" });
     }
-
-    if (!user) {
-        return res.status(400).json({ message: "Unable to add user" });
-    }
-
-    return res.status(201).json({ user });
 };
 
 const getAllUsers = async (req, res, next) => {
@@ -89,21 +77,18 @@ const getById = async (req, res, next) => {
 const updateUser = async (req, res, next) => {
     const id = req.params.id;
     
-    // Check if req.body exists
     if (!req.body) {
         return res.status(400).json({ message: "Request body is missing" });
     }
 
     const { name, gmail, age, password } = req.body;
 
-    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid user ID" });
     }
 
     let user;
     try {
-        // Check for duplicate email (excluding the current user)
         if (gmail) {
             const existingUser = await Register.findOne({ gmail, _id: { $ne: id } });
             if (existingUser) {
@@ -111,13 +96,11 @@ const updateUser = async (req, res, next) => {
             }
         }
 
-        // Prepare update fields
         const updateFields = { name, gmail, age };
         if (password) {
             updateFields.password = await bcrypt.hash(password, 10);
         }
 
-        // Update user
         user = await Register.findByIdAndUpdate(
             id,
             updateFields,
@@ -138,7 +121,6 @@ const updateUser = async (req, res, next) => {
 const deleteUser = async (req, res, next) => {
     const id = req.params.id;
 
-    // Validate ID
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid user ID" });
     }
@@ -195,4 +177,3 @@ exports.getById = getById;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.loginUser = loginUser;
-
