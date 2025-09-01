@@ -13,10 +13,14 @@
     "@stripe/react-stripe-js": "^3.9.2",
     "@stripe/stripe-js": "^7.9.0",
     "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
     "cord": "^1.0.1",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "mongoose": "^8.17.1"
+    "mongoose": "^8.17.1",
+    "strip": "^3.0.0",
+    "stripe": "^18.5.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
