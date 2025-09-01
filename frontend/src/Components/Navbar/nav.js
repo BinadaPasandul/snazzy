@@ -8,7 +8,7 @@ function Nav() {
 
     const handleLogout = () => {
         localStorage.removeItem('user');
-        navigate('/log');
+        navigate('/login');
     };
 
     return (
@@ -31,7 +31,7 @@ function Nav() {
                             </NavLink>
                         </li>
                         <li>
-                            <NavLink to="/log" activeClassName="active">
+                            <NavLink to="/login" activeClassName="active">
                                 <button className="nav-btn">Login</button>
                             </NavLink>
                         </li>

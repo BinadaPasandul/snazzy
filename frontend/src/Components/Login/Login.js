@@ -31,14 +31,14 @@ const Login = () => {
                     history("/userdetails");
                 } else if (response.role === "admin") {
                     history("/admin");
-                } else if (response.role === "productmanager") {
+                } else if (response.role === "product_manager") {
                     history("/productmanager");
-                } else if (response.role === "ordermanager"){
+                } else if (response.role === "order_manager"){
                     history("/ordermanager");
 
                 } else if(response.role ==="promotionmanager"){
                     history("/promotionmanager")
-                } else if(response.role ==="financialmanager"){
+                } else if(response.role ==="financial_manager"){
                     history("/financialmanager")
                 } else{
                     alert("Unknown role");
