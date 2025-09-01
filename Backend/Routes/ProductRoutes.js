@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 
 //Insert Model
-const Product = require("../Model/ProductModel");
+const Product = require("../Models/ProductModel");
 
 //Insert Product Controller
-const ProductController = require("../Controllers/ProductControllers");
+const ProductController = require("../Controllers/ProductController");
 
 router.get("/",ProductController.getAllProducts);
 router.post("/",ProductController.addProducts);

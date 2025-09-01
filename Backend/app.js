@@ -28,16 +28,17 @@ mongoose.connect("mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/")
 })
 .catch((err)=> console.log((err)));
 
+
+//Product Manager
+
 //pass = zQKIpuqwgpTycmAm
 
-const express = require("express");
-const mongoose = require("mongoose");
-const router = require("./Routes/ProductRoutes");
+const router1 = require("./Routes/ProductRoutes");
 
 
 //Middleware
 app.use(express.json());
-app.use("/products",router);
+app.use("/products",router1);
 
 
 mongoose.connect("mongodb+srv://lakmith:zQKIpuqwgpTycmAm@snazzydb.lwyeb7v.mongodb.net/")
