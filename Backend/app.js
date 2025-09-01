@@ -41,9 +41,3 @@ app.use(express.json());
 app.use("/products",router1);
 
 
-mongoose.connect("mongodb+srv://lakmith:zQKIpuqwgpTycmAm@snazzydb.lwyeb7v.mongodb.net/")
-.then(()=> console.log("Connected to MongoDB"))
-.then(()=>  {
-    app.listen(5000);
-})
-.catch((err) => console.log((err)));
