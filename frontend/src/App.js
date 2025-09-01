@@ -2,7 +2,7 @@ import "./App.css";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from  "./Components/Login/Login"
-import Signup from "./Components/Signup/Signup"
+import Signup from "./Components/Signup/signup"
 import Admin from "./Components/Admin/Admin";
 import Productmanager from "./Components/Productmanager/productmanager";
 import Promotionmanager from "./Components/Promotionmanager/promotionmanager";
