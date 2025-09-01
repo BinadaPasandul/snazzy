@@ -27,3 +27,22 @@ mongoose.connect("mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/")
     app.listen(5000);
 })
 .catch((err)=> console.log((err)));
+
+//pass = zQKIpuqwgpTycmAm
+
+const express = require("express");
+const mongoose = require("mongoose");
+const router = require("./Routes/ProductRoutes");
+
+
+//Middleware
+app.use(express.json());
+app.use("/products",router);
+
+
+mongoose.connect("mongodb+srv://lakmith:zQKIpuqwgpTycmAm@snazzydb.lwyeb7v.mongodb.net/")
+.then(()=> console.log("Connected to MongoDB"))
+.then(()=>  {
+    app.listen(5000);
+})
+.catch((err) => console.log((err)));
