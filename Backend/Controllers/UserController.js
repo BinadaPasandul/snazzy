@@ -7,9 +7,9 @@ const addUsers = async (req, res, next) => {
         return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const { name, gmail, password, age, role } = req.body;
+    const { name, gmail, password, age, address, role } = req.body;
 
-    if (!name || !gmail || !password || !age || !role) {
+    if (!name || !gmail || !password || !age || !address || !role) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -36,7 +36,7 @@ const addUsers = async (req, res, next) => {
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        user = new Register({ name, gmail, password: hashedPassword, age, role });
+        user = new Register({ name, gmail, password: hashedPassword, age, address, role });
         await user.save();
         return res.status(201).json({ message: "ok", user }); // Changed to message: "ok"
     } catch (err) {
@@ -81,7 +81,7 @@ const updateUser = async (req, res, next) => {
         return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const { name, gmail, age, password } = req.body;
+    const { name, gmail, age, address, password } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid user ID" });
@@ -96,7 +96,7 @@ const updateUser = async (req, res, next) => {
             }
         }
 
-        const updateFields = { name, gmail, age };
+        const updateFields = { name, gmail, age, address };
         if (password) {
             updateFields.password = await bcrypt.hash(password, 10);
         }
@@ -138,6 +138,9 @@ const deleteUser = async (req, res, next) => {
     }
 };
 
+const jwt = require("jsonwebtoken");
+
+// inside loginUser
 const loginUser = async (req, res, next) => {
     if (!req.body) {
         return res.status(400).json({ status: "error", err: "Request body is missing" });
@@ -160,8 +163,16 @@ const loginUser = async (req, res, next) => {
             return res.status(401).json({ status: "error", err: "Invalid email or password" });
         }
 
+        
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET || "yoursecretkey",
+            { expiresIn: "1h" }
+        );
+
         return res.status(200).json({
             status: "ok",
+            token,
             name: user.name,
             role: user.role
         });

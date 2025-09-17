@@ -10,6 +10,7 @@ const Signup = () => {
         gmail: "",
         password: "",
         age: "",
+        address: "",
         role: "customer" // Default role
     });
     const [error, setError] = useState(null);
@@ -24,7 +25,7 @@ const Signup = () => {
         setError(null);
 
         // Validate inputs
-        if (!user.name || !user.gmail || !user.password || !user.age) {
+        if (!user.name || !user.gmail || !user.password || !user.age || !user.address) {
             setError("All fields are required");
             return;
         }
@@ -48,6 +49,7 @@ const Signup = () => {
             gmail: String(user.gmail),
             password: String(user.password),
             age: Number(user.age),
+            address: String(user.address),
             role: String(user.role)
         }).then((res) => res.data);
     };
@@ -112,7 +114,18 @@ const Signup = () => {
                     />
                 </div>
 
-              
+                <div className="form-group">
+                    <label htmlFor="address">Address:</label>
+                    <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        onChange={handleInputChange}
+                        value={user.address}
+                        required
+                        placeholder="Enter your address"
+                    />
+                </div>
 
                 {error && <p style={{ color: 'red' }}>{error}</p>}
 

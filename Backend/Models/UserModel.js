@@ -19,6 +19,10 @@ const regiSchema = new Schema({
     type: Number,
     required: true,
   },
+  address:{
+    type: String,
+    required: true,
+  },
   role: {
     type: String,
     enum: ['customer', 'admin', 'staff', 'product_manager', 'order_manager', 'promotion_manager', 'financial_manager'],

@@ -19,31 +19,33 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await sendRequest();
-            if (response.status === "ok") {
-                // Store user info in local storage
-                localStorage.setItem('user', JSON.stringify({
-                    name: response.name,
-                    role: response.role
-                }));
-                alert("Login Success");
-                // Navigate based on role
-                if (response.role === "customer") {
-                    history("/userdetails");
-                } else if (response.role === "admin") {
-                    history("/admin");
-                } else if (response.role === "product_manager") {
-                    history("/productmanager");
-                } else if (response.role === "order_manager"){
-                    history("/ordermanager");
+if (response.status === "ok") {
+    // Save token + user details
+    localStorage.setItem("token", response.token);
+    localStorage.setItem("user", JSON.stringify({
+        name: response.name,
+        role: response.role
+    }));
 
-                } else if(response.role ==="promotionmanager"){
-                    history("/promotionmanager")
-                } else if(response.role ==="financial_manager"){
-                    history("/financialmanager")
-                } else{
-                    alert("Unknown role");
-                }
-            } else {
+    alert("Login Success");
+    // Redirect by role
+    if (response.role === "customer") {
+        history("/userdetails");
+    } else if (response.role === "admin") {
+        history("/admin");
+    } else if (response.role === "product_manager") {
+        history("/productmanager");
+    } else if (response.role === "order_manager") {
+        history("/ordermanager");
+    } else if (response.role === "promotion_manager") {
+        history("/promotionmanager");
+    } else if (response.role === "financial_manager") {
+        history("/financialmanager");
+    } else {
+        alert("Unknown role");
+    }
+}
+ else {
                 alert("Login error: " + response.err);
             }
         } catch (err) {
