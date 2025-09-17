@@ -6,6 +6,8 @@ import axios from 'axios';
 function Admin() {
     const history = useNavigate();
     const [users, setUsers] = useState([]);
+    const [editingUser, setEditingUser] = useState(null);
+    const [editForm, setEditForm] = useState({ name: "", gmail: "", age: "", address: "", role: "" });
     const [user, setUser] = useState({
         name: "",
         gmail: "",
@@ -168,6 +170,7 @@ function Admin() {
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Age</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Address</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Role</th>
+                            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -178,6 +181,18 @@ function Admin() {
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.age}</td>
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.address}</td>
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.role}</td>
+                                <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
+                                    <button onClick={() => {
+                                        setEditingUser(u._id);
+                                        setEditForm({ name: u.name || "", gmail: u.gmail || "", age: u.age || "", address: u.address || "", role: u.role || "" });
+                                    }} style={{ marginRight: 8 }}>Edit</button>
+                                    <button onClick={async () => {
+                                        if (!window.confirm('Delete this user?')) return;
+                                        const token = localStorage.getItem('token');
+                                        await axios.delete(`http://localhost:5000/user/${u._id}`, { headers: { Authorization: token } });
+                                        await fetchUsers();
+                                    }}>Delete</button>
+                                </td>
                             </tr>
                         ))}
                         {users.length === 0 && (
@@ -188,6 +203,57 @@ function Admin() {
                     </tbody>
                 </table>
             </div>
+
+            {editingUser && (
+                <div style={{ marginTop: 24 }}>
+                    <h2>Edit User</h2>
+                    <form onSubmit={async (e) => {
+                        e.preventDefault();
+                        const token = localStorage.getItem('token');
+                        await axios.put(`http://localhost:5000/user/${editingUser}`, {
+                            name: editForm.name,
+                            gmail: editForm.gmail,
+                            age: Number(editForm.age),
+                            address: editForm.address,
+                            role: editForm.role
+                        }, { headers: { Authorization: token } });
+                        setEditingUser(null);
+                        await fetchUsers();
+                    }}>
+                        <div className="form-group">
+                            <label>Name</label>
+                            <input value={editForm.name} onChange={(e)=> setEditForm({ ...editForm, name: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                            <label>Email</label>
+                            <input type="email" value={editForm.gmail} onChange={(e)=> setEditForm({ ...editForm, gmail: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                            <label>Age</label>
+                            <input type="number" value={editForm.age} onChange={(e)=> setEditForm({ ...editForm, age: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                            <label>Address</label>
+                            <input value={editForm.address} onChange={(e)=> setEditForm({ ...editForm, address: e.target.value })} />
+                        </div>
+                        <div className="form-group">
+                            <label>Role</label>
+                            <select value={editForm.role} onChange={(e)=> setEditForm({ ...editForm, role: e.target.value })}>
+                                <option value="customer">Customer</option>
+                                <option value="admin">Admin</option>
+                                <option value="product_manager">Product Manager</option>
+                                <option value="order_manager">Order Manager</option>
+                                <option value="promotion_manager">Promotion Manager</option>
+                                <option value="financial_manager">Financial Manager</option>
+                            </select>
+                        </div>
+                        <div style={{ marginTop: 12 }}>
+                            <button type="submit" style={{ marginRight: 8 }}>Save</button>
+                            <button type="button" onClick={()=> setEditingUser(null)}>Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            )}
         </div>
     );
 }

@@ -81,7 +81,7 @@ const updateUser = async (req, res, next) => {
         return res.status(400).json({ message: "Request body is missing" });
     }
 
-    const { name, gmail, age, address, password } = req.body;
+    const { name, gmail, age, address, password, role } = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
         return res.status(400).json({ message: "Invalid user ID" });
@@ -99,6 +99,27 @@ const updateUser = async (req, res, next) => {
         const updateFields = { name, gmail, age, address };
         if (password) {
             updateFields.password = await bcrypt.hash(password, 10);
+        }
+
+        // Only admins can change the role; validate role value
+        if (typeof role !== 'undefined') {
+            const requesterRole = req.user && req.user.role;
+            const validRoles = [
+                "customer",
+                "admin",
+                "staff",
+                "product_manager",
+                "order_manager",
+                "promotion_manager",
+                "financial_manager"
+            ];
+            if (!requesterRole || requesterRole !== 'admin') {
+                return res.status(403).json({ message: "Only admins can change user roles" });
+            }
+            if (!validRoles.includes(role)) {
+                return res.status(400).json({ message: `Invalid role. Allowed values are: ${validRoles.join(", ")}` });
+            }
+            updateFields.role = role;
         }
 
         user = await Register.findByIdAndUpdate(
