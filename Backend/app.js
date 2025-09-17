@@ -1,21 +1,30 @@
 console.log("hiii");
-console.log("welcome to Snazzy")
+console.log("welcome to Snazzy");
 
-// pw-snazzy123   - admin
+// Load environment variables first
+require('dotenv').config();
 
 const express = require("express");
 const mongoose = require("mongoose");
-const router = require("./Routes/UserRoutes");
-
-const app = express();
 const cors = require("cors");
 
-//middleware
+// Routes
+const userRouter = require("./Routes/UserRoutes");
+const paymentRouter = require('./Routes/paymentRoute');
+const refundRouter = require('./Routes/refundRoute');
 
+
+const app = express();
+
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-app.use("/user", router);
+// Routes
+app.use("/user", userRouter);
+app.use("/payment" , paymentRouter);
+app.use("/refund", refundRouter);
+
 
 //database connection link
 //link - mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/
