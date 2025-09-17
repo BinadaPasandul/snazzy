@@ -14,13 +14,13 @@ function App() {
     <div>
       <React.Fragment>
         <Routes>
-          <Route path="/" element={<Login />} />
+          <Route path="/log" element={<Login />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/productmanager" element={<Productmanager />} />
           <Route path="/promotionmanager" element={<Promotionmanager />} />
-          <Route path="/ordermanager" element={<Ordermanager />} />
+          <Route path="/" element={<Ordermanager />} />
         </Routes>
       </React.Fragment>
     </div>

@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const router = require("./Routes/UserRoutes");
 const router1 = require("./Routes/ProductRoutes");
 const paymentRoute = require('./Routes/paymentRoute');
+const orderRoute = require('./Routes/OrderRoute');
 const bodyParser = require('body-parser');
 require('dotenv').config();
 
@@ -29,6 +30,9 @@ app.use('/payment', paymentRoute);
 app.use(express.json());
 app.use("/products",router1);
 
+//Binada
+app.use("/orders",orderRoute);
+
 
 //database connection link
 //link - mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/
@@ -41,6 +45,7 @@ mongoose.connect("mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/")
 })
 .catch((err)=> console.log((err)));*/
 
+
 // MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
     .then(() => console.log('MongoDB Atlas connected'))
@@ -50,7 +55,6 @@ const PORT = 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
-//Product Manager
 
 //pass = zQKIpuqwgpTycmAm
 
