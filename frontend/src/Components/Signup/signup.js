@@ -59,7 +59,7 @@ const Signup = () => {
             <Nav />
             <h1>Sign Up</h1>
             <form className="user-form" onSubmit={handleSubmit}>
-                <h2>User Information</h2>
+                
 
                 <div className="form-group">
                     <label htmlFor="name">Full Name:</label>

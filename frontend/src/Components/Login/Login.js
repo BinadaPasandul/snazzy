@@ -65,7 +65,7 @@ if (response.status === "ok") {
             <Nav />
             <h1>Login</h1>
             <form className="user-form" onSubmit={handleSubmit}>
-                <h2>User Information</h2>
+                
 
                 <div className="form-group">
                     <label htmlFor="email">Email:</label>

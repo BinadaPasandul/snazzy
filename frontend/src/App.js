@@ -1,9 +1,5 @@
 import "./App.css";
 import React from "react";
-<<<<<<< HEAD
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Signup from "./Components/Signup/signup";
-=======
 import {
   BrowserRouter as Router,
   Routes,
@@ -20,8 +16,7 @@ import PaymentForm from "./Components/Payment/PaymentForm";
 import UpdateCard from "./Components/Payment/UpdateCard";
 
 // User/Admin components
-import Signup from "./Components/Signup/Signup";
->>>>>>> 1f3d1a6f93742a00505668a98819324f92e3ccd1
+import Signup from "./Components/Signup/signup";
 import Admin from "./Components/Admin/Admin";
 import AdminRefundRequest from "./Components/Admin/AdminRefundRequest"; //senaa
 import Productmanager from "./Components/Productmanager/productmanager";
@@ -127,7 +122,6 @@ function App() {
               </ProtectedRoute>
             }
           />
-
           {/* Payment Routes */}
           <Route
             path="/cardlist"
