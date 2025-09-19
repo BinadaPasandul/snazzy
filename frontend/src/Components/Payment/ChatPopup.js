@@ -115,7 +115,7 @@ const ChatPopup = ({ paymentId, onClose }) => {
               {msg.fileUrl && msg.fileType?.startsWith("image/") && (
                 <div style={{ marginTop: 5 }}>
                   <img
-                    src={`${api.defaults.baseURL}${msg.fileUrl}`} // ✅ prepend backend URL
+                    src={`${api.defaults.baseURL}${msg.fileUrl}`} // prepend backend URL
                     alt="uploaded"
                     style={{ maxWidth: "150px", borderRadius: 6 }}
                   />

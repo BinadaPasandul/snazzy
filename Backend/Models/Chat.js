@@ -12,12 +12,12 @@ const chatSchema = new mongoose.Schema(
   {
     paymentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Payment", // ✅ Make sure you have a Payment model
+      ref: "Payment", // Payment model
       required: true,
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Register", // ✅ matches your user model
+      ref: "Register", //user model
       required: true,
     },
     messages: [messageSchema],

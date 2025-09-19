@@ -9,10 +9,10 @@ const {
 
 const router = express.Router();
 
-// User sends text or image (must include paymentId in body)
+
 router.post("/send", authMiddleware(), upload.single("image"), sendMessage);
 
-// Admin replies (text or image)
+// Admin 
 router.post(
   "/admin-reply/:paymentId",
   authMiddleware("admin"),
@@ -20,7 +20,6 @@ router.post(
   adminReply
 );
 
-// Get chat history by paymentId
 router.get("/chat/:paymentId", authMiddleware(), getChatHistory);
 
 module.exports = router;

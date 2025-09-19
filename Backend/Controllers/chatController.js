@@ -35,7 +35,7 @@ const sendMessage = async (req, res) => {
     chat.messages.push(newMessage);
     await chat.save();
 
-    // ✅ Only trigger AI if sender is user
+   //Ai response
     if (message) {
       const aiReply = await askAI(message);
       if (aiReply) {
