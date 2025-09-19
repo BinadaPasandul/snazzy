@@ -14,7 +14,7 @@ function App() {
     <div>
       <React.Fragment>
         <Routes>
-          <Route path="/" element={<Productmanager />} />
+          <Route path="/" element={<pmanager />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/admin" element={<Admin />} />
