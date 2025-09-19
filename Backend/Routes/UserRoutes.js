@@ -5,6 +5,9 @@ const User = require("../Models/UserModel");
 
 const UserController = require("../Controllers/UserController");
 const authMiddleware = require("../Middleware/authMiddleware");
+router.post("/forgot-password", UserController.forgotPassword);
+router.post("/reset-password/:token", UserController.resetPassword);
+
 
 router.post("/",UserController.addUsers);
 router.get("/", authMiddleware('admin'), UserController.getAllUsers);

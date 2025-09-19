@@ -23,6 +23,8 @@ import Productmanager from "./Components/Productmanager/productmanager";
 import Promotionmanager from "./Components/Promotionmanager/promotionmanager";
 import Ordermanager from "./Components/Ordermanager/ordermanager";
 import Login from "./Components/Login/Login";
+import ForgotPassword from "./Components/Login/ForgotPassword";
+import ResetPassword from "./Components/Login/ResetPassword";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import Userdetails from "./Components/Userdetails/Userdetails";
 import UpdateUser from "./Components/User/UpdateUser";
@@ -52,6 +54,22 @@ function App() {
             element={
               <PublicOnlyRoute>
                 <Signup />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <PublicOnlyRoute>
+                <ForgotPassword />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <PublicOnlyRoute>
+                <ResetPassword />
               </PublicOnlyRoute>
             }
           />

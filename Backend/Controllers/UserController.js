@@ -1,6 +1,8 @@
 const Register = require("../Models/UserModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 const addUsers = async (req, res, next) => {
     if (!req.body) {
@@ -203,9 +205,61 @@ const loginUser = async (req, res, next) => {
     }
 };
 
+const forgotPassword = async (req, res) => {
+  const { gmail } = req.body;
+  const user = await Register.findOne({ gmail });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+
+
+  try {
+    await sendEmail({
+      email: user.gmail,
+      subject: "Password Reset",
+      message: `You requested a password reset. Click here to reset: ${resetURL}`,
+    });
+
+    res.status(200).json({ message: "Password reset link sent to email" });
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    res.status(500).json({ message: "Error sending email" });
+  }
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+  const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
+
+  const user = await Register.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Token invalid or expired" });
+  }
+
+  user.password = await bcrypt.hash(req.body.password, 10);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Password reset successful" });
+};
+
 exports.addUsers = addUsers;
 exports.getAllUsers = getAllUsers;
 exports.getById = getById;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.loginUser = loginUser;
+exports.forgotPassword = forgotPassword;
+exports.resetPassword = resetPassword;
