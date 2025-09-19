@@ -7,6 +7,7 @@ import Admin from "./Components/Admin/Admin";
 import Productmanager from "./Components/Productmanager/productmanager";
 import Promotionmanager from "./Components/Promotionmanager/promotionmanager";
 import Ordermanager from "./Components/Ordermanager/ordermanager";
+import Checkout from "./Components/Checkout/checkout";
 
 
 function App() {
@@ -21,6 +22,8 @@ function App() {
           <Route path="/productmanager" element={<Productmanager />} />
           <Route path="/promotionmanager" element={<Promotionmanager />} />
           <Route path="/" element={<Ordermanager />} />
+          <Route path="/checkout" element={<Checkout />} />
+
         </Routes>
       </React.Fragment>
     </div>

@@ -16,12 +16,12 @@ const orderSchema = new Schema({
         required:true,//validation
 
     },
-     shoe_description:{
+     size:{
         type:String,//data type
         required:true,//validation
 
     },
-     shoe_price:{
+     quantity:{
         type:Number,//data type
         required:true,//validation
 

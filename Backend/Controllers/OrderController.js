@@ -30,14 +30,14 @@ const getAllOrders = async (req, res, next) =>{
 const addOrders = async(req, res, next) =>{
 
 console.log("Incoming body:", req.body);// added this to identify wheather there is a error in code
-const {customer_name,customer_address,shoe_description,shoe_price,payment_type}
+const {customer_name,customer_address,size,quantity,payment_type}
  = req.body;
 
      let orders;
 
         try{
 
-        orders = new Order ({customer_name,customer_address,shoe_description,shoe_price,payment_type});
+        orders = new Order ({customer_name,customer_address,size,quantity,payment_type});
         await orders.save();
 
          }catch(err){
@@ -79,11 +79,11 @@ const getById = async (req, res, next) =>{
 //update order
 const updateOrder = async (req, res, next) =>{
         const id = req.params.id;
-        const{customer_name,customer_address,shoe_description,shoe_price,payment_type}=req.body;
+        const{customer_name,customer_address,size,quantity,payment_type}=req.body;
 
         let order;
         try{
-            order= await Order.findByIdAndUpdate(id,{customer_name:customer_name,customer_address:customer_address,shoe_description:shoe_description,shoe_price:shoe_price,payment_type:payment_type});
+            order= await Order.findByIdAndUpdate(id,{customer_name:customer_name,customer_address:customer_address,size:size,quantity:quantity,payment_type:payment_type});
             order = await order.save();
         }catch (err){
         console.log(err);
