@@ -12,6 +12,7 @@ const cors = require("cors");
 const userRouter = require("./Routes/UserRoutes");
 const paymentRouter = require('./Routes/paymentRoute');
 const refundRouter = require('./Routes/refundRoute');
+const ProductRouter = require("./Routes/ProductRoutes");
 
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(cors());
 app.use("/user", userRouter);
 app.use("/payment" , paymentRouter);
 app.use("/refund", refundRouter);
+app.use("/product",ProductRouter);
 
 
 //database connection link
