@@ -25,7 +25,7 @@ app.use(cors());
 app.use("/user", userRouter);
 app.use("/payment" , paymentRouter);
 app.use("/refund", refundRouter);
-app.use("/product",ProductRouter);
+app.use("/products", ProductRouter);
 
 
 //database connection link
