@@ -9,6 +9,9 @@ const AddProducts = () => {
         pname: "",
         pcode: "",
         pamount: "",
+        psize:"",
+        pcolor:"",
+        pdescription:""
     });
     const [error, setError] = useState(null);
 
@@ -21,7 +24,7 @@ const AddProducts = () => {
         e.preventDefault();
         setError(null);
 
-        if (!product || !product.pname || !product.pcode || !product.pamount) {
+        if (!product || !product.pname || !product.pcode || !product.pamount || !product.psize || !product.pcolor || !product.pdescription) {
             setError("All fields are required");
             return;
         }
@@ -44,6 +47,9 @@ const AddProducts = () => {
             pname: String(product.pname),
             pcode: String(product.pcode),
             pamount: Number(product.pamount),
+            psize: Number(product.psize),
+            pcolor: String(product.pcolor),
+            pdescription: String(product.pdescription), 
         }).then((res) => res.data);
     };
 
@@ -138,6 +144,67 @@ const AddProducts = () => {
                             }}
                         />
                     </div>
+                    <div className="form-group" style={{ marginBottom: '20px' }}>
+                        <label htmlFor="psize" style={{ display: 'block', marginBottom: '6px' }}>
+                            Size:
+                        </label>
+                        <input
+                            type="number"
+                            id="psize"
+                            name="psize"
+                            onChange={handleInputChangep}
+                            value={product.psize}
+                            required
+                            placeholder="Enter Sizes"
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '6px',
+                                border: '1px solid #ccc'
+                            }}
+                        />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: '16px' }}>
+                        <label htmlFor="pcolor" style={{ display: 'block', marginBottom: '6px' }}>
+                            Product Colors:
+                        </label>
+                        <input
+                            type="text"
+                            id="pcolor"
+                            name="pcolor"
+                            onChange={handleInputChangep}
+                            value={product.pcolor}
+                            required
+                            placeholder="Enter Product Colors"
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '6px',
+                                border: '1px solid #ccc'
+                            }}
+                        />
+                    </div>
+                    <div className="form-group" style={{ marginBottom: '16px' }}>
+                        <label htmlFor="pdescription" style={{ display: 'block', marginBottom: '6px' }}>
+                            Product Description:
+                        </label>
+                        <input
+                            type="text"
+                            id="pdescription"
+                            name="pdescription"
+                            onChange={handleInputChangep}
+                            value={product.pdescription}
+                            required
+                            placeholder="Enter Product Description"
+                            style={{
+                                width: '100%',
+                                padding: '10px',
+                                borderRadius: '6px',
+                                border: '1px solid #ccc'
+                            }}
+                        />
+                    </div>
+                    
 
                     {error && (
                         <p style={{ color: 'red', marginBottom: '16px', textAlign: 'center' }}>

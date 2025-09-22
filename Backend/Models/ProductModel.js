@@ -14,6 +14,18 @@ const ProductSchema = new Schema({
         type:Number,
         required:true,
     },
+     psize:{
+        type:Number,
+        required:true,
+    },
+    pcolor:{
+        type:String,
+        required:true,
+    },
+    pdescription:{
+        type:String,
+        required:true,
+    },
 });
 
 module.exports = mongoose.model(

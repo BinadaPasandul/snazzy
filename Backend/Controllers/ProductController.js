@@ -23,12 +23,12 @@ const getAllProducts = async (req, res, next) =>{
 //Data insert
 const addProducts = async(req,res,next) => {
 
-    const {pname,pcode,pamount} = req.body;
+    const {pname,pcode,pamount,psize,pcolor,pdescription} = req.body;
 
     let products;
 
     try{
-        products = new Product({pname,pcode,pamount});
+        products = new Product({pname,pcode,pamount,psize,pcolor,pdescription});
         await products.save();
     }catch(err){
         console.log(err);
@@ -65,13 +65,13 @@ const getById = async(req,res,next) => {
 const updateProduct = async(req, res, next) =>{
 
     const id = req.params.id;
-    const {pname,pcode,pamount} = req.body;
+    const {pname,pcode,pamount,psize,pcolor,pdescription} = req.body;
 
     let products;
 
     try{
         products = await Product.findByIdAndUpdate(id,
-            {pname: pname,pcode: pcode,pamount: pamount});
+            {pname: pname,pcode: pcode,pamount: pamount,psize: psize,pcolor: pcolor,pdescription: pdescription});
             products = await products.save();
     }catch(err)
     {
