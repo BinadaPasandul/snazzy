@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Nav from '../Navbar/nav';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import ImgUploader from './ImgUploader';
 
 const AddProducts = () => {
     const navigate = useNavigate();
@@ -53,7 +54,9 @@ const AddProducts = () => {
         }).then((res) => res.data);
     };
 
-    return (
+    
+
+        return (
         <div style={{ background: '#f5f7fa', minHeight: '100vh' }}>
             <Nav />
             <div style={{
@@ -82,6 +85,12 @@ const AddProducts = () => {
                         Product Information
                     </h2>
 
+                    <div>
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                        <ImgUploader />
+                        </div>
+                    </div>
+                    
                     <div className="form-group" style={{ marginBottom: '16px' }}>
                         <label htmlFor="pname" style={{ display: 'block', marginBottom: '6px' }}>
                             Product Name:
@@ -234,7 +243,6 @@ const AddProducts = () => {
                 </form>
             </div>
         </div>
-    );
-};
-
+         );
+    };
 export default AddProducts;
