@@ -7,6 +7,9 @@ function Admin() {
     const history = useNavigate();
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
+    const [report, setReport] = useState(null);
+    const [loadingReport, setLoadingReport] = useState(false);
+    const [reportError, setReportError] = useState("");
     const [editForm, setEditForm] = useState({ name: "", gmail: "", age: "", address: "", role: "" });
     const [user, setUser] = useState({
         name: "",
@@ -19,14 +22,33 @@ function Admin() {
 
     const fetchUsers = async () => {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/user", {
-            headers: { Authorization: token }
-        });
-        setUsers(response.data.users || []);
+        try {
+            const response = await axios.get("http://localhost:5000/user", {
+                headers: { Authorization: token }
+            });
+            setUsers(response.data.users || []);
+        } catch (e) {
+            const msg = e?.response?.data?.message || e.message || 'Failed to fetch users';
+            alert(msg);
+            setUsers([]);
+        }
     };
 
     useEffect(() => {
         fetchUsers().catch(() => setUsers([]));
+        (async ()=>{
+            try {
+                setLoadingReport(true);
+                setReportError("");
+                const token = localStorage.getItem("token");
+                const response = await axios.get("http://localhost:5000/user/report", { headers: { Authorization: token } });
+                setReport(response.data);
+            } catch (e) {
+                setReportError(e?.response?.data?.message || e.message || "Failed to load report");
+            } finally {
+                setLoadingReport(false);
+            }
+        })();
     }, []);
 
     const handleInputChange = (e) => {
@@ -171,6 +193,30 @@ function Admin() {
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Address</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Role</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Actions</th>
+                            <th style={{ textAlign: 'right', borderBottom: '1px solid #ccc', padding: '8px' }}>
+                                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                                    
+                                    <button onClick={async ()=>{
+                                        try {
+                                            const token = localStorage.getItem('token');
+                                            const res = await axios.get('http://localhost:5000/user/export/pdf', {
+                                                headers: { Authorization: token },
+                                                responseType: 'blob'
+                                            });
+                                            const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/pdf' }));
+                                            const link = document.createElement('a');
+                                            link.href = url;
+                                            link.setAttribute('download', 'users.pdf');
+                                            document.body.appendChild(link);
+                                            link.click();
+                                            link.remove();
+                                            window.URL.revokeObjectURL(url);
+                                        } catch (e) {
+                                            alert(e?.response?.data?.message || e.message || 'Failed to download PDF');
+                                        }
+                                    }}>Download PDF</button>
+                                </div>
+                            </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -203,6 +249,8 @@ function Admin() {
                     </tbody>
                 </table>
             </div>
+
+            
 
             {editingUser && (
                 <div style={{ marginTop: 24 }}>

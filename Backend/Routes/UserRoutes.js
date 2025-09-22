@@ -64,5 +64,8 @@ router.delete("/:id", authMiddleware(), async (req, res, next) => {
   }
 });
 router.post("/login", UserController.loginUser);
+router.get("/report", authMiddleware('admin'), UserController.getUserReport);
+
+router.get("/export/pdf", authMiddleware('admin'), UserController.exportUsersPdf);
 
 module.exports = router;

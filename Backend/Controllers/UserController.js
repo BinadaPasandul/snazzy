@@ -205,6 +205,43 @@ const loginUser = async (req, res, next) => {
     }
 };
 
+// Admin: get user report/stats
+const getUserReport = async (req, res, next) => {
+    try {
+        const totalUsersPromise = Register.countDocuments();
+        const byRolePromise = Register.aggregate([
+            { $group: { _id: "$role", count: { $sum: 1 } } },
+            { $project: { _id: 0, role: "$_id", count: 1 } }
+        ]);
+        const ageStatsPromise = Register.aggregate([
+            { $group: { _id: null, avgAge: { $avg: "$age" }, minAge: { $min: "$age" }, maxAge: { $max: "$age" } } },
+            { $project: { _id: 0, avgAge: { $round: ["$avgAge", 1] }, minAge: 1, maxAge: 1 } }
+        ]);
+
+        const [totalUsers, byRole, ageStatsArr] = await Promise.all([
+            totalUsersPromise,
+            byRolePromise,
+            ageStatsPromise
+        ]);
+
+        const roleBreakdown = {};
+        for (const r of byRole) {
+            roleBreakdown[r.role] = r.count;
+        }
+
+        const ageStats = ageStatsArr && ageStatsArr[0] ? ageStatsArr[0] : { avgAge: 0, minAge: 0, maxAge: 0 };
+
+        return res.status(200).json({
+            totalUsers,
+            roleBreakdown,
+            age: ageStats
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while generating user report" });
+    }
+};
+
 const forgotPassword = async (req, res) => {
   const { gmail } = req.body;
   const user = await Register.findOne({ gmail });
@@ -261,5 +298,43 @@ exports.getById = getById;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.loginUser = loginUser;
+exports.getUserReport = getUserReport;
+
+
+
+// Admin: export all users as PDF (exclude password)
+const PDFDocument = require('pdfkit');
+const exportUsersPdf = async (req, res, next) => {
+    try {
+        const users = await Register.find({}, { password: 0 }).lean();
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="users.pdf"');
+
+        const doc = new PDFDocument({ size: 'A4', margin: 40 });
+        doc.pipe(res);
+
+        doc.fontSize(18).text('Users Report', { align: 'center' });
+        doc.moveDown();
+
+        const header = ['Name', 'Email', 'Age', 'Address', 'Role'];
+        doc.fontSize(12).text(header.join(' | '));
+        doc.moveDown(0.3);
+        doc.moveTo(40, doc.y).lineTo(555, doc.y).stroke();
+        doc.moveDown(0.5);
+
+        users.forEach((u) => {
+            const line = [u.name || '', u.gmail || '', u.age ?? '', u.address || '', u.role || ''].join(' | ');
+            doc.text(line, { continued: false });
+        });
+
+        doc.end();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while exporting users PDF" });
+    }
+};
+
+exports.exportUsersPdf = exportUsersPdf;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;
