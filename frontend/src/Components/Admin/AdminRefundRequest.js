@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/api";
+import AdminChatPopup from "./AdminChatPopup"; 
+
 
 const AdminRefundRequests = () => {
   const [refunds, setRefunds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [chatPaymentId, setChatPaymentId] = useState(null); // track which payment's chat is open
 
-  // Fetch all refund requests
   const fetchRefunds = async () => {
     try {
       const res = await api.get("/refund/all");
@@ -19,11 +21,10 @@ const AdminRefundRequests = () => {
     }
   };
 
-  // Handle approve/reject
   const handleAction = async (requestId, action) => {
     try {
       await api.put(`/refund/handle/${requestId}`, { action });
-      fetchRefunds(); // refresh after action
+      fetchRefunds(); 
     } catch (err) {
       console.error("Error handling refund:", err);
       alert("Failed to update refund status");
@@ -76,29 +77,44 @@ const AdminRefundRequests = () => {
                   {new Date(req.createdAt).toLocaleString()}
                 </td>
                 <td className="p-2 border">
-                  {req.status === "pending" ? (
-                    <div className="flex gap-2 justify-center">
-                      <button
-                        onClick={() => handleAction(req._id, "approve")}
-                        className="px-3 py-1 bg-green-500 text-white rounded"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleAction(req._id, "reject")}
-                        className="px-3 py-1 bg-red-500 text-white rounded"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="italic text-gray-500">No action</span>
-                  )}
+                  <div className="flex gap-2 justify-center">
+                    {req.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => handleAction(req._id, "approve")}
+                          className="px-3 py-1 bg-green-500 text-white rounded"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleAction(req._id, "reject")}
+                          className="px-3 py-1 bg-red-500 text-white rounded"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {/* Chat button */}
+                    <button
+                      onClick={() => setChatPaymentId(req.paymentId?._id)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded"
+                    >
+                      Chat
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Chat popup */}
+      {chatPaymentId && (
+        <AdminChatPopup
+          paymentId={chatPaymentId}
+          onClose={() => setChatPaymentId(null)}
+        />
       )}
     </div>
   );

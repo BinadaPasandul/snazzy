@@ -12,19 +12,21 @@ const cors = require("cors");
 const userRouter = require("./Routes/UserRoutes");
 const paymentRouter = require('./Routes/paymentRoute');
 const refundRouter = require('./Routes/refundRoute');
-
+const chatRouter = require('./Routes/chatRoute');
 
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use('/uploads', express.static('Uploads'));
+
 
 // Routes
 app.use("/user", userRouter);
 app.use("/payment" , paymentRouter);
 app.use("/refund", refundRouter);
-
+app.use("/chat", chatRouter);
 
 //database connection link
 //link - mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/
