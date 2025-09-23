@@ -24,7 +24,7 @@ const DisplayProducts = () => {
 
   // Navigate to product detail/edit page
   const handleProductClick = (id) => {
-    navigate(`/admin/products/${id}`); // adjust the route as needed
+    navigate(`/products/${id}`); // adjust the route as needed
   };
 
   return (
