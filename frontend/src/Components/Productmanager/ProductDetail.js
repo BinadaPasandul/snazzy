@@ -93,6 +93,7 @@ const ProductDetail = () => {
             <p style={{ margin: "6px 0" }}><strong>Amount:</strong> {product.pamount}</p>
             <p style={{ margin: "6px 0" }}><strong>Size:</strong> {product.psize}</p>
             <p style={{ margin: "6px 0" }}><strong>Color:</strong> {product.pcolor}</p>
+            <p style={{ margin: "6px 0" }}><strong>Quantity:</strong> {product.quantity}</p>
             <p style={{ margin: "12px 0", color: "#555" }}>{product.pdescription}</p>
 
             <div style={{ marginTop: "20px", display: "flex", gap: "16px" }}>

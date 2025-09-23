@@ -12,7 +12,8 @@ const AddProducts = () => {
     pamount: "",
     psize: "",
     pcolor: "",
-    pdescription: ""
+    pdescription: "",
+    quantity: ""
   });
   const [imageFile, setImageFile] = useState(null);
   const [error, setError] = useState(null);
@@ -52,6 +53,7 @@ const AddProducts = () => {
       formData.append("psize", product.psize);
       formData.append("pcolor", product.pcolor);
       formData.append("pdescription", product.pdescription);
+      formData.append("quantity", product.quantity);
       formData.append("image", imageFile); // field name must match upload.single("image")
 
       const res = await axios.post("http://localhost:5000/products", formData, {
@@ -103,6 +105,7 @@ const AddProducts = () => {
             { label: "Price", name: "pamount", type: "number" },
             { label: "Size", name: "psize", type: "number" },
             { label: "Color", name: "pcolor", type: "text" },
+            { label: "Quantity", name: "quantity", type: "number" },
             { label: "Description", name: "pdescription", type: "text" },
           ].map((field) => (
             <div key={field.name} style={{ marginBottom: "16px" }}>

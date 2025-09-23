@@ -13,6 +13,7 @@ const DisplayProducts = () => {
     psize: "",
     pcolor: "",
     pdescription: "",
+    quantity: "",
     image: null,
   });
 
@@ -53,6 +54,7 @@ const DisplayProducts = () => {
       psize: product.psize,
       pcolor: product.pcolor,
       pdescription: product.pdescription,
+      quantity: product.quantity,
       image: null,
     });
   };
@@ -78,6 +80,7 @@ const DisplayProducts = () => {
       formData.append("psize", editedProduct.psize);
       formData.append("pcolor", editedProduct.pcolor);
       formData.append("pdescription", editedProduct.pdescription);
+      formData.append("quantity", editedProduct.quantity);
       if (editedProduct.image) {
         formData.append("image", editedProduct.image);
       }
@@ -157,7 +160,7 @@ const DisplayProducts = () => {
               {editingId === p._id ? (
                 // EDIT FORM
                 <>
-                  {["pname", "pcode", "pamount", "psize", "pcolor", "pdescription"].map(
+                  {["pname", "pcode", "pamount", "psize", "pcolor", "pdescription", "quantity"].map(
                     (field) => (
                       <input
                         key={field}
@@ -214,6 +217,7 @@ const DisplayProducts = () => {
                   <p><strong>Amount:</strong> {p.pamount}</p>
                   <p><strong>Size:</strong> {p.psize}</p>
                   <p><strong>Color:</strong> {p.pcolor}</p>
+                    <p><strong>Quantity:</strong> {p.quantity}</p>
                   <p>{p.pdescription}</p>
                   {/* ACTION BUTTONS */}
                   <div>

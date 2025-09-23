@@ -99,6 +99,7 @@ const DisplayProducts = () => {
               <p><strong>Amount:</strong> {p.pamount}</p>
               <p><strong>Size:</strong> {p.psize}</p>
               <p><strong>Color:</strong> {p.pcolor}</p>
+                <p><strong>Quantity:</strong> {p.quantity}</p>
               <p style={{ color: "#777" }}>{p.pdescription}</p>
             </div>
           ))}

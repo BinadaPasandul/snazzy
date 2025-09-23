@@ -8,5 +8,7 @@ router.post("/", upload.single("image"), ProductController.addProducts);
 router.get("/:id", ProductController.getById);
 router.put("/:id", upload.single("image"), ProductController.updateProduct);
 router.delete("/:id", ProductController.deleteProduct);
+router.post("/products/:id/purchase", ProductController.purchaseProduct);
+
 
 module.exports = router;
