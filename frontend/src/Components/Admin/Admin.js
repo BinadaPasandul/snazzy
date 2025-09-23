@@ -172,7 +172,7 @@ function Admin() {
                         <option value="product_manager">Product Manager</option>
                         <option value="order_manager">Order Manager</option>
                         <option value="promotion_manager">Promotion Manager</option>
-                        <option value="financial_manager">Financial Manager</option>
+                        
                     </select>
                 </div>
 
