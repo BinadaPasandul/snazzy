@@ -15,6 +15,7 @@ function OrderManager() {
     customer_name: "",
     customer_address: "",
     shoe_description: "",
+    product_code:"",
     shoe_price: "",
     size: "",
     quantity: "",
@@ -31,6 +32,7 @@ function OrderManager() {
       customer_name: order.customer_name,
       customer_address: order.customer_address,
       shoe_description: order.shoe_description,
+      product_code:order.product_code,
       shoe_price: order.shoe_price,
       size: order.size,
       quantity: order.quantity,
@@ -87,6 +89,7 @@ function OrderManager() {
               <th>Customer Name</th>
               <th>Address</th>
               <th>Shoe Description</th>
+              <th>Product code</th>
               <th>Price</th>
               <th>Size</th>
               <th>Quantity</th>
@@ -100,6 +103,7 @@ function OrderManager() {
                 <td>{order.customer_name}</td>
                 <td>{order.customer_address}</td>
                 <td>{order.shoe_description}</td>
+                <td>{order.product_code}</td>
                 <td>{order.shoe_price}</td>
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
@@ -174,6 +178,17 @@ function OrderManager() {
                   required
                 />
               </div>
+              <div>
+                <label>Product Code:</label>
+                <input
+                  type="text"
+                  name="shoe_description"
+                  value={formData.product_code}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+
               <div>
                 <label>Price:</label>
                 <input
