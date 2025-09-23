@@ -60,3 +60,46 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 
 
+//image adding part
+require("./Models/ImageModel");
+const ImageSchema = mongoose.model("ImageModel");
+
+const multerimg = require("multer");
+
+const storageimg = multerimg.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,"../frontend/src/Components/Image/files");
+    },
+    
+    filename:function(req,file,cb){
+    
+    const uniqueSuffix = Date.now();
+    cb(null,uniqueSuffix+file.originalname);
+    }
+
+});
+
+const uploadimg = multerimg({storage: storageimg});
+app.post("/uploadImg",uploadimg.single("image"),async(req,res)=>{
+        console.log(req.body);
+        const imageName = req.file.filename;
+
+        try{
+            await ImageSchema.create({image:imageName});
+            res.status(200).json({message:"Image Added Successfully"});
+        }catch(err){
+            res.status(500).json({message:"Error in adding image"});
+        }
+});
+
+//Display IMG
+
+app.get("/getImage",async(req,res)=>{
+try{
+    ImageSchema.find({}).then((data)=>{
+        res.status(200).json({data:data});
+    });
+}catch(err){
+    res.status(500).json({message:"Error in getting image"});
+}
+});

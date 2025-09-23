@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Nav from '../Navbar/nav';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import ImgUploader from './ImgUploader';
+import ImgUploader from '../Image/ImgUploader';
 
 const AddProducts = () => {
     const navigate = useNavigate();

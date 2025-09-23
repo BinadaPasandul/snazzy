@@ -105,10 +105,10 @@ const ImgUploader = () => {
               gap: '12px',
             }}
           >
-            {allImages.map((img) => (
+            {allImages.map((data) => (
               <img
-                key={img._id || img.url}
-                src={img.url}
+                key={data._id}
+                src={'http://localhost:5000/files/${data.image}'}
                 alt="uploaded"
                 style={{
                   width: '100%',
