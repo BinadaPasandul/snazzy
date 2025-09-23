@@ -1,111 +1,77 @@
 const Product = require("../Models/ProductModel");
 
-const getAllProducts = async (req, res, next) =>{
+const addProducts = async (req, res) => {
+  const { pname, pcode, pamount, psize, pcolor, pdescription } = req.body;
+  const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
-    let Products;
-
-    //get all products
-    try{
-        products = await Product.find();
-    }catch (err) {
-        console.log(err);
-    }
-    //not found
-    if(!products){
-        return res.status(404).json({message:"Product not found"});
-
-    }
-    //Display all products
-    return res.status(200).json({products});
-
+  try {
+    const product = new Product({
+      pname,
+      pcode,
+      pamount,
+      psize,
+      pcolor,
+      pdescription,
+      image: imagePath
+    });
+    await product.save();
+    return res.status(201).json({ product });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unable to add product" });
+  }
 };
 
-//Data insert
-const addProducts = async(req,res,next) => {
+const updateProduct = async (req, res) => {
+  const id = req.params.id;
+  const { pname, pcode, pamount, psize, pcolor, pdescription } = req.body;
+  const updateData = { pname, pcode, pamount, psize, pcolor, pdescription };
 
-    const {pname,pcode,pamount,psize,pcolor,pdescription} = req.body;
+  // If a new image is uploaded, replace the old one
+  if (req.file) {
+    updateData.image = `/uploads/${req.file.filename}`;
+  }
 
-    let products;
-
-    try{
-        products = new Product({pname,pcode,pamount,psize,pcolor,pdescription});
-        await products.save();
-    }catch(err){
-        console.log(err);
-    }
-    //If data not inserting 
-    if(!products){
-        return res.status(404).json({message:"unable to add products"});
-    }
-    return res.status(200).json({products});
-
+  try {
+    const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    return res.status(200).json({ product });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Unable to update product" });
+  }
 };
 
-//Get by ID
-const getById = async(req,res,next) => {
-
-    const id = req.params.id;
-
-    let product;
-
-    try{
-        product = await Product.findById(id);
-    }catch(err){
-        console.log(err);
+module.exports = {
+  getAllProducts: async (req, res) => {
+    try {
+      const products = await Product.find();
+      return res.status(200).json({ products });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching products" });
     }
-    //if no product available to that id
-      if(!product){
-        return res.status(404).json({message:"unable to get product"});
+  },
+  addProducts,
+  getById: async (req, res) => {
+    try {
+      const product = await Product.findById(req.params.id);
+      if (!product) return res.status(404).json({ message: "Product not found" });
+      return res.status(200).json({ product });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching product" });
     }
-    return res.status(200).json({product});
-
+  },
+  updateProduct,
+  deleteProduct: async (req, res) => {
+    try {
+      const product = await Product.findByIdAndDelete(req.params.id);
+      if (!product) return res.status(404).json({ message: "Product not found" });
+      return res.status(200).json({ product });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error deleting product" });
+    }
+  }
 };
-
-//Update User Details
-const updateProduct = async(req, res, next) =>{
-
-    const id = req.params.id;
-    const {pname,pcode,pamount,psize,pcolor,pdescription} = req.body;
-
-    let products;
-
-    try{
-        products = await Product.findByIdAndUpdate(id,
-            {pname: pname,pcode: pcode,pamount: pamount,psize: psize,pcolor: pcolor,pdescription: pdescription});
-            products = await products.save();
-    }catch(err)
-    {
-        console.log(err);
-    }
-        if(!products){
-        return res.status(404).json({message:"unable to Update"});
-    }
-    return res.status(200).json({products});
-
-     
-};
-
-//Delete Product Details
-const deleteProduct = async(req,res,next)=>{
-        const id = req.params.id;
-
-        let product;
-
-        try{
-            product = await Product.findByIdAndDelete(id);
-        }
-        catch(err){
-            console.log(err)
-        }
-            if(!product){
-        return res.status(404).json({message:"unable to Delete"});
-    }
-    return res.status(200).json({product});
-
-}
-
-exports.getAllProducts = getAllProducts;
-exports.addProducts = addProducts;
-exports.getById = getById;
-exports.updateProduct = updateProduct;
-exports.deleteProduct = deleteProduct;

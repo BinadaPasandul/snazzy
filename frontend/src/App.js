@@ -7,6 +7,11 @@ import Admin from "./Components/Admin/Admin";
 import Productmanager from "./Components/Productmanager/productmanager";
 import Promotionmanager from "./Components/Promotionmanager/promotionmanager";
 import Ordermanager from "./Components/Ordermanager/ordermanager";
+import DisplayProducts from "./Components/Productmanager/displayproducts";
+import ItemDisplay from "./Components/Productmanager/itempage";
+
+
+
 
 
 function App() {
@@ -21,6 +26,8 @@ function App() {
           <Route path="/productmanager" element={<Productmanager />} />
           <Route path="/promotionmanager" element={<Promotionmanager />} />
           <Route path="/" element={<Ordermanager />} />
+          <Route path="/products" element={<DisplayProducts />} />
+          <Route path="/items" element={<ItemDisplay />} />
         </Routes>
       </React.Fragment>
     </div>
