@@ -29,6 +29,10 @@ const regiSchema = new Schema({
     enum: ['customer', 'admin', 'staff', 'product_manager', 'order_manager', 'promotion_manager', 'financial_manager'],
     default: 'customer',
   },
+  loyaltyPoints: {
+    type: Number,
+    default: 0,
+  },
   stripeCustomerId: { type: String },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
