@@ -16,6 +16,8 @@ const chatRouter = require('./Routes/chatRoute');
 const orderRoute = require('./Routes/OrderRoute');
 const promotionRouter = require('./Routes/PromotionRoute');
 const bodyParser = require('body-parser');
+const ProductRouter = require("./Routes/ProductRoutes");
+
 
 const app = express();
 

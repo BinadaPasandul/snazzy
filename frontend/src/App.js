@@ -227,7 +227,35 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+           <Route
+            path="/products"
+            element={
+              <ProtectedRoute role="product_manager">
+                <DisplayProducts />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/items"
+            element={
+                <ItemDisplay />
+            }
+          />
+             <Route
+            path="/products/:id"
+            element={
+                <ProductDetail />
+            }
+          />
+          <Route
+            path="/products/:id/edit"
+            element={
+              <ProtectedRoute role="product_manager">
+                <UpdateProduct />
+              </ProtectedRoute>
+            }
+          />
+          
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

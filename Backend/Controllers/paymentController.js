@@ -1,47 +1,48 @@
 const Stripe = require('stripe');
-const Payment = require('../Models/Payment');
 const PaymentMethod = require('../Models/PaymentMethod');
+const Payment = require('../Models/Payment');
+const Register = require('../Models/UserModel');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 // Add a card
 exports.addCard = async (req, res) => {
   const { paymentMethodId } = req.body;
-  
-  // Ensure user is set by JWT middleware
   const userId = req.user?.id;
-  if (!userId) return res.status(401).json({ message: 'User not authenticated' });
 
-  if (!paymentMethodId) {
-    return res.status(400).json({ message: 'paymentMethodId required' });
-  }
+  if (!userId) return res.status(401).json({ message: 'User not authenticated' });
+  if (!paymentMethodId) return res.status(400).json({ message: 'paymentMethodId required' });
 
   try {
-    // Retrieve the payment method from Stripe
+    const user = await Register.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    let customerId = user.stripeCustomerId;
+    if (!customerId) {
+      const customer = await stripe.customers.create({ email: user.gmail, name: user.name });
+      customerId = customer.id;
+      user.stripeCustomerId = customerId;
+      await user.save();
+    }
+
+    await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+    await stripe.customers.update(customerId, { invoice_settings: { default_payment_method: paymentMethodId } });
+
     const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
 
-    // Check if it is a card
-    if (!pm.card) {
-      return res.status(400).json({ message: 'Payment method is not a card' });
-    }
-
-    // Prevent adding duplicate cards
     const existing = await PaymentMethod.findOne({ stripePaymentMethodId: paymentMethodId });
-    if (existing) {
-      return res.status(400).json({ message: 'Card already added' });
-    }
+    if (existing) return res.status(400).json({ message: 'Card already added' });
 
-    // Create new PaymentMethod document
     const newCard = new PaymentMethod({
       userId,
+      stripeCustomerId: customerId,
       stripePaymentMethodId: paymentMethodId,
       cardBrand: pm.card.brand,
       last4: pm.card.last4,
       expMonth: pm.card.exp_month,
-      expYear: pm.card.exp_year
+      expYear: pm.card.exp_year,
     });
 
     await newCard.save();
-
     res.status(200).json({ message: 'Card added', paymentMethod: newCard });
 
   } catch (err) {
@@ -49,6 +50,7 @@ exports.addCard = async (req, res) => {
     res.status(500).json({ message: err.message || 'Server error' });
   }
 };
+
 
 // Get all cards
 exports.getCards = async (req, res) => {
@@ -106,8 +108,13 @@ exports.deleteCard = async (req, res) => {
   const { cardId } = req.params;
 
   try {
-    const deleted = await PaymentMethod.findOneAndDelete({ _id: cardId, userId });
-    if (!deleted) return res.status(404).json({ message: 'Card not found' });
+    const card = await PaymentMethod.findOne({ _id: cardId, userId });
+    if (!card) return res.status(404).json({ message: 'Card not found' });
+
+    // Detach card from Stripe
+    await stripe.paymentMethods.detach(card.stripePaymentMethodId);
+
+    await card.deleteOne();
     res.status(200).json({ message: 'Card deleted' });
   } catch (err) {
     console.error(err);
@@ -121,28 +128,30 @@ exports.createPayment = async (req, res) => {
   const { amount, paymentMethodId } = req.body;
 
   if (!userId) return res.status(401).json({ message: 'User not authenticated' });
-  if (!amount || !paymentMethodId) 
-    return res.status(400).json({ message: 'amount & paymentMethodId required' });
+  if (!amount || !paymentMethodId) return res.status(400).json({ message: 'amount & paymentMethodId required' });
 
   try {
-    // Verify the card exists for this user
+    const user = await Register.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
     const pm = await PaymentMethod.findOne({ userId, stripePaymentMethodId: paymentMethodId });
     if (!pm) return res.status(400).json({ message: 'Invalid payment method' });
 
-    // Create the PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // in cents
+      amount: Math.round(amount * 100),
       currency: 'usd',
+      customer: user.stripeCustomerId,
       payment_method: paymentMethodId,
+      off_session: true,
       confirm: true,
-      automatic_payment_methods: { enabled: true, allow_redirects: 'never' }, // fix
     });
 
-    // Save payment record in DB
     const payment = new Payment({
       userId,
       amount,
       stripePaymentId: paymentIntent.id,
+      currency: 'usd',
+      status: paymentIntent.status,
     });
     await payment.save();
 
@@ -158,6 +167,7 @@ exports.createPayment = async (req, res) => {
     res.status(500).json({ message: err.message || 'Server error' });
   }
 };
+
 // Get all payments for the logged-in user
 exports.getPayments = async (req, res) => {
   const userId = req.user?.id; // from JWT middleware
