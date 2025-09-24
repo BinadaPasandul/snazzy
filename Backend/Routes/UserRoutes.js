@@ -5,6 +5,9 @@ const User = require("../Models/UserModel");
 
 const UserController = require("../Controllers/UserController");
 const authMiddleware = require("../Middleware/authMiddleware");
+router.post("/forgot-password", UserController.forgotPassword);
+router.post("/reset-password/:token", UserController.resetPassword);
+
 
 router.post("/",UserController.addUsers);
 router.get("/", authMiddleware('admin'), UserController.getAllUsers);
@@ -61,5 +64,8 @@ router.delete("/:id", authMiddleware(), async (req, res, next) => {
   }
 });
 router.post("/login", UserController.loginUser);
+router.get("/report", authMiddleware('admin'), UserController.getUserReport);
+
+router.get("/export/pdf", authMiddleware('admin'), UserController.exportUsersPdf);
 
 module.exports = router;

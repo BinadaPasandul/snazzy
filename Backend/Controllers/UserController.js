@@ -1,6 +1,8 @@
 const Register = require("../Models/UserModel");
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 const addUsers = async (req, res, next) => {
     if (!req.body) {
@@ -203,9 +205,136 @@ const loginUser = async (req, res, next) => {
     }
 };
 
+// Admin: get user report/stats
+const getUserReport = async (req, res, next) => {
+    try {
+        const totalUsersPromise = Register.countDocuments();
+        const byRolePromise = Register.aggregate([
+            { $group: { _id: "$role", count: { $sum: 1 } } },
+            { $project: { _id: 0, role: "$_id", count: 1 } }
+        ]);
+        const ageStatsPromise = Register.aggregate([
+            { $group: { _id: null, avgAge: { $avg: "$age" }, minAge: { $min: "$age" }, maxAge: { $max: "$age" } } },
+            { $project: { _id: 0, avgAge: { $round: ["$avgAge", 1] }, minAge: 1, maxAge: 1 } }
+        ]);
+
+        const [totalUsers, byRole, ageStatsArr] = await Promise.all([
+            totalUsersPromise,
+            byRolePromise,
+            ageStatsPromise
+        ]);
+
+        const roleBreakdown = {};
+        for (const r of byRole) {
+            roleBreakdown[r.role] = r.count;
+        }
+
+        const ageStats = ageStatsArr && ageStatsArr[0] ? ageStatsArr[0] : { avgAge: 0, minAge: 0, maxAge: 0 };
+
+        return res.status(200).json({
+            totalUsers,
+            roleBreakdown,
+            age: ageStats
+        });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while generating user report" });
+    }
+};
+
+const forgotPassword = async (req, res) => {
+  const { gmail } = req.body;
+  const user = await Register.findOne({ gmail });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const resetToken = user.createPasswordResetToken();
+  await user.save({ validateBeforeSave: false });
+
+  const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+
+
+  try {
+    await sendEmail({
+      email: user.gmail,
+      subject: "Password Reset",
+      message: `You requested a password reset. Click here to reset: ${resetURL}`,
+    });
+
+    res.status(200).json({ message: "Password reset link sent to email" });
+  } catch (err) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+    res.status(500).json({ message: "Error sending email" });
+  }
+};
+
+// Reset Password
+const resetPassword = async (req, res) => {
+  const hashedToken = crypto.createHash("sha256").update(req.params.token).digest("hex");
+
+  const user = await Register.findOne({
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(400).json({ message: "Token invalid or expired" });
+  }
+
+  user.password = await bcrypt.hash(req.body.password, 10);
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: "Password reset successful" });
+};
+
 exports.addUsers = addUsers;
 exports.getAllUsers = getAllUsers;
 exports.getById = getById;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.loginUser = loginUser;
+exports.getUserReport = getUserReport;
+
+
+
+// Admin: export all users as PDF (exclude password)
+const PDFDocument = require('pdfkit');
+const exportUsersPdf = async (req, res, next) => {
+    try {
+        const users = await Register.find({}, { password: 0 }).lean();
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename="users.pdf"');
+
+        const doc = new PDFDocument({ size: 'A4', margin: 40 });
+        doc.pipe(res);
+
+        doc.fontSize(18).text('Users Report', { align: 'center' });
+        doc.moveDown();
+
+        const header = ['Name', 'Email', 'Age', 'Address', 'Role'];
+        doc.fontSize(12).text(header.join(' | '));
+        doc.moveDown(0.3);
+        doc.moveTo(40, doc.y).lineTo(555, doc.y).stroke();
+        doc.moveDown(0.5);
+
+        users.forEach((u) => {
+            const line = [u.name || '', u.gmail || '', u.age ?? '', u.address || '', u.role || ''].join(' | ');
+            doc.text(line, { continued: false });
+        });
+
+        doc.end();
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Server error while exporting users PDF" });
+    }
+};
+
+exports.exportUsersPdf = exportUsersPdf;
+exports.forgotPassword = forgotPassword;
+exports.resetPassword = resetPassword;

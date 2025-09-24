@@ -12,6 +12,9 @@ const cors = require("cors");
 const userRouter = require("./Routes/UserRoutes");
 const paymentRouter = require('./Routes/paymentRoute');
 const refundRouter = require('./Routes/refundRoute');
+const chatRouter = require('./Routes/chatRoute');
+const orderRoute = require('./Routes/OrderRoute');
+const bodyParser = require('body-parser');
 const ProductRouter = require("./Routes/ProductRoutes");
 
 
@@ -20,12 +23,13 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors());
+app.use('/uploads', express.static('Uploads'));
+
 
 // Routes
 app.use("/user", userRouter);
 app.use("/payment" , paymentRouter);
 app.use("/refund", refundRouter);
-app.use("/products", ProductRouter);
 
 
 //database connection link

@@ -23,10 +23,15 @@ import Productmanager from "./Components/Productmanager/productmanager";
 import Promotionmanager from "./Components/Promotionmanager/promotionmanager";
 import Ordermanager from "./Components/Ordermanager/ordermanager";
 import Login from "./Components/Login/Login";
+import ForgotPassword from "./Components/Login/ForgotPassword";
+import ResetPassword from "./Components/Login/ResetPassword";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import Userdetails from "./Components/Userdetails/Userdetails";
 import UpdateUser from "./Components/User/UpdateUser";
 import PublicOnlyRoute from "./Components/PublicOnlyRoute";
+
+import Checkout from "./Components/Checkout/checkout";
+import MyOrders from "./Components/MyOrders/myorders";
 
 // Initialize Stripe
 const stripePromise = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
@@ -55,13 +60,30 @@ function App() {
               </PublicOnlyRoute>
             }
           />
+          <Route
+            path="/forgot-password"
+            element={
+              <PublicOnlyRoute>
+                <ForgotPassword />
+              </PublicOnlyRoute>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <PublicOnlyRoute>
+                <ResetPassword />
+              </PublicOnlyRoute>
+            }
+          />
+          
 
           {/* Protected Routes */}
           <Route
             path="/"
             element={
               <ProtectedRoute>
-                <Userdetails />
+                <Login />
               </ProtectedRoute>
             }
           />
@@ -81,6 +103,25 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute role="customer">
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+
+            <Route
+            path="/myorders"
+            element={
+              <ProtectedRoute role="customer">
+                <MyOrders />
+              </ProtectedRoute>
+            }
+          />
+
           <Route
             path="/admin"
             element={
@@ -114,6 +155,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          
           <Route
             path="/promotionmanager"
             element={
