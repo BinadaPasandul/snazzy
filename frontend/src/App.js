@@ -29,6 +29,10 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import Userdetails from "./Components/Userdetails/Userdetails";
 import UpdateUser from "./Components/User/UpdateUser";
 import PublicOnlyRoute from "./Components/PublicOnlyRoute";
+import DisplayProducts from "./Components/Productmanager/displayproducts";
+import UpdateProduct from "./Components/Productmanager/UpdateProduct";
+import ItemDisplay from "./Components/Productmanager/itempage";
+import ProductDetail from "./Components/Productmanager/productdetail";
 
 import Checkout from "./Components/Checkout/checkout";
 import MyOrders from "./Components/MyOrders/myorders";
@@ -197,7 +201,35 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+           <Route
+            path="/products"
+            element={
+              <ProtectedRoute role="product_manager">
+                <DisplayProducts />
+              </ProtectedRoute>
+            }
+          />
+           <Route
+            path="/items"
+            element={
+                <ItemDisplay />
+            }
+          />
+             <Route
+            path="/products/:id"
+            element={
+                <ProductDetail />
+            }
+          />
+          <Route
+            path="/products/:id/edit"
+            element={
+              <ProtectedRoute role="product_manager">
+                <UpdateProduct />
+              </ProtectedRoute>
+            }
+          />
+          
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
