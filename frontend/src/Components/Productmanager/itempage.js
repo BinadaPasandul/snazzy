@@ -96,7 +96,7 @@ const DisplayProducts = () => {
 
               <h2 style={{ margin: "8px 0", fontSize: "18px", color: "#333" }}>{p.pname}</h2>
               <p><strong>Code:</strong> {p.pcode}</p>
-              <p><strong>Amount:</strong> {p.pamount}</p>
+              <p><strong>Price:</strong> {p.pamount}</p>
               <p><strong>Size:</strong> {p.psize}</p>
               <p><strong>Color:</strong> {p.pcolor}</p>
                 <p><strong>Quantity:</strong> {p.quantity}</p>
