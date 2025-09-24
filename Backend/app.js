@@ -30,6 +30,9 @@ app.use('/uploads', express.static('Uploads'));
 app.use("/user", userRouter);
 app.use("/payment" , paymentRouter);
 app.use("/refund", refundRouter);
+app.use("/chat", chatRouter);
+app.use("/orders",orderRoute);
+app.use("/products", ProductRouter);
 
 
 //database connection link
