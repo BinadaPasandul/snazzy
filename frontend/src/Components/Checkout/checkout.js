@@ -39,7 +39,7 @@ function Checkout() {
     try {
       await api.post("/orders", form);
       alert("✅ Order placed successfully!");
-      navigate("/myorders"); 
+      navigate("/myorders");
     } catch (err) {
       console.error("Order failed:", err.response?.data || err.message);
       alert("⚠️ Error placing order");
@@ -101,6 +101,7 @@ function Checkout() {
             onChange={handleChange}
             required
           />
+
           <select
             name="payment_type"
             value={form.payment_type}
@@ -110,7 +111,10 @@ function Checkout() {
             <option value="card">Card</option>
           </select>
 
-          <button type="submit">Submit Order</button>
+          {/* ✅ Show submit button only if payment type is cash */}
+          {form.payment_type === "cash" && (
+            <button type="submit">Submit Order</button>
+          )}
         </form>
       </div>
 
