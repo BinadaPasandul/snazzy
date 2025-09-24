@@ -1,0 +1,114 @@
+/* Container */
+.promotions-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 40px 20px;
+  background: #f5f7fb;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Promotion Card */
+.promotion-card {
+  position: relative;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.promotion-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Banner Image */
+.promotion-banner {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  transition: transform 0.3s ease;
+}
+
+.promotion-card:hover .promotion-banner {
+  transform: scale(1.05);
+}
+
+/* Title */
+.promotion-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a202c;
+  margin-bottom: 8px;
+}
+
+/* Description */
+.promotion-description {
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+
+/* Discount Badge */
+.promotion-discount {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  padding: 6px 14px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-bottom: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promotion-card:hover .promotion-discount {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+/* Countdown Timer Badge */
+.promotion-countdown {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ff416c, #ff4b2b);
+  padding: 6px 12px;
+  border-radius: 12px;
+  display: inline-block;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.promotion-card:hover .promotion-countdown {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+
+/* Countdown Timer */
+.promotion-countdown {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e53e3e;
+  background: #fff5f5;
+  padding: 4px 10px;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .promotions-container {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+}

@@ -14,6 +14,7 @@ const paymentRouter = require('./Routes/paymentRoute');
 const refundRouter = require('./Routes/refundRoute');
 const chatRouter = require('./Routes/chatRoute');
 const orderRoute = require('./Routes/OrderRoute');
+const promotionRouter = require('./Routes/PromotionRoute');
 const bodyParser = require('body-parser');
 
 const app = express();
@@ -30,6 +31,7 @@ app.use("/payment" , paymentRouter);
 app.use("/refund", refundRouter);
 app.use("/chat", chatRouter);
 app.use("/orders",orderRoute);
+app.use("/Promotions", promotionRouter);
 
 //database connection link
 //link - mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/

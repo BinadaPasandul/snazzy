@@ -20,7 +20,7 @@ import Signup from "./Components/Signup/signup";
 import Admin from "./Components/Admin/Admin";
 import AdminRefundRequest from "./Components/Admin/AdminRefundRequest"; //senaa
 import Productmanager from "./Components/Productmanager/productmanager";
-import Promotionmanager from "./Components/Promotionmanager/promotionmanager";
+import Promotionmanager from "./Components/Promotionmanager/promotiondashboard";
 import Ordermanager from "./Components/Ordermanager/ordermanager";
 import Login from "./Components/Login/Login";
 import ForgotPassword from "./Components/Login/ForgotPassword";
@@ -29,6 +29,10 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 import Userdetails from "./Components/Userdetails/Userdetails";
 import UpdateUser from "./Components/User/UpdateUser";
 import PublicOnlyRoute from "./Components/PublicOnlyRoute";
+import InsertPromotion from "./Components/Promotionmanager/insertpromotion";
+import Promotions from "./Components/Promotions/Promotions";
+import EditPromotion from "./Components/Promotionmanager/EditPromotion";
+
 
 import Checkout from "./Components/Checkout/checkout";
 import MyOrders from "./Components/MyOrders/myorders";
@@ -157,13 +161,39 @@ function App() {
           />
           
           <Route
-            path="/promotionmanager"
+            path="/promotiondashboard"
             element={
               <ProtectedRoute role="promotion_manager">
                 <Promotionmanager />
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/insertpromotion"
+            element={
+              <ProtectedRoute role="promotion_manager">
+                <InsertPromotion />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/EditPromotion/:id"
+            element={
+              <ProtectedRoute role="promotion_manager">
+                <EditPromotion />
+              </ProtectedRoute>
+            }
+          />
+                    <Route
+            path="/Promotion"
+            element={
+              <PublicOnlyRoute>
+                <Promotions />
+              </PublicOnlyRoute>
+            }
+          />
+
           {/* Payment Routes */}
           <Route
             path="/cardlist"

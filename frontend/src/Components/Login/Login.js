@@ -41,7 +41,7 @@ const Login = () => {
         } else if (response.role === "order_manager") {
           history("/ordermanager");
         } else if (response.role === "promotion_manager") {
-          history("/promotionmanager");
+          history("/promotiondashboard");
         } else if (response.role === "financial_manager") {
           history("/financialmanager");
         } else {
