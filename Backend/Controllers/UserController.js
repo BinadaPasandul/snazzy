@@ -1,51 +1,74 @@
 const Register = require("../Models/UserModel");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const bcrypt = require("bcrypt");
 const mongoose = require("mongoose");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
 
 const addUsers = async (req, res, next) => {
-    if (!req.body) {
-        return res.status(400).json({ message: "Request body is missing" });
+  if (!req.body) {
+    return res.status(400).json({ message: "Request body is missing" });
+  }
+
+  const { name, gmail, password, age, address, role } = req.body;
+
+  if (!name || !gmail || !password || !age || !address || !role) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  // 🔹 Validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(gmail)) {
+    return res.status(400).json({ message: "Invalid email address" });
+  }
+
+  const validRoles = [
+    "customer",
+    "admin",
+    "staff",
+    "product_manager",
+    "order_manager",
+    "promotion_manager",
+    "financial_manager"
+  ];
+  if (!validRoles.includes(role)) {
+    return res.status(400).json({ 
+      message: `Invalid role. Allowed values are: ${validRoles.join(", ")}`
+    });
+  }
+
+  try {
+    const existingUser = await Register.findOne({ gmail });
+    if (existingUser) {
+      return res.status(400).json({ message: "Email already exists" });
     }
 
-    const { name, gmail, password, age, address, role } = req.body;
+    // 🔹 Create Stripe customer
+    const customer = await stripe.customers.create({
+      email: gmail,
+      name,
+    });
 
-    if (!name || !gmail || !password || !age || !address || !role) {
-        return res.status(400).json({ message: "All fields are required" });
-    }
+    // 🔹 Hash password and save user with stripeCustomerId
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new Register({
+      name,
+      gmail,
+      password: hashedPassword,
+      age,
+      address,
+      role,
+      stripeCustomerId: customer.id, // save Stripe ID
+    });
 
-    const validRoles = [
-        "customer",
-        "admin",
-        "staff",
-        "product_manager",
-        "order_manager",
-        "promotion_manager",
-        "financial_manager"
-    ];
-    if (!validRoles.includes(role)) {
-        return res.status(400).json({ 
-            message: `Invalid role. Allowed values are: ${validRoles.join(", ")}`
-        });
-    }
-
-    let user;
-    try {
-        const existingUser = await Register.findOne({ gmail });
-        if (existingUser) {
-            return res.status(400).json({ message: "Email already exists" });
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        user = new Register({ name, gmail, password: hashedPassword, age, address, role });
-        await user.save();
-        return res.status(201).json({ message: "ok", user }); // Changed to message: "ok"
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Server error while adding user" });
-    }
+    await user.save();
+    return res.status(201).json({ message: "ok", user });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error while adding user" });
+  }
 };
+
 
 const getAllUsers = async (req, res, next) => {
     try {
@@ -77,68 +100,38 @@ const getById = async (req, res, next) => {
 };
 
 const updateUser = async (req, res, next) => {
-    const id = req.params.id;
-    
-    if (!req.body) {
-        return res.status(400).json({ message: "Request body is missing" });
+  const userId = req.params.id;
+  const { name, gmail, password, age, address, role } = req.body;
+
+  try {
+    const user = await Register.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
 
-    const { name, gmail, age, address, password, role } = req.body;
+    // update local DB fields
+    if (name) user.name = name;
+    if (gmail) user.gmail = gmail;
+    if (password) user.password = await bcrypt.hash(password, 10);
+    if (age) user.age = age;
+    if (address) user.address = address;
+    if (role) user.role = role;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "Invalid user ID" });
+    // 🔹 Update in Stripe if customer exists
+    if (user.stripeCustomerId) {
+      await stripe.customers.update(user.stripeCustomerId, {
+        email: gmail || user.gmail,
+        name: name || user.name,
+      });
     }
 
-    let user;
-    try {
-        if (gmail) {
-            const existingUser = await Register.findOne({ gmail, _id: { $ne: id } });
-            if (existingUser) {
-                return res.status(400).json({ message: "Email already exists" });
-            }
-        }
+    await user.save();
 
-        const updateFields = { name, gmail, age, address };
-        if (password) {
-            updateFields.password = await bcrypt.hash(password, 10);
-        }
-
-        // Only admins can change the role; validate role value
-        if (typeof role !== 'undefined') {
-            const requesterRole = req.user && req.user.role;
-            const validRoles = [
-                "customer",
-                "admin",
-                "staff",
-                "product_manager",
-                "order_manager",
-                "promotion_manager",
-                "financial_manager"
-            ];
-            if (!requesterRole || requesterRole !== 'admin') {
-                return res.status(403).json({ message: "Only admins can change user roles" });
-            }
-            if (!validRoles.includes(role)) {
-                return res.status(400).json({ message: `Invalid role. Allowed values are: ${validRoles.join(", ")}` });
-            }
-            updateFields.role = role;
-        }
-
-        user = await Register.findByIdAndUpdate(
-            id,
-            updateFields,
-            { new: true, runValidators: true }
-        ).select("-password");
-
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        return res.status(200).json({ user });
-    } catch (err) {
-        console.error(err);
-        return res.status(500).json({ message: "Server error while updating user" });
-    }
+    return res.status(200).json({ message: "User updated successfully", user });
+  } catch (err) {
+    console.error("Error updating user:", err);
+    return res.status(500).json({ message: "Server error while updating user" });
+  }
 };
 
 const deleteUser = async (req, res, next) => {
