@@ -34,6 +34,8 @@ app.use("/refund", refundRouter);
 app.use("/chat", chatRouter);
 app.use("/orders",orderRoute);
 app.use("/Promotions", promotionRouter);
+app.use("/products", ProductRouter);
+
 
 //database connection link
 //link - mongodb+srv://admin:snazzy123@snazzy.vopoe0w.mongodb.net/
