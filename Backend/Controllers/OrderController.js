@@ -1,124 +1,144 @@
 const Order = require("../Models/OrderModel");
+const Register = require("../Models/UserModel");
 
-//Display data
+// ✅ Get all orders
+const getAllOrders = async (req, res) => {
+    try {
+        const orders = await Order.find()
+            .populate("product_id")
+            .populate("userId", "username email"); // optional: show user info
 
-const getAllOrders = async (req, res, next) =>{
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: "No orders found" });
+        }
 
-
-    //if there are orders display them
-    let Orders;
-    try{
-        Orders = await Order.find();
-
-    }catch(err){
-        console.log(err);
+        return res.status(200).json({ orders });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error fetching orders" });
     }
-
-    //if there are no orders
-
-    if(!Orders){
-        return res.status(404).json({message:"order not found"})
-    }
-
-    //display all order
-    return res.status(200).json({Orders})
-
 };
 
-//data insert
+// ✅ Add new order
+const addOrders = async (req, res) => {
+    const userId = req.user?.id;
 
-const addOrders = async(req, res, next) =>{
-
-console.log("Incoming body:", req.body);// added this to identify wheather there is a error in code
-const {customer_name,customer_address,size,quantity,payment_type}
- = req.body;
-
-     let orders;
-
-        try{
-
-        orders = new Order ({customer_name,customer_address,size,quantity,payment_type});
-        await orders.save();
-
-         }catch(err){
-
-        console.log(err);
-
-         }
-
-//if no data is inserting
-
-if(!orders){
-return res.status(404).json({message:"unable to add orders"});
-}
-return res.status(200).json({orders});
-
-};
-
-//get by id 
-const getById = async (req, res, next) =>{
-
-    const id = req.params.id;
-    let order;
-    
-    try{
-        order = await Order.findById(id);
-    }catch (err){
-        console.log(err);
+    if (!userId) {
+        return res.status(401).json({ message: "User not authenticated" });
     }
 
-    //if there is no order
-    if(!order){
-        return res.status(404).json({ message: "Order not found" });
-    }
-     return res.status(200).json({order});
+    console.log("Incoming body:", req.body);
 
-};
-
-
-//update order
-const updateOrder = async (req, res, next) =>{
-        const id = req.params.id;
-        const{customer_name,customer_address,size,quantity,payment_type}=req.body;
-
-        let order;
-        try{
-            order= await Order.findByIdAndUpdate(id,{customer_name:customer_name,customer_address:customer_address,size:size,quantity:quantity,payment_type:payment_type});
-            order = await order.save();
-        }catch (err){
-        console.log(err);
-    }
-        //if there is no order available
-        if(!order){
-        return res.status(404).json({ message: "unable to pdate order" });
-    }
-     return res.status(200).json({order});
-        
-};
-
-
-
-//deletion part
-//delete order
-const deleteOrder = async (req, res, next) => {
-    const id = req.params.id;
-    let order;
+    const { customer_name, customer_address, product_id, size, quantity, payment_type } = req.body;
 
     try {
-        order = await Order.findByIdAndDelete(id);
+        // optional: validate user exists
+        const user = await Register.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const order = new Order({
+            userId,
+            customer_name,
+            customer_address,
+            product_id,
+            size,
+            quantity,
+            payment_type,
+        });
+
+        await order.save();
+
+        return res.status(201).json({ order });
     } catch (err) {
-        console.log(err);
+        console.error(err);
+        return res.status(500).json({ message: "Error creating order" });
+    }
+};
+
+// ✅ Get order by ID
+const getById = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const order = await Order.findById(id)
+            .populate("product_id")
+            .populate("userId", "username email");
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        return res.status(200).json({ order });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Error fetching order" });
+    }
+};
+
+// ✅ Update order
+const updateOrder = async (req, res) => {
+    const { id } = req.params;
+    const { customer_name, customer_address, size, quantity, payment_type } = req.body;
+
+    try {
+        const order = await Order.findByIdAndUpdate(
+            id,
+            { customer_name, customer_address, size, quantity, payment_type },
+            { new: true } // return updated doc
+        );
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found" });
+        }
+
+        return res.status(200).json({ order });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Unable to update order" });
+    }
+};
+
+// ✅ Delete order
+const deleteOrder = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const order = await Order.findByIdAndDelete(id);
+
+        if (!order) {
+            return res.status(404).json({ message: "Order not found, cannot delete" });
+        }
+
+        return res.status(200).json({ message: "Order deleted successfully" });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ message: "Unable to delete order" });
+    }
+};
+// ✅ Get all orders for the logged-in user
+const getUserOrders = async (req, res) => {
+  const userId = req.user?.id; // set by auth middleware
+
+  if (!userId) {
+    return res.status(401).json({ message: "User not authenticated" });
+  }
+
+  try {
+    const orders = await Order.find({ userId })
+      .populate("product_id"); // optional: populate product info
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this user" });
     }
 
-    //if order not found
-    if (!order) {
-        return res.status(404).json({ message: "Order not found, cannot delete" });
-    }
-
-    return res.status(200).json({ message: "Order deleted successfully" });
+    return res.status(200).json({ orders });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Error fetching user orders" });
+  }
 };
 
 
-module.exports = {getAllOrders, addOrders, getById, updateOrder,deleteOrder};
-
-
+module.exports = { getAllOrders, addOrders, getById, updateOrder, deleteOrder, getUserOrders };

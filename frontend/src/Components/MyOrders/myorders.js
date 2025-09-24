@@ -1,16 +1,29 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../utils/api"; // your axios instance with JWT
 
-const URL = "http://localhost:5000/orders/user";
-
-function MyOrders({ userId }) {
+function MyOrders() {
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get("/orders/user"); // fetch only current user's orders
+      setOrders(res.data.orders || []);
+    } catch (err) {
+      console.error("Failed to fetch orders:", err.response?.data || err.message);
+      alert("Failed to fetch orders. Please make sure you are logged in.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios.get(`${URL}/${userId}`)
-      .then((res) => setOrders(res.data.orders))
-      .catch((err) => console.error(err));
-  }, [userId]);
+    fetchOrders();
+  }, []);
+
+  if (loading) {
+    return <p>Loading orders...</p>;
+  }
 
   return (
     <div>
@@ -22,26 +35,22 @@ function MyOrders({ userId }) {
           <thead>
             <tr>
               <th>Order ID</th>
-              <th>Shoe Name</th>
-              <th>Price</th>
-              <th>Quantity</th>
+              <th>Product ID</th>
               <th>Size</th>
+              <th>Quantity</th>
               <th>Delivery Address</th>
               <th>Payment Type</th>
-              <th>Order Status</th>
             </tr>
           </thead>
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
                 <td>{order._id}</td>
-                <td>{order.shoe_name || "Pending"}</td>
-                <td>{order.price || "Pending"}</td>
-                <td>{order.quantity}</td>
+                <td>{order.product_id}</td>
                 <td>{order.size}</td>
+                <td>{order.quantity}</td>
                 <td>{order.customer_address}</td>
                 <td>{order.payment_type}</td>
-                <td>{order.order_status}</td>
               </tr>
             ))}
           </tbody>

@@ -1,40 +1,45 @@
 import React, { useEffect, useState } from "react";
 import Nav from "../Navbar/nav";
-import axios from "axios";
-
-const URL = "http://localhost:5000/orders";
-
-const fetchHandler = async () => {
-  return await axios.get(URL).then((res) => res.data);
-};
+import api from "../../utils/api"; // axios instance with JWT
 
 function OrderManager() {
   const [orders, setOrders] = useState([]);
-  const [editingOrder, setEditingOrder] = useState(null); 
+  const [editingOrder, setEditingOrder] = useState(null);
   const [formData, setFormData] = useState({
     customer_name: "",
     customer_address: "",
-    shoe_description: "",
-    shoe_price: "",
+    product_id: "",
     size: "",
     quantity: "",
-    payment_type: ""
+    payment_type: "",
   });
 
+  // Fetch orders
+  const fetchOrders = async () => {
+    try {
+      const res = await api.get("/orders");
+      setOrders(res.data.orders || []); // ✅ fixed lowercase 'orders'
+    } catch (err) {
+      console.error("Failed to fetch orders:", err.response?.data || err.message);
+      alert("Failed to fetch orders. Are you logged in?");
+      setOrders([]);
+    }
+  };
+
   useEffect(() => {
-    fetchHandler().then((data) => setOrders(data.Orders));
+    fetchOrders();
   }, []);
 
+  // Open modal to edit
   const openEditModal = (order) => {
     setEditingOrder(order);
     setFormData({
-      customer_name: order.customer_name,
-      customer_address: order.customer_address,
-      shoe_description: order.shoe_description,
-      shoe_price: order.shoe_price,
-      size: order.size,
-      quantity: order.quantity,
-      payment_type: order.payment_type
+      customer_name: order.customer_name || "",
+      customer_address: order.customer_address || "",
+      product_id: order.product_id || "",
+      size: order.size || "",
+      quantity: order.quantity || "",
+      payment_type: order.payment_type || "",
     });
   };
 
@@ -49,14 +54,14 @@ function OrderManager() {
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.put(`${URL}/${editingOrder._id}`, formData);
-      const updated = res.data.order ?? formData;
+      const res = await api.put(`/orders/${editingOrder._id}`, formData);
+      const updatedOrder = res.data.order || formData;
       setOrders((prev) =>
-        prev.map((o) => (o._id === editingOrder._id ? { ...o, ...updated } : o))
+        prev.map((o) => (o._id === editingOrder._id ? { ...o, ...updatedOrder } : o))
       );
       closeModal();
     } catch (err) {
-      console.error(err);
+      console.error("Failed to update order:", err.response?.data || err.message);
       alert("Failed to update order");
     }
   };
@@ -65,10 +70,10 @@ function OrderManager() {
     const confirmDelete = window.confirm("Are you sure you want to delete this order?");
     if (!confirmDelete) return;
     try {
-      await axios.delete(`${URL}/${id}`);
+      await api.delete(`/orders/${id}`);
       setOrders((prev) => prev.filter((o) => o._id !== id));
     } catch (err) {
-      console.error(err);
+      console.error("Failed to delete order:", err.response?.data || err.message);
       alert("Failed to delete order");
     }
   };
@@ -78,16 +83,13 @@ function OrderManager() {
       <Nav />
       <h2>Order Manager - Display Order Details</h2>
 
-      {orders.length === 0 ? (
-        <p>No orders found</p>
-      ) : (
+      {orders.length > 0 ? (
         <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
           <thead>
             <tr>
               <th>Customer Name</th>
               <th>Address</th>
-              <th>Shoe Description</th>
-              <th>Price</th>
+              <th>Product ID</th>
               <th>Size</th>
               <th>Quantity</th>
               <th>Payment Type</th>
@@ -99,8 +101,7 @@ function OrderManager() {
               <tr key={order._id}>
                 <td>{order.customer_name}</td>
                 <td>{order.customer_address}</td>
-                <td>{order.shoe_description}</td>
-                <td>{order.shoe_price}</td>
+                <td>{order.product_id}</td>
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
                 <td>{order.payment_type}</td>
@@ -117,9 +118,11 @@ function OrderManager() {
             ))}
           </tbody>
         </table>
+      ) : (
+        <p>No orders found</p>
       )}
 
-      {/* Modal */}
+      {/* Edit Modal */}
       {editingOrder && (
         <div
           style={{
@@ -131,7 +134,7 @@ function OrderManager() {
             backgroundColor: "rgba(0,0,0,0.5)",
             display: "flex",
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
           <div
@@ -139,81 +142,59 @@ function OrderManager() {
               backgroundColor: "#fff",
               padding: "20px",
               borderRadius: "8px",
-              width: "400px"
+              width: "400px",
             }}
           >
             <h3>Edit Order</h3>
             <form onSubmit={handleUpdate}>
-              <div>
-                <label>Customer Name:</label>
-                <input
-                  type="text"
-                  name="customer_name"
-                  value={formData.customer_name}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Address:</label>
-                <input
-                  type="text"
-                  name="customer_address"
-                  value={formData.customer_address}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Shoe Description:</label>
-                <input
-                  type="text"
-                  name="shoe_description"
-                  value={formData.shoe_description}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Price:</label>
-                <input
-                  type="number"
-                  name="shoe_price"
-                  value={formData.shoe_price}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Size:</label>
-                <input
-                  type="text"
-                  name="size"
-                  value={formData.size}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Quantity:</label>
-                <input
-                  type="number"
-                  name="quantity"
-                  value={formData.quantity}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div>
-                <label>Payment Type:</label>
-                <input
-                  type="text"
-                  name="payment_type"
-                  value={formData.payment_type}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                name="customer_name"
+                value={formData.customer_name}
+                onChange={handleChange}
+                placeholder="Customer Name"
+                required
+              />
+              <input
+                type="text"
+                name="customer_address"
+                value={formData.customer_address}
+                onChange={handleChange}
+                placeholder="Address"
+                required
+              />
+              <input
+                type="text"
+                name="product_id"
+                value={formData.product_id}
+                onChange={handleChange}
+                placeholder="Product ID"
+                required
+              />
+              <input
+                type="text"
+                name="size"
+                value={formData.size}
+                onChange={handleChange}
+                placeholder="Size"
+                required
+              />
+              <input
+                type="number"
+                name="quantity"
+                value={formData.quantity}
+                onChange={handleChange}
+                placeholder="Quantity"
+                required
+              />
+              <input
+                type="text"
+                name="payment_type"
+                value={formData.payment_type}
+                onChange={handleChange}
+                placeholder="Payment Type"
+                required
+              />
               <div style={{ marginTop: "10px" }}>
                 <button type="submit">Save</button>
                 <button type="button" onClick={closeModal} style={{ marginLeft: "10px" }}>
