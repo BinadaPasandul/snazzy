@@ -7,6 +7,9 @@ function MyOrders() {
   const [refunds, setRefunds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openChatForPayment, setOpenChatForPayment] = useState(null);
+  const [showReasonDialog, setShowReasonDialog] = useState(false);
+  const [selectedOrderForRefund, setSelectedOrderForRefund] = useState(null);
+  const [selectedReason, setSelectedReason] = useState("");
 
   const fetchOrders = async () => {
     try {
@@ -34,19 +37,36 @@ function MyOrders() {
     fetchRefunds();
   }, []);
 
-  const handleRefund = async (orderId, paymentId) => {
-    if (!window.confirm("Are you sure you want to request a refund for this order?")) return;
+  const handleRefundClick = (orderId, paymentId) => {
+    setSelectedOrderForRefund({ orderId, paymentId });
+    setShowReasonDialog(true);
+  };
+
+  const handleRefundSubmit = async () => {
+    if (!selectedReason) {
+      alert("Please select a reason for the refund request.");
+      return;
+    }
 
     try {
-      const res = await api.post(`/refund/request/${paymentId}`, {
-        reason: "Order refund request"
+      const res = await api.post(`/refund/request/${selectedOrderForRefund.paymentId}`, {
+        reason: selectedReason
       });
       alert("Refund request submitted successfully!");
       fetchRefunds(); // refresh refunds after request
+      setShowReasonDialog(false);
+      setSelectedOrderForRefund(null);
+      setSelectedReason("");
     } catch (err) {
       console.error("Refund failed:", err.response?.data || err.message);
       alert("Failed to request refund.");
     }
+  };
+
+  const handleCancelRefund = () => {
+    setShowReasonDialog(false);
+    setSelectedOrderForRefund(null);
+    setSelectedReason("");
   };
 
   const getRefundStatus = (orderId) => {
@@ -139,7 +159,7 @@ function MyOrders() {
                   {/* Show refund button only if no refund request exists and order has payment_id */}
                   {!getRefundStatus(order._id) && order.payment_id && (
                     <button
-                      onClick={() => handleRefund(order._id, order.payment_id)}
+                      onClick={() => handleRefundClick(order._id, order.payment_id)}
                       style={{
                         backgroundColor: "red",
                         color: "white",
@@ -199,6 +219,105 @@ function MyOrders() {
           paymentId={openChatForPayment}
           onClose={() => setOpenChatForPayment(null)}
         />
+      )}
+
+      {/* Refund Reason Selection Dialog */}
+      {showReasonDialog && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2000,
+          }}
+        >
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "30px",
+              borderRadius: "8px",
+              width: "400px",
+              maxWidth: "90%",
+            }}
+          >
+            <h3 style={{ marginTop: 0, marginBottom: "20px" }}>
+              Select Refund Reason
+            </h3>
+            
+            <div style={{ marginBottom: "20px" }}>
+              <p style={{ marginBottom: "15px", fontWeight: "bold" }}>
+                Please select a reason for your refund request:
+              </p>
+              
+              {[
+                "Ordered by mistake",
+                "Found a better price elsewhere", 
+                "Delivery time too long",
+                "Changed mind / no longer needed",
+                "Other"
+              ].map((reason) => (
+                <label
+                  key={reason}
+                  style={{
+                    display: "block",
+                    marginBottom: "10px",
+                    cursor: "pointer",
+                    padding: "8px",
+                    borderRadius: "4px",
+                    backgroundColor: selectedReason === reason ? "#e3f2fd" : "#f5f5f5",
+                    border: selectedReason === reason ? "2px solid #2196f3" : "2px solid transparent",
+                  }}
+                >
+                  <input
+                    type="radio"
+                    name="refundReason"
+                    value={reason}
+                    checked={selectedReason === reason}
+                    onChange={(e) => setSelectedReason(e.target.value)}
+                    style={{ marginRight: "10px" }}
+                  />
+                  {reason}
+                </label>
+              ))}
+            </div>
+
+            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
+              <button
+                onClick={handleCancelRefund}
+                style={{
+                  backgroundColor: "#6c757d",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRefundSubmit}
+                disabled={!selectedReason}
+                style={{
+                  backgroundColor: selectedReason ? "#dc3545" : "#ccc",
+                  color: "white",
+                  border: "none",
+                  padding: "10px 20px",
+                  borderRadius: "4px",
+                  cursor: selectedReason ? "pointer" : "not-allowed",
+                }}
+              >
+                Submit Refund Request
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
