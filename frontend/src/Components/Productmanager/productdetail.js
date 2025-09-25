@@ -26,12 +26,16 @@ const ProductDetail = () => {
   }, [id]);
 
   const handleBuyNow = () => {
-  // ✅ Pass product code and price to checkout
+  // ✅ Pass product code and price to checkout (use discounted price if available)
+  const finalPrice = product.hasActivePromotion ? product.discountedPrice : product.pamount;
   navigate("/checkout", { 
     state: { 
       productCode: product.pcode, 
-      productPrice: product.pamount,
-      productname:product.pname
+      productPrice: finalPrice,
+      originalPrice: product.pamount,
+      productname: product.pname,
+      hasPromotion: product.hasActivePromotion,
+      promotion: product.hasActivePromotion ? product.promotion : null
     } 
   });
 };
@@ -103,7 +107,34 @@ const ProductDetail = () => {
               {product.pname}
             </h1>
             <p style={{ margin: "6px 0" }}><strong>Code:</strong> {product.pcode}</p>
-            <p style={{ margin: "6px 0" }}><strong>Price:</strong> {product.pamount}</p>
+            
+            {/* Price Display with Promotion */}
+            {product.hasActivePromotion ? (
+              <div style={{ margin: "6px 0" }}>
+                <p style={{ margin: "0", color: "#e53e3e", textDecoration: "line-through" }}>
+                  <strong>Original Price:</strong> ${product.originalPrice}
+                </p>
+                <p style={{ margin: "0", color: "#38a169", fontSize: "20px", fontWeight: "bold" }}>
+                  <strong>Sale Price:</strong> ${product.discountedPrice}
+                </p>
+                <div style={{ 
+                  background: "#fef5e7", 
+                  padding: "8px 12px", 
+                  borderRadius: "6px", 
+                  margin: "8px 0",
+                  border: "1px solid #f6ad55"
+                }}>
+                  <p style={{ margin: "0", color: "#c05621", fontSize: "14px" }}>
+                    🎉 <strong>{product.promotion.title}</strong> - {product.promotion.discount}% OFF!
+                  </p>
+                  <p style={{ margin: "4px 0 0 0", color: "#744210", fontSize: "12px" }}>
+                    Valid until: {new Date(product.promotion.endDate).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p style={{ margin: "6px 0" }}><strong>Price:</strong> ${product.pamount}</p>
+            )}
             <p style={{ margin: "6px 0" }}><strong>Size:</strong> {product.psize}</p>
             <p style={{ margin: "6px 0" }}><strong>Color:</strong> {product.pcolor}</p>
             <p style={{ margin: "6px 0" }}><strong>Quantity:</strong> {product.quantity}</p>

@@ -96,7 +96,31 @@ const DisplayProducts = () => {
 
               <h2 style={{ margin: "8px 0", fontSize: "18px", color: "#333" }}>{p.pname}</h2>
               <p><strong>Code:</strong> {p.pcode}</p>
-              <p><strong>Price:</strong> {p.pamount}</p>
+              
+              {/* Price Display with Promotion */}
+              {p.hasActivePromotion ? (
+                <div style={{ margin: "6px 0" }}>
+                  <p style={{ margin: "0", color: "#e53e3e", textDecoration: "line-through", fontSize: "14px" }}>
+                    <strong>Original:</strong> ${p.originalPrice}
+                  </p>
+                  <p style={{ margin: "0", color: "#38a169", fontSize: "16px", fontWeight: "bold" }}>
+                    <strong>Sale:</strong> ${p.discountedPrice}
+                  </p>
+                  <div style={{ 
+                    background: "#fef5e7", 
+                    padding: "4px 8px", 
+                    borderRadius: "4px", 
+                    margin: "4px 0",
+                    border: "1px solid #f6ad55"
+                  }}>
+                    <p style={{ margin: "0", color: "#c05621", fontSize: "12px" }}>
+                      🎉 {p.promotion.discount}% OFF!
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p><strong>Price:</strong> ${p.pamount}</p>
+              )}
               <p><strong>Size:</strong> {p.psize}</p>
               <p><strong>Color:</strong> {p.pcolor}</p>
                 <p><strong>Quantity:</strong> {p.quantity}</p>

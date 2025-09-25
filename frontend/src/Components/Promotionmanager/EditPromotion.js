@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import Nav from '../Navbar/nav';
-import './EditPromotion.css'; // Ensure correct path
+import Nav from '../Navbar/nav'; // Ensure correct path
 
 function EditPromotion() {
     const { id } = useParams();

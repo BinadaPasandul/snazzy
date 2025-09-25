@@ -1,4 +1,5 @@
 const Product = require("../Models/ProductModel");
+const Promotion = require("../Models/PromotionModel");
 
 //Data Insert 
 const addProducts = async (req, res) => {
@@ -68,11 +69,62 @@ const purchaseProduct = async (req, res) => {
 
 
 
+// Helper function to calculate discounted price
+const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
+  const discount = (originalPrice * discountPercentage) / 100;
+  return originalPrice - discount;
+};
+
+// Helper function to check if promotion is active
+const isPromotionActive = (startDate, endDate) => {
+  const now = new Date();
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  return now >= start && now <= end;
+};
+
 module.exports = {
   getAllProducts: async (req, res) => {
     try {
       const products = await Product.find();
-      return res.status(200).json({ products });
+      
+      // Get all active promotions
+      const promotions = await Promotion.find();
+      const activePromotions = promotions.filter(promo => 
+        isPromotionActive(promo.startDate, promo.endDate)
+      );
+      
+      // Add promotion info to products
+      const productsWithPromotions = products.map(product => {
+        const productPromotion = activePromotions.find(promo => 
+          promo.productId === product.pcode
+        );
+        
+        if (productPromotion) {
+          const discountedPrice = calculateDiscountedPrice(product.pamount, productPromotion.discount);
+          return {
+            ...product.toObject(),
+            promotion: {
+              id: productPromotion._id,
+              title: productPromotion.title,
+              discount: productPromotion.discount,
+              startDate: productPromotion.startDate,
+              endDate: productPromotion.endDate,
+              bannerImage: productPromotion.bannerImage
+            },
+            originalPrice: product.pamount,
+            discountedPrice: discountedPrice,
+            hasActivePromotion: true
+          };
+        }
+        
+        return {
+          ...product.toObject(),
+          hasActivePromotion: false
+        };
+      });
+      
+      return res.status(200).json({ products: productsWithPromotions });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: "Error fetching products" });
@@ -83,7 +135,42 @@ module.exports = {
     try {
       const product = await Product.findById(req.params.id);
       if (!product) return res.status(404).json({ message: "Product not found" });
-      return res.status(200).json({ product });
+      
+      // Check for active promotion for this product
+      const promotions = await Promotion.find();
+      const activePromotions = promotions.filter(promo => 
+        isPromotionActive(promo.startDate, promo.endDate)
+      );
+      
+      const productPromotion = activePromotions.find(promo => 
+        promo.productId === product.pcode
+      );
+      
+      if (productPromotion) {
+        const discountedPrice = calculateDiscountedPrice(product.pamount, productPromotion.discount);
+        const productWithPromotion = {
+          ...product.toObject(),
+          promotion: {
+            id: productPromotion._id,
+            title: productPromotion.title,
+            discount: productPromotion.discount,
+            startDate: productPromotion.startDate,
+            endDate: productPromotion.endDate,
+            bannerImage: productPromotion.bannerImage
+          },
+          originalPrice: product.pamount,
+          discountedPrice: discountedPrice,
+          hasActivePromotion: true
+        };
+        return res.status(200).json({ product: productWithPromotion });
+      }
+      
+      return res.status(200).json({ 
+        product: {
+          ...product.toObject(),
+          hasActivePromotion: false
+        }
+      });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: "Error fetching product" });
@@ -100,5 +187,57 @@ module.exports = {
       return res.status(500).json({ message: "Error deleting product" });
     }
   },
-  purchaseProduct
+  purchaseProduct,
+  
+  // Get product with promotion details by product code
+  getProductByCode: async (req, res) => {
+    try {
+      const { productCode } = req.params;
+      const product = await Product.findOne({ pcode: productCode });
+      
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      
+      // Check for active promotion
+      const promotions = await Promotion.find();
+      const activePromotions = promotions.filter(promo => 
+        isPromotionActive(promo.startDate, promo.endDate)
+      );
+      
+      const productPromotion = activePromotions.find(promo => 
+        promo.productId === product.pcode
+      );
+      
+      if (productPromotion) {
+        const discountedPrice = calculateDiscountedPrice(product.pamount, productPromotion.discount);
+        return res.status(200).json({
+          product: {
+            ...product.toObject(),
+            promotion: {
+              id: productPromotion._id,
+              title: productPromotion.title,
+              discount: productPromotion.discount,
+              startDate: productPromotion.startDate,
+              endDate: productPromotion.endDate,
+              bannerImage: productPromotion.bannerImage
+            },
+            originalPrice: product.pamount,
+            discountedPrice: discountedPrice,
+            hasActivePromotion: true
+          }
+        });
+      }
+      
+      return res.status(200).json({
+        product: {
+          ...product.toObject(),
+          hasActivePromotion: false
+        }
+      });
+    } catch (err) {
+      console.error(err);
+      return res.status(500).json({ message: "Error fetching product" });
+    }
+  }
 };

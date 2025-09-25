@@ -3,7 +3,7 @@ import Nav from '../Navbar/nav';
 import axios from "axios";
 import User from '../User/User';
 import { useReactToPrint } from 'react-to-print';
-import './Userdetails.css';
+
 
 
 

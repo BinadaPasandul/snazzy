@@ -5,6 +5,7 @@ import Nav from '../Navbar/nav';
 
 function PromotionDashboard() {
     const [promotions, setPromotions] = useState([]);
+    const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -12,30 +13,50 @@ function PromotionDashboard() {
     const BACKEND_URL = 'http://localhost:5000'; // your backend host
 
     useEffect(() => {
-        const fetchPromotions = async () => {
+        const fetchData = async () => {
             setLoading(true);
             setError('');
             try {
-                const res = await axios.get(`${BACKEND_URL}/Promotions`);
-                const promos = res.data.promotions || [];
+                // Fetch both promotions and products
+                const [promotionsRes, productsRes] = await Promise.all([
+                    axios.get(`${BACKEND_URL}/Promotions`),
+                    axios.get(`${BACKEND_URL}/products`)
+                ]);
+                
+                const promos = promotionsRes.data.promotions || [];
+                const prods = productsRes.data.products || [];
+                
                 setPromotions(promos);
+                setProducts(prods);
             } catch (err) {
                 setError(err?.response?.data?.message || err.message);
             } finally {
                 setLoading(false);
             }
         };
-        fetchPromotions();
+        fetchData();
     }, []);
 
     const refresh = async () => {
         try {
-            const res = await axios.get(`${BACKEND_URL}/Promotions`);
-            const promos = res.data.promotions || [];
+            const [promotionsRes, productsRes] = await Promise.all([
+                axios.get(`${BACKEND_URL}/Promotions`),
+                axios.get(`${BACKEND_URL}/products`)
+            ]);
+            
+            const promos = promotionsRes.data.promotions || [];
+            const prods = productsRes.data.products || [];
+            
             setPromotions(promos);
+            setProducts(prods);
         } catch (err) {
             setError(err?.response?.data?.message || err.message);
         }
+    };
+
+    // Helper function to get product details by product code
+    const getProductByCode = (productCode) => {
+        return products.find(product => product.pcode === productCode);
     };
 
     const handleDelete = async (promotionId) => {
@@ -90,8 +111,60 @@ function PromotionDashboard() {
                                 )}
                                 <div style={{ padding: '12px' }}>
                                     <h3 style={{ margin: '0 0 8px 0' }}>{p.title}</h3>
-                                    <p><strong>Product ID:</strong> {p.productId}</p>
-                                    <p><strong>Description:</strong> {p.description || 'N/A'}</p>
+                                    
+                                    {/* Product Details */}
+                                    {(() => {
+                                        const product = getProductByCode(p.productId);
+                                        if (product) {
+                                            const originalPrice = product.pamount;
+                                            const discountedPrice = originalPrice - (originalPrice * p.discount / 100);
+                                            return (
+                                                <div style={{ 
+                                                    background: '#f8f9fa', 
+                                                    padding: '8px', 
+                                                    borderRadius: '6px', 
+                                                    marginBottom: '8px',
+                                                    border: '1px solid #e9ecef'
+                                                }}>
+                                                    <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 'bold', color: '#495057' }}>
+                                                        📦 {product.pname}
+                                                    </p>
+                                                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#6c757d' }}>
+                                                        Code: {product.pcode} | Size: {product.psize} | Color: {product.pcolor}
+                                                    </p>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                        <span style={{ 
+                                                            color: '#e53e3e', 
+                                                            textDecoration: 'line-through', 
+                                                            fontSize: '12px' 
+                                                        }}>
+                                                            ${originalPrice}
+                                                        </span>
+                                                        <span style={{ 
+                                                            color: '#38a169', 
+                                                            fontWeight: 'bold', 
+                                                            fontSize: '14px' 
+                                                        }}>
+                                                            ${discountedPrice.toFixed(2)}
+                                                        </span>
+                                                        <span style={{ 
+                                                            background: '#dc3545', 
+                                                            color: 'white', 
+                                                            padding: '2px 6px', 
+                                                            borderRadius: '4px', 
+                                                            fontSize: '10px',
+                                                            fontWeight: 'bold'
+                                                        }}>
+                                                            SAVE ${(originalPrice - discountedPrice).toFixed(2)}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            );
+                                        }
+                                        return <p><strong>Product ID:</strong> {p.productId} (Product not found)</p>;
+                                    })()}
+                                    
+                                    <p><strong>Promotion Description:</strong> {p.description || 'N/A'}</p>
                                     <p><strong>Discount:</strong> {p.discount}%</p>
                                     <p><strong>Start:</strong> {p.startDate ? new Date(p.startDate).toLocaleDateString() : 'N/A'}</p>
                                     <p><strong>End:</strong> {p.endDate ? new Date(p.endDate).toLocaleDateString() : 'N/A'}</p>
