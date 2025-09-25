@@ -192,6 +192,7 @@ function Admin() {
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Age</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Address</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Role</th>
+                            <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Loyalty Points</th>
                             <th style={{ textAlign: 'left', borderBottom: '1px solid #ccc', padding: '8px' }}>Actions</th>
                             <th style={{ textAlign: 'right', borderBottom: '1px solid #ccc', padding: '8px' }}>
                                 <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
@@ -227,6 +228,7 @@ function Admin() {
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.age}</td>
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.address}</td>
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.role}</td>
+                                <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>{u.role === 'customer' ? (u.loyaltyPoints ?? 0) : ''}</td>
                                 <td style={{ borderBottom: '1px solid #eee', padding: '8px' }}>
                                     <button onClick={() => {
                                         setEditingUser(u._id);
@@ -243,7 +245,7 @@ function Admin() {
                         ))}
                         {users.length === 0 && (
                             <tr>
-                                <td colSpan={5} style={{ padding: '12px', color: '#666' }}>No users found.</td>
+                                <td colSpan={8} style={{ padding: '12px', color: '#666' }}>No users found.</td>
                             </tr>
                         )}
                     </tbody>
@@ -292,7 +294,7 @@ function Admin() {
                                 <option value="product_manager">Product Manager</option>
                                 <option value="order_manager">Order Manager</option>
                                 <option value="promotion_manager">Promotion Manager</option>
-                                <option value="financial_manager">Financial Manager</option>
+                                
                             </select>
                         </div>
                         <div style={{ marginTop: 12 }}>

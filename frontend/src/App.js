@@ -192,9 +192,9 @@ function App() {
                     <Route
             path="/Promotion"
             element={
-              <PublicOnlyRoute>
+              
                 <Promotions />
-              </PublicOnlyRoute>
+              
             }
           />
 
