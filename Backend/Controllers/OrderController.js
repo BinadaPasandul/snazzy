@@ -51,8 +51,11 @@ const addOrders = async (req, res) => {
         });
 
         await order.save();
+        user.loyaltyPoints = (user.loyaltyPoints || 0) + 5;
+        await user.save();
 
-        return res.status(201).json({ order });
+        return res.status(201).json({ order, loyaltyPoints: user.loyaltyPoints });
+        
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Error creating order" });
@@ -111,6 +114,14 @@ const deleteOrder = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({ message: "Order not found, cannot delete" });
+        }
+        if (order.userId) {
+            const user = await Register.findById(order.userId);
+            if (user) {
+                // prevent going below 0
+                user.loyaltyPoints = Math.max((user.loyaltyPoints || 0) - 5, 0);
+                await user.save();
+            }
         }
 
         return res.status(200).json({ message: "Order deleted successfully" });
