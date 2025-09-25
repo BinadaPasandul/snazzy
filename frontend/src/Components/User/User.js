@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 
 function User(props) {
-  const { _id, name, gmail, age, address, role } = props.user;
+  const { _id, name, gmail, age, address, role, loyaltyPoints } = props.user;
   
   const history = useNavigate();
 
@@ -30,14 +30,14 @@ function User(props) {
   
   return (
     <div>
-      <h1>User Display</h1>
+      <h1>User Details</h1>
 
-      <h2>ID:{_id}</h2>
+      
       <h2>Name:{name}</h2>
       <h2>Gmail:{gmail}</h2>
       <h2>Age:{age}</h2>
       {address && <h2>Address:{address}</h2>}
-      {role && <h2>Role:{role}</h2>}
+      {role === 'customer' && <h2>Loyalty Points: {loyaltyPoints}</h2>}
       <NavLink to={`/userdetails/${_id}`}>Update</NavLink>
       <button onClick={deleteHandler}>Delete</button>
     </div>

@@ -18,7 +18,7 @@ function Nav() {
                     <>
                         {/* Greeting with role */}
                         <li className="user-greeting">
-                            Welcome, {user.name} ({user.role})
+                            Hi {user.name} 
                         </li>
 
                         {/* Profile link */}
@@ -76,16 +76,7 @@ function Nav() {
                             </li>
                         )}
 
-                        {user.role === "financial_manager" && (
-                            <li>
-                                <NavLink 
-                                    to="/financialmanager" 
-                                    className={({ isActive }) => (isActive ? "active" : "")}
-                                >
-                                    <button className="nav-btn">Financial Manager</button>
-                                </NavLink>
-                            </li>
-                        )}
+                      
 
                         {/* Logout */}
                         <li>
