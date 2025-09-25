@@ -80,12 +80,12 @@ const getById = async (req, res) => {
 // ✅ Update order
 const updateOrder = async (req, res) => {
     const { id } = req.params;
-    const { customer_name, customer_address, size, quantity, payment_type } = req.body;
+    const { customer_name, customer_address, size, quantity, payment_type, status } = req.body;
 
     try {
         const order = await Order.findByIdAndUpdate(
             id,
-            { customer_name, customer_address, size, quantity, payment_type },
+            { customer_name, customer_address, size, quantity, payment_type, status },
             { new: true } // return updated doc
         );
 

@@ -12,13 +12,14 @@ function OrderManager() {
     size: "",
     quantity: "",
     payment_type: "",
+    status: "Packing", // ✅ new default
   });
 
   // Fetch orders
   const fetchOrders = async () => {
     try {
       const res = await api.get("/orders");
-      setOrders(res.data.orders || []); // ✅ fixed lowercase 'orders'
+      setOrders(res.data.orders || []);
     } catch (err) {
       console.error("Failed to fetch orders:", err.response?.data || err.message);
       alert("Failed to fetch orders. Are you logged in?");
@@ -40,6 +41,7 @@ function OrderManager() {
       size: order.size || "",
       quantity: order.quantity || "",
       payment_type: order.payment_type || "",
+      status: order.status || "Packing",
     });
   };
 
@@ -78,6 +80,24 @@ function OrderManager() {
     }
   };
 
+  // ✅ handle inline status change from table
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const orderToUpdate = orders.find((o) => o._id === id);
+      const res = await api.put(`/orders/${id}`, {
+        ...orderToUpdate,
+        status: newStatus,
+      });
+      const updatedOrder = res.data.order;
+      setOrders((prev) =>
+        prev.map((o) => (o._id === id ? updatedOrder : o))
+      );
+    } catch (err) {
+      console.error("Failed to update status:", err.response?.data || err.message);
+      alert("Failed to update status");
+    }
+  };
+
   return (
     <div>
       <Nav />
@@ -93,6 +113,7 @@ function OrderManager() {
               <th>Size</th>
               <th>Quantity</th>
               <th>Payment Type</th>
+              <th>Status</th> {/* ✅ new column */}
               <th>Actions</th>
             </tr>
           </thead>
@@ -105,6 +126,16 @@ function OrderManager() {
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
                 <td>{order.payment_type}</td>
+                <td>
+                  <select
+                    value={order.status || "Packing"}
+                    onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                  >
+                    <option value="Packing">Packing</option>
+                    <option value="Delivering">Delivering</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </td>
                 <td>
                   <button onClick={() => openEditModal(order)}>Edit</button>
                   <button
@@ -195,6 +226,17 @@ function OrderManager() {
                 placeholder="Payment Type"
                 required
               />
+              {/* ✅ Status field in modal */}
+              <select
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                style={{ marginTop: "10px", width: "100%" }}
+              >
+                <option value="Packing">Packing</option>
+                <option value="Delivering">Delivering</option>
+                <option value="Delivered">Delivered</option>
+              </select>
               <div style={{ marginTop: "10px" }}>
                 <button type="submit">Save</button>
                 <button type="button" onClick={closeModal} style={{ marginLeft: "10px" }}>

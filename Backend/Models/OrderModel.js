@@ -34,7 +34,14 @@ const orderSchema = new Schema({
         type:String,//data type
         required:true,//validation
 
-    }
+    },
+
+    //new field added to update the order status yooo
+    status:{
+        type:String,
+        enum:["Packing","Delivering","Delivered"],
+        default:"Packing",
+    },
 });
 
 

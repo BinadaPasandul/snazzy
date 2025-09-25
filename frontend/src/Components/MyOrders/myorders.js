@@ -21,6 +21,18 @@ function MyOrders() {
     fetchOrders();
   }, []);
 
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "Delivered":
+        return "green";
+      case "Delivering":
+        return "orange";
+      case "Packing":
+      default:
+        return "blue";
+    }
+  };
+
   if (loading) {
     return <p>Loading orders...</p>;
   }
@@ -31,7 +43,7 @@ function MyOrders() {
       {orders.length === 0 ? (
         <p>No orders found</p>
       ) : (
-        <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
+        <table border="1" cellPadding="8" style={{ marginTop: "20px", borderCollapse: "collapse" }}>
           <thead>
             <tr>
               <th>Order ID</th>
@@ -40,6 +52,7 @@ function MyOrders() {
               <th>Quantity</th>
               <th>Delivery Address</th>
               <th>Payment Type</th>
+              <th>Status</th> {/* ✅ new column */}
             </tr>
           </thead>
           <tbody>
@@ -51,6 +64,19 @@ function MyOrders() {
                 <td>{order.quantity}</td>
                 <td>{order.customer_address}</td>
                 <td>{order.payment_type}</td>
+                <td>
+                  <span
+                    style={{
+                      padding: "4px 8px",
+                      borderRadius: "4px",
+                      color: "white",
+                      backgroundColor: getStatusColor(order.status),
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {order.status || "Packing"}
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>
