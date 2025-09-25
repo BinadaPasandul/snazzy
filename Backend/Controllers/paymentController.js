@@ -90,7 +90,13 @@ exports.updateCard = async (req, res) => {
     const pm = await stripe.paymentMethods.retrieve(paymentMethodId);
     const updated = await PaymentMethod.findOneAndUpdate(
       { _id: cardId, userId },
-      { stripePaymentMethodId: paymentMethodId, cardBrand: pm.card.brand, last4: pm.card.last4 },
+      { 
+        stripePaymentMethodId: paymentMethodId, 
+        cardBrand: pm.card.brand, 
+        last4: pm.card.last4,
+        expMonth: pm.card.exp_month,
+        expYear: pm.card.exp_year
+      },
       { new: true }
     );
 
