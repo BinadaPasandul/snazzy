@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/api"; // your axios instance with JWT
+import ChatPopup from "../Payment/ChatPopup"; // Import chat popup component
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
+  const [refunds, setRefunds] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openChatForPayment, setOpenChatForPayment] = useState(null);
 
   const fetchOrders = async () => {
     try {
@@ -17,22 +20,43 @@ function MyOrders() {
     }
   };
 
+  const fetchRefunds = async () => {
+    try {
+      const res = await api.get("/refund/my-requests");
+      setRefunds(res.data.refunds || []);
+    } catch (err) {
+      console.error("Failed to fetch refunds:", err.response?.data || err.message);
+    }
+  };
+
   useEffect(() => {
     fetchOrders();
+    fetchRefunds();
   }, []);
 
-  const handleRefund = async (orderId) => {
+  const handleRefund = async (orderId, paymentId) => {
     if (!window.confirm("Are you sure you want to request a refund for this order?")) return;
 
     try {
-      await api.post(`/orders/${orderId}/refund`); // ✅ backend route for refund
+      const res = await api.post(`/refund/request/${paymentId}`, {
+        reason: "Order refund request"
+      });
       alert("Refund request submitted successfully!");
-      fetchOrders(); // refresh orders after refund
+      fetchRefunds(); // refresh refunds after request
     } catch (err) {
       console.error("Refund failed:", err.response?.data || err.message);
       alert("Failed to request refund.");
     }
   };
+
+  const getRefundStatus = (orderId) => {
+    const order = orders.find(o => o._id === orderId);
+    if (!order || !order.payment_id) return null;
+    
+    const refund = refunds.find(r => r.paymentId._id === order.payment_id);
+    return refund ? refund.status : null;
+  };
+
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -40,9 +64,21 @@ function MyOrders() {
         return "green";
       case "Delivering":
         return "orange";
-      case "Packing":
+      case "Processing":
       default:
         return "blue";
+    }
+  };
+
+  const getRefundStatusColor = (status) => {
+    switch (status) {
+      case "approved":
+        return "green";
+      case "rejected":
+        return "red";
+      case "pending":
+      default:
+        return "orange";
     }
   };
 
@@ -96,14 +132,14 @@ function MyOrders() {
                       fontWeight: "bold",
                     }}
                   >
-                    {order.status || "Packing"}
+                    {order.status || "Processing"}
                   </span>
                 </td>
                 <td>
-                  {/* ✅ Show refund button only if NOT delivered */}
-                  {order.status !== "Delivered" && (
+                  {/* Show refund button only if no refund request exists and order has payment_id */}
+                  {!getRefundStatus(order._id) && order.payment_id && (
                     <button
-                      onClick={() => handleRefund(order._id)}
+                      onClick={() => handleRefund(order._id, order.payment_id)}
                       style={{
                         backgroundColor: "red",
                         color: "white",
@@ -116,11 +152,53 @@ function MyOrders() {
                       Refund
                     </button>
                   )}
+                  
+                  {/* Show refund status if refund request exists */}
+                  {getRefundStatus(order._id) && (
+                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                      <span
+                        style={{
+                          padding: "4px 8px",
+                          borderRadius: "4px",
+                          color: "white",
+                          backgroundColor: getRefundStatusColor(getRefundStatus(order._id)),
+                          fontWeight: "bold",
+                          fontSize: "12px",
+                        }}
+                      >
+                        Refund: {getRefundStatus(order._id)}
+                      </span>
+                      {order.payment_id && (
+                        <button
+                          onClick={() => setOpenChatForPayment(order.payment_id)}
+                          style={{
+                            backgroundColor: "#007bff",
+                            color: "white",
+                            border: "none",
+                            padding: "4px 8px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            fontSize: "12px",
+                          }}
+                        >
+                          💬 Chat
+                        </button>
+                      )}
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Chat Popup for refund requests */}
+      {openChatForPayment && (
+        <ChatPopup
+          paymentId={openChatForPayment}
+          onClose={() => setOpenChatForPayment(null)}
+        />
       )}
     </div>
   );

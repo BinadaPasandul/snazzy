@@ -39,9 +39,13 @@ const orderSchema = new Schema({
         required:true,//validation
 
     },
-    //New field to store the total amount from checkout
-    total_price: { type: Number, required: true },
-    
+     //New field to store the total amount from checkout
+     total_price: { type: Number, required: true },
+     
+     payment_id:{
+         type:String,//data type
+         required:false,//optional for cash payments
+     },
 
     //new field added to update the order status yooo
     status:{

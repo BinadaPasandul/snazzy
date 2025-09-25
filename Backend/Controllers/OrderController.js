@@ -29,7 +29,7 @@ const addOrders = async (req, res) => {
 
     console.log("Incoming body:", req.body);
 
-    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, } = req.body;
+    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, payment_id } = req.body;
 
     try {
         // optional: validate user exists
@@ -48,6 +48,7 @@ const addOrders = async (req, res) => {
             quantity,
             payment_type,
             total_price,
+            payment_id,
         });
 
         await order.save();
@@ -85,12 +86,12 @@ const getById = async (req, res) => {
 // ✅ Update order
 const updateOrder = async (req, res) => {
     const { id } = req.params;
-    const { customer_name, customer_address, size, quantity, payment_type, status } = req.body;
+    const { customer_name, customer_address, size, quantity, payment_type, payment_id, status } = req.body;
 
     try {
         const order = await Order.findByIdAndUpdate(
             id,
-            { customer_name, customer_address, size, quantity, payment_type, status },
+            { customer_name, customer_address, size, quantity, payment_type, payment_id, status },
             { new: true } // return updated doc
         );
 

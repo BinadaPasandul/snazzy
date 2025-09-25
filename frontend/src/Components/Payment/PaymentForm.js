@@ -79,8 +79,15 @@ const PaymentForm = () => {
         window.parent.postMessage({
           type: 'PAYMENT_SUCCESS',
           payment: res.data.payment,
+          paymentId: res.data.payment._id, // Explicitly include payment ID
           amount: res.data.payment.amount
         }, '*');
+        console.log('Payment success message sent to parent:', {
+          type: 'PAYMENT_SUCCESS',
+          payment: res.data.payment,
+          paymentId: res.data.payment._id,
+          amount: res.data.payment.amount
+        });
       } else {
         // Only redirect if not in iframe
         setTimeout(() => {
