@@ -1,5 +1,6 @@
 const Order = require("../Models/OrderModel");
 const Register = require("../Models/UserModel");
+const UserController = require("./UserController");
 
 // ✅ Get all orders
 const getAllOrders = async (req, res) => {
@@ -49,12 +50,13 @@ const addOrders = async (req, res) => {
         });
 
         await order.save();
-
+        await UserController.updateLoyaltyPoints(userId);
         return res.status(201).json({ order });
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Error creating order" });
     }
+  
 };
 
 // ✅ Get order by ID
@@ -80,12 +82,12 @@ const getById = async (req, res) => {
 // ✅ Update order
 const updateOrder = async (req, res) => {
     const { id } = req.params;
-    const { customer_name, customer_address, size, quantity, payment_type } = req.body;
+    const { customer_name, customer_address, size, quantity, payment_type, status } = req.body;
 
     try {
         const order = await Order.findByIdAndUpdate(
             id,
-            { customer_name, customer_address, size, quantity, payment_type },
+            { customer_name, customer_address, size, quantity, payment_type, status },
             { new: true } // return updated doc
         );
 
@@ -139,6 +141,9 @@ const getUserOrders = async (req, res) => {
     return res.status(500).json({ message: "Error fetching user orders" });
   }
 };
+
+
+
 
 
 module.exports = { getAllOrders, addOrders, getById, updateOrder, deleteOrder, getUserOrders };

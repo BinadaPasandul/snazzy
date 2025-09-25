@@ -26,9 +26,15 @@ const ProductDetail = () => {
   }, [id]);
 
   const handleBuyNow = () => {
-    // Replace with real checkout logic
-    alert(`Proceeding to buy: ${product.pname}`);
-  };
+  // ✅ Pass product code and price to checkout
+  navigate("/checkout", { 
+    state: { 
+      productCode: product.pcode, 
+      productPrice: product.pamount 
+    } 
+  });
+};
+
 
   const handleAddToCart = () => {
     // Replace with cart API or global state
@@ -96,7 +102,7 @@ const ProductDetail = () => {
               {product.pname}
             </h1>
             <p style={{ margin: "6px 0" }}><strong>Code:</strong> {product.pcode}</p>
-            <p style={{ margin: "6px 0" }}><strong>Amount:</strong> {product.pamount}</p>
+            <p style={{ margin: "6px 0" }}><strong>Price:</strong> {product.pamount}</p>
             <p style={{ margin: "6px 0" }}><strong>Size:</strong> {product.psize}</p>
             <p style={{ margin: "6px 0" }}><strong>Color:</strong> {product.pcolor}</p>
             <p style={{ margin: "6px 0" }}><strong>Quantity:</strong> {product.quantity}</p>

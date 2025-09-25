@@ -4,7 +4,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 
 
 function User(props) {
-  const { _id, name, gmail, age, address, role } = props.user;
+  const { _id, name, gmail, age, address, role, loyaltyPoints } = props.user;
   
   const history = useNavigate();
 
@@ -29,70 +29,17 @@ function User(props) {
 
   
   return (
-    <div className="profile-card">
-      <div className="profile-content">
-        <div className="user-info">
-          <div className="avatar-section">
-            <div className="avatar">
-              {name ? name.charAt(0).toUpperCase() : 'U'}
-            </div>
-            {role && <div className="role-badge">{role}</div>}
-          </div>
-          
-          <div className="user-details">
-            <div className="detail-item">
-              <div className="detail-icon">🆔</div>
-              <div className="detail-content">
-                <div className="detail-label">User ID</div>
-                <div className="detail-value">{_id}</div>
-              </div>
-            </div>
-            
-            <div className="detail-item">
-              <div className="detail-icon">👤</div>
-              <div className="detail-content">
-                <div className="detail-label">Full Name</div>
-                <div className="detail-value">{name}</div>
-              </div>
-            </div>
-            
-            <div className="detail-item">
-              <div className="detail-icon">📧</div>
-              <div className="detail-content">
-                <div className="detail-label">Email Address</div>
-                <div className="detail-value">{gmail}</div>
-              </div>
-            </div>
-            
-            <div className="detail-item">
-              <div className="detail-icon">🎂</div>
-              <div className="detail-content">
-                <div className="detail-label">Age</div>
-                <div className="detail-value">{age} years old</div>
-              </div>
-            </div>
-            
-            {address && (
-              <div className="detail-item">
-                <div className="detail-icon">📍</div>
-                <div className="detail-content">
-                  <div className="detail-label">Address</div>
-                  <div className="detail-value">{address}</div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-        
-        <div className="action-buttons">
-          <NavLink to={`/userdetails/${_id}`} className="action-btn btn-update">
-            ✏️ Update Profile
-          </NavLink>
-          <button onClick={deleteHandler} className="action-btn btn-delete">
-            🗑️ Delete Account
-          </button>
-        </div>
-      </div>
+    <div>
+      <h1>User Details</h1>
+
+      
+      <h2>Name:{name}</h2>
+      <h2>Gmail:{gmail}</h2>
+      <h2>Age:{age}</h2>
+      {address && <h2>Address:{address}</h2>}
+      {role === 'customer' && <h2>Loyalty Points: {loyaltyPoints}</h2>}
+      <NavLink to={`/userdetails/${_id}`}>Update</NavLink>
+      <button onClick={deleteHandler}>Delete</button>
     </div>
   );
 }

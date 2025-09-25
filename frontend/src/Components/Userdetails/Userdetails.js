@@ -6,6 +6,7 @@ import { useReactToPrint } from 'react-to-print';
 import './Userdetails.css';
 
 
+
 const URL = "http://localhost:5000/user/me";
 const fetchCurrentUser = async () => {
   const token = localStorage.getItem('token');
@@ -34,9 +35,6 @@ function Userdetails() {
     <div className="user-profile-container"> 
       <Nav/>
       
-      <div className="profile-header">
-        <h1>User Profile</h1>
-      </div>
 
       <div ref={ComponentsRef}>
         {users && users.map((user, i)=> (
@@ -45,12 +43,8 @@ function Userdetails() {
           </div>
         ))}
       </div>
-      
-      <div className="action-buttons">
-        <button onClick={handlePrint} className="action-btn btn-download">
-          📄 Download Report
-        </button>
-      </div>
+      <a href="/myorders"><button>My orders</button></a>
+      <a href="/cardlist"><button>My cards</button></a>
     </div>
   )
 }

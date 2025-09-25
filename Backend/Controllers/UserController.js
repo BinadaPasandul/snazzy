@@ -328,6 +328,21 @@ const exportUsersPdf = async (req, res, next) => {
     }
 };
 
+
+const Order = require("../Models/OrderModel");
+
+// ...existing code...
+
+// Utility: Update loyalty points for a user
+const updateLoyaltyPoints = async (userId) => {
+  const orderCount = await Order.countDocuments({ userId });
+  await Register.findByIdAndUpdate(userId, { loyaltyPoints: orderCount });
+};
+
+exports.updateLoyaltyPoints = updateLoyaltyPoints;
+
+// ...existing code...
+
 exports.exportUsersPdf = exportUsersPdf;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;
