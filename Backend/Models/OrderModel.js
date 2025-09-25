@@ -50,10 +50,7 @@ const orderSchema = new Schema({
         default:"Processing",
     },
 
-    payment_id:{
-        type:String,
-        required:true,
-    }
+
 });
 
 

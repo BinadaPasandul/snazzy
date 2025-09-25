@@ -29,7 +29,7 @@ const addOrders = async (req, res) => {
 
     console.log("Incoming body:", req.body);
 
-    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price,payment_id } = req.body;
+    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, } = req.body;
 
     try {
         // optional: validate user exists
@@ -48,7 +48,6 @@ const addOrders = async (req, res) => {
             quantity,
             payment_type,
             total_price,
-            payment_id
         });
 
         await order.save();
