@@ -19,6 +19,7 @@ function Checkout() {
     payment_type: "cash",
   });
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [paymentId, setPaymentId] = useState(null);
 
   useEffect(() => {
     if (productCode) {
@@ -32,6 +33,12 @@ function Checkout() {
       if (event.data.type === 'PAYMENT_SUCCESS') {
         console.log('Payment successful:', event.data);
         setPaymentSuccess(true);
+        
+        // Store payment ID from either explicit paymentId or payment._id
+        const receivedPaymentId = event.data.paymentId || event.data.payment._id;
+        setPaymentId(receivedPaymentId);
+        
+        console.log('Received payment ID:', receivedPaymentId);
         
         // Automatically submit order after successful payment
         if (!form.product_id) {
@@ -47,10 +54,14 @@ function Checkout() {
         const orderData = {
           ...form,
           total_price: form.quantity * productPrice,
+          payment_id: receivedPaymentId, // Include payment ID
         };
 
+        console.log('Submitting order with data:', orderData);
+
         try {
-          await api.post("/orders", orderData);
+          const orderResponse = await api.post("/orders", orderData);
+          console.log('Order submitted successfully:', orderResponse.data);
           alert("✅ Order placed successfully!");
           navigate("/myorders");
         } catch (err) {
@@ -83,6 +94,7 @@ function Checkout() {
     const orderData = {
       ...form,
       total_price: form.quantity * productPrice,
+      payment_id: paymentId, // Include payment ID if available
     };
 
     try {
@@ -186,18 +198,23 @@ function Checkout() {
             <button type="submit">Submit Order</button>
           )}
 
-          {/* Show payment success status */}
-          {form.payment_type === "card" && paymentSuccess && (
-            <div style={{ 
-              background: "#d4edda", 
-              color: "#155724", 
-              padding: "10px", 
-              borderRadius: "4px",
-              marginTop: "10px"
-            }}>
-              ✅ Payment successful! Order is being submitted...
-            </div>
-          )}
+           {/* Show payment success status */}
+           {form.payment_type === "card" && paymentSuccess && (
+             <div style={{ 
+               background: "#d4edda", 
+               color: "#155724", 
+               padding: "10px", 
+               borderRadius: "4px",
+               marginTop: "10px"
+             }}>
+               ✅ Payment successful! Order is being submitted...
+               {paymentId && (
+                 <div style={{ fontSize: "12px", marginTop: "5px", opacity: 0.8 }}>
+                   Payment ID: {paymentId}
+                 </div>
+               )}
+             </div>
+           )}
         </form>
       </div>
 
