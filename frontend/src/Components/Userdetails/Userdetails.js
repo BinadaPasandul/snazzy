@@ -43,8 +43,12 @@ function Userdetails() {
           </div>
         ))}
       </div>
-      <a href="/myorders"><button>My orders</button></a>
-      <a href="/cardlist"><button>My cards</button></a>
+      {users && users.map((user, i) => (
+        <div key={i}>
+          {user.role === 'customer' && <a href="/myorders"><button>My orders</button></a>}
+          {user.role === 'customer' && <a href="/cardlist"><button>My cards</button></a>}
+        </div>
+      ))}
     </div>
   )
 }

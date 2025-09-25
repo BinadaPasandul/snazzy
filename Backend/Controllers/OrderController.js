@@ -29,7 +29,7 @@ const addOrders = async (req, res) => {
 
     console.log("Incoming body:", req.body);
 
-    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, } = req.body;
+    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, payment_id } = req.body;
 
     try {
         // optional: validate user exists
@@ -48,11 +48,15 @@ const addOrders = async (req, res) => {
             quantity,
             payment_type,
             total_price,
+            payment_id,
         });
 
         await order.save();
+        user.loyaltyPoints = (user.loyaltyPoints || 0) + 5;
+        await user.save();
 
-        return res.status(201).json({ order });
+        return res.status(201).json({ order, loyaltyPoints: user.loyaltyPoints });
+        
     } catch (err) {
         console.error(err);
         return res.status(500).json({ message: "Error creating order" });
@@ -82,12 +86,12 @@ const getById = async (req, res) => {
 // ✅ Update order
 const updateOrder = async (req, res) => {
     const { id } = req.params;
-    const { customer_name, customer_address, size, quantity, payment_type, status } = req.body;
+    const { customer_name, customer_address, size, quantity, payment_type, payment_id, status } = req.body;
 
     try {
         const order = await Order.findByIdAndUpdate(
             id,
-            { customer_name, customer_address, size, quantity, payment_type, status },
+            { customer_name, customer_address, size, quantity, payment_type, payment_id, status },
             { new: true } // return updated doc
         );
 
@@ -111,6 +115,14 @@ const deleteOrder = async (req, res) => {
 
         if (!order) {
             return res.status(404).json({ message: "Order not found, cannot delete" });
+        }
+        if (order.userId) {
+            const user = await Register.findById(order.userId);
+            if (user) {
+                // prevent going below 0
+                user.loyaltyPoints = Math.max((user.loyaltyPoints || 0) - 5, 0);
+                await user.save();
+            }
         }
 
         return res.status(200).json({ message: "Order deleted successfully" });
