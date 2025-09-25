@@ -11,6 +11,10 @@ const orderSchema = new Schema({
         required:true,//validation
 
     },
+    product_name:{
+        type:String,
+        required:true,
+    },
     customer_address:{
         type:String,//data type
         required:true,//validation
@@ -35,13 +39,21 @@ const orderSchema = new Schema({
         required:true,//validation
 
     },
+    //New field to store the total amount from checkout
+    total_price: { type: Number, required: true },
+    
 
     //new field added to update the order status yooo
     status:{
         type:String,
-        enum:["Packing","Delivering","Delivered"],
-        default:"Packing",
+        enum:["Processing","Delivering","Delivered"],
+        default:"Processing",
     },
+
+    payment_id:{
+        type:String,
+        required:true,
+    }
 });
 
 

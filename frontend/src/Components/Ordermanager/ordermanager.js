@@ -107,11 +107,14 @@ function OrderManager() {
         <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
           <thead>
             <tr>
+              <th>Order ID</th> {/* ✅ Added column */}
               <th>Customer Name</th>
               <th>Address</th>
               <th>Product ID</th>
+              <th>Product Name</th>
               <th>Size</th>
               <th>Quantity</th>
+              <th>Total Price</th>
               <th>Payment Type</th>
               <th>Status</th> {/* ✅ new column */}
               <th>Actions</th>
@@ -120,18 +123,21 @@ function OrderManager() {
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
+                <td>{order._id}</td> {/* ✅ Show Order ID */}
                 <td>{order.customer_name}</td>
                 <td>{order.customer_address}</td>
                 <td>{order.product_id}</td>
+                <td>{order.product_name}</td>
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
+                <td>{order.total_price}</td>
                 <td>{order.payment_type}</td>
                 <td>
                   <select
                     value={order.status || "Packing"}
                     onChange={(e) => handleStatusChange(order._id, e.target.value)}
                   >
-                    <option value="Packing">Packing</option>
+                    <option value="Packing">Processing</option>
                     <option value="Delivering">Delivering</option>
                     <option value="Delivered">Delivered</option>
                   </select>
@@ -233,7 +239,7 @@ function OrderManager() {
                 onChange={handleChange}
                 style={{ marginTop: "10px", width: "100%" }}
               >
-                <option value="Packing">Packing</option>
+                <option value="Packing">Processing</option>
                 <option value="Delivering">Delivering</option>
                 <option value="Delivered">Delivered</option>
               </select>

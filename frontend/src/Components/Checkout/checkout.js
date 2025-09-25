@@ -7,10 +7,11 @@ function Checkout() {
   const location = useLocation();
 
   // ✅ Get product data from ProductDetail
-  const { productCode, productPrice } = location.state || {};
+  const { productCode, productPrice, productname } = location.state || {};
 
   const [form, setForm] = useState({
     customer_name: "",
+    product_name:productname,
     customer_address: "",
     product_id: productCode || "", // auto-fill from navigation
     size: "",
