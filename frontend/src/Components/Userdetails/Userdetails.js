@@ -3,6 +3,7 @@ import Nav from '../Navbar/nav';
 import axios from "axios";
 import User from '../User/User';
 import { useReactToPrint } from 'react-to-print';
+import './Userdetails.css';
 
 
 
@@ -31,7 +32,7 @@ function Userdetails() {
   });
 
   return (
-    <div> 
+    <div className="user-profile-container"> 
       <Nav/>
       
 
@@ -39,7 +40,7 @@ function Userdetails() {
         {users && users.map((user, i)=> (
           <div key={i}>
             <User user={user}/>
-            </div>
+          </div>
         ))}
       </div>
       <a href="/myorders"><button>My orders</button></a>

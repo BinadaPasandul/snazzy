@@ -7,12 +7,14 @@ function Promotions() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const BACKEND_URL = 'http://localhost:5000'; // Your backend host
+
   const fetchPromotions = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await axios.get('http://localhost:5000/Promotions');
-      setPromotions(res.data?.Promotions || []);
+      const res = await axios.get(`${BACKEND_URL}/Promotions`);
+      setPromotions(res.data?.promotions || []);
     } catch (err) {
       setError(err?.response?.data?.message || err.message);
     } finally {
@@ -24,7 +26,7 @@ function Promotions() {
     fetchPromotions();
   }, []);
 
-  // countdown calculation
+  // Countdown calculation
   const getCountdown = (endDate) => {
     const now = new Date().getTime();
     const end = new Date(endDate).getTime();
@@ -40,7 +42,7 @@ function Promotions() {
     return `${days}d ${hours}h ${minutes}m ${seconds}s`;
   };
 
-  // Local countdown timers state
+  // Countdown timers state
   const [timers, setTimers] = useState({});
 
   useEffect(() => {
@@ -66,7 +68,11 @@ function Promotions() {
         promotions.map((p) => (
           <div key={p._id} className="promotion-card">
             {p.bannerImage ? (
-              <img src={p.bannerImage} alt={p.title} className="promotion-banner" />
+              <img
+                src={`${BACKEND_URL}${p.bannerImage}`} // full URL for backend images
+                alt={p.title}
+                className="promotion-banner"
+              />
             ) : (
               <div className="promotion-banner" style={{ background: '#f3f4f6' }} />
             )}
