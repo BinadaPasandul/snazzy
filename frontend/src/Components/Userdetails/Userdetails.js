@@ -3,6 +3,7 @@ import Nav from '../Navbar/nav';
 import axios from "axios";
 import User from '../User/User';
 import { useReactToPrint } from 'react-to-print';
+import './Userdetails.css';
 
 
 const URL = "http://localhost:5000/user/me";
@@ -30,18 +31,26 @@ function Userdetails() {
   });
 
   return (
-    <div> 
+    <div className="user-profile-container"> 
       <Nav/>
-      <h1>User details</h1>
+      
+      <div className="profile-header">
+        <h1>User Profile</h1>
+      </div>
 
       <div ref={ComponentsRef}>
         {users && users.map((user, i)=> (
           <div key={i}>
             <User user={user}/>
-            </div>
+          </div>
         ))}
       </div>
-      <button onClick={handlePrint}>Download Report</button>
+      
+      <div className="action-buttons">
+        <button onClick={handlePrint} className="action-btn btn-download">
+          📄 Download Report
+        </button>
+      </div>
     </div>
   )
 }
