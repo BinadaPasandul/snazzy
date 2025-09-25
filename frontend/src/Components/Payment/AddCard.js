@@ -28,34 +28,49 @@ const AddCard = () => {
     }
 
     try {
-      // Send paymentMethod.id to backend to attach to user
-      await api.post('/payment/add', { paymentMethodId: paymentMethod.id }); // no withCredentials
-      setSuccess('Card added successfully!');
+      await api.post('/payment/add', { paymentMethodId: paymentMethod.id });
+      setSuccess('✅ Card added successfully!');
       setError(null);
 
-      // Redirect after 2 seconds
       setTimeout(() => {
         navigate('/CardList');
       }, 2000);
-
     } catch (err) {
-      setError(err.response?.data?.message || 'Error adding card');
+      setError(err.response?.data?.message || '⚠️ Error adding card');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="card p-4">
-      <h3>Add Card</h3>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
+      <div className="w-full max-w-md bg-white shadow-md rounded-lg p-6">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Add Card</h3>
 
-      <CardElement className="form-control mb-3" />
-      
-      {error && <div className="alert alert-danger">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="border border-gray-300 rounded-md p-3">
+            <CardElement className="outline-none" />
+          </div>
 
-      <button type="submit" className="btn btn-primary" disabled={!stripe}>
-        Add Card
-      </button>
-    </form>
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-md p-2">
+              {error}
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-600 text-sm rounded-md p-2">
+              {success}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={!stripe}
+            className="w-full bg-indigo-600 text-white font-medium py-2 px-4 rounded-md shadow-sm transition hover:bg-indigo-700 disabled:opacity-50"
+          >
+            Add Card
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 
