@@ -30,7 +30,8 @@ const ProductDetail = () => {
   navigate("/checkout", { 
     state: { 
       productCode: product.pcode, 
-      productPrice: product.pamount 
+      productPrice: product.pamount,
+      productname:product.pname
     } 
   });
 };

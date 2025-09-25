@@ -1,19 +1,14 @@
-const express =  require ("express");
+const express = require("express");
 const router = express.Router();
 
-//Insert Model 
-const Promotion = require ("../Models/PromotionModel");
-//Insert Promotion Controller
 const PromotionController = require("../Controllers/PromotionController");
+const upload = require("../Middleware/uploadMiddleware"); // your multer setup
 
-//creaet route path
-router.get("/",PromotionController.getAllPromotions);
-router.post("/",PromotionController.addPromotions);
-router.get("/:id",PromotionController.getById);
-router.put("/:id",PromotionController.updatePromotion);
-router.delete("/:id",PromotionController.deletePromotion);
+// Routes
+router.get("/", PromotionController.getAllPromotions);
+router.post("/", upload.single("bannerImage"), PromotionController.addPromotions); // handle image
+router.get("/:id", PromotionController.getById);
+router.put("/:id", upload.single("bannerImage"), PromotionController.updatePromotion); // optional image update
+router.delete("/:id", PromotionController.deletePromotion);
 
-
-
-//export
-module.exports= router;
+module.exports = router;

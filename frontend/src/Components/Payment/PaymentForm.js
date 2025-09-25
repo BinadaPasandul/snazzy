@@ -4,14 +4,30 @@ import api from '../../utils/api';
 
 const PaymentForm = () => {
   const [cards, setCards] = useState([]);
-  const [amount, setAmount] = useState('');
+  const [amount, setAmount] = useState(null); // ✅ amount comes from query param
   const [selectedCard, setSelectedCard] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
   const navigate = useNavigate();
 
-  // Fetch cards for user
+  // ✅ Get amount and form completion status from query string (passed from Checkout)
+  useEffect(() => {
+    const queryParams = new URLSearchParams(window.location.search);
+    const amt = queryParams.get('amount');
+    const formComplete = queryParams.get('formComplete');
+    
+    if (amt) {
+      setAmount(parseFloat(amt));
+    }
+    
+    // If formComplete is not true, show error
+    if (formComplete !== 'true') {
+      setError('Please complete all required fields in the checkout form before proceeding with payment.');
+    }
+  }, []);
+
+  // ✅ Fetch cards for user
   useEffect(() => {
     const fetchCards = async () => {
       try {
@@ -30,31 +46,47 @@ const PaymentForm = () => {
     setError(null);
     setSuccess(null);
 
+    // Check if form is complete
+    const queryParams = new URLSearchParams(window.location.search);
+    const formComplete = queryParams.get('formComplete');
+    
+    if (formComplete !== 'true') {
+      setError('Please complete all required fields in the checkout form before proceeding with payment.');
+      return;
+    }
+
     if (!selectedCard) {
       setError('Please select a card');
       return;
     }
 
-    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      setError('Please enter a valid amount');
+    if (!amount || isNaN(amount) || amount <= 0) {
+      setError('Invalid amount');
       return;
     }
 
     try {
       const res = await api.post('/payment/pay', {
-        amount: parseFloat(amount),
+        amount, // ✅ already set from query param
         paymentMethodId: selectedCard,
       });
 
-      // Use amount from response
       setSuccess(`Payment of $${res.data.payment.amount} successful!`);
-      setAmount('');
       setSelectedCard('');
 
-      // Redirect to home after 2 seconds
-      setTimeout(() => {
-        navigate('/CardList');
-      }, 2000);
+      // Send success message to parent window (checkout) without navigating
+      if (window.parent !== window) {
+        window.parent.postMessage({
+          type: 'PAYMENT_SUCCESS',
+          payment: res.data.payment,
+          amount: res.data.payment.amount
+        }, '*');
+      } else {
+        // Only redirect if not in iframe
+        setTimeout(() => {
+          navigate('/CardList');
+        }, 2000);
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Payment failed');
     }
@@ -64,6 +96,7 @@ const PaymentForm = () => {
     <form onSubmit={handleSubmit} className="card p-4">
       <h3>Make Payment</h3>
 
+      {/* ✅ Card selection */}
       <select
         value={selectedCard}
         onChange={(e) => setSelectedCard(e.target.value)}
@@ -78,20 +111,22 @@ const PaymentForm = () => {
         ))}
       </select>
 
-      <input
-        type="number"
-        placeholder="Amount (USD)"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        className="form-control mb-3"
-        required
-      />
+      {/* ✅ Show amount (read-only, no input field) */}
+      {amount !== null && (
+        <div className="mb-3">
+          <strong>Amount to Pay:</strong> ${amount}
+        </div>
+      )}
 
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
 
-      <button type="submit" className="btn btn-primary">
-        Pay
+      <button 
+        type="submit" 
+        className="btn btn-primary"
+        disabled={!amount || amount <= 0 || cards.length === 0 || !selectedCard}
+      >
+        Pay ${amount}
       </button>
     </form>
   );

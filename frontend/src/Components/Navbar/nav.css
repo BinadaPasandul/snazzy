@@ -1,0 +1,170 @@
+/* ==============================
+   Navbar Base
+   ============================== */
+.navbar {
+  background: #111; /* Dark background */
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* ==============================
+   Navbar Inner Layout
+   ============================== */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 40px;
+  max-width: 1300px;
+  margin: auto;
+}
+
+/* ==============================
+   Logo
+   ============================== */
+.logo {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  transition: transform 0.2s ease;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.logo span {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: 1px;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.logo:hover span {
+  color: #6c63ff;
+}
+
+/* ==============================
+   Navigation Links
+   ============================== */
+.nav-links {
+  display: flex;
+  gap: 25px;
+  align-items: center;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.nav-link {
+  position: relative;
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #ddd;
+  padding: 8px 16px;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+/* Hover effect (underline glow) */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  height: 2px;
+  background: #6c63ff;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link:hover::after {
+  width: 80%;
+}
+
+.nav-link:hover {
+  color: #fff;
+  background: rgba(108, 99, 255, 0.1);
+}
+
+/* Active link */
+.nav-link.active {
+  background: #6c63ff;
+  color: #fff;
+  box-shadow: 0 0 12px rgba(108, 99, 255, 0.6);
+}
+
+/* ==============================
+   User Greeting
+   ============================== */
+.user-greeting {
+  font-size: 0.9rem;
+  color: #bbb;
+  margin-right: 8px;
+}
+
+.user-greeting span {
+  color: #6c63ff;
+  font-weight: 500;
+}
+
+/* ==============================
+   Logout Button
+   ============================== */
+.logout-btn {
+  background: #ff4d4d;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 30px;
+  color: #fff;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: #e63939;
+  box-shadow: 0 0 10px rgba(255, 77, 77, 0.6);
+}
+
+/* ==============================
+   Responsive Design
+   ============================== */
+@media (max-width: 900px) {
+  .nav-links {
+    gap: 15px;
+  }
+}
+
+@media (max-width: 700px) {
+  .navbar-container {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 12px 20px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    margin-top: 10px;
+  }
+
+  .nav-link {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+}
