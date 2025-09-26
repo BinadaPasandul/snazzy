@@ -113,18 +113,45 @@ exports.deleteCard = async (req, res) => {
   const userId = req.user.id;
   const { cardId } = req.params;
 
+  // Validate cardId format
+  if (!cardId || cardId.length !== 24) {
+    return res.status(400).json({ message: 'Invalid card ID format' });
+  }
+
   try {
+    // Find the card
     const card = await PaymentMethod.findOne({ _id: cardId, userId });
-    if (!card) return res.status(404).json({ message: 'Card not found' });
+    if (!card) {
+      return res.status(404).json({ message: 'Card not found' });
+    }
 
     // Detach card from Stripe
-    await stripe.paymentMethods.detach(card.stripePaymentMethodId);
+    try {
+      await stripe.paymentMethods.detach(card.stripePaymentMethodId);
+    } catch (stripeError) {
+      console.error('Stripe detach error:', stripeError);
+      // Continue with database deletion even if Stripe fails
+      // This handles cases where the payment method was already detached
+    }
 
+    // Delete from database
     await card.deleteOne();
-    res.status(200).json({ message: 'Card deleted' });
+    
+    res.status(200).json({ message: 'Card deleted successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Delete card error:', err);
+    
+    // Handle specific error types
+    if (err.name === 'CastError') {
+      return res.status(400).json({ message: 'Invalid card ID format' });
+    }
+    
+    if (err.name === 'ValidationError') {
+      return res.status(400).json({ message: 'Validation error: ' + err.message });
+    }
+    
+    // Generic server error
+    res.status(500).json({ message: 'Server error: ' + err.message });
   }
 };
 
