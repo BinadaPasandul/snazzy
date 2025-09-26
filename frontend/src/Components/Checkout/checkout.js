@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../utils/api"; // your axios instance
+import Nav from "../Navbar/nav";
+import Footer from "../Footer/Footer";
 
 function Checkout() {
   const navigate = useNavigate();
@@ -184,6 +186,8 @@ function Checkout() {
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
 
   return (
+    <div>
+      <Nav />
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#f9fafb',
@@ -834,6 +838,9 @@ function Checkout() {
           </div>
         </div>
       </div>
+      
+    </div>
+    <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Nav from "../Navbar/nav"; // keep/remove based on project
+import Footer from "../Footer/Footer";
 
 const ProductDetail = () => {
   const { id } = useParams();               // grabs the :id from URL
@@ -173,6 +174,7 @@ const ProductDetail = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

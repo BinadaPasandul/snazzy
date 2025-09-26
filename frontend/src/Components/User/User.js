@@ -1,6 +1,8 @@
 import axios from "axios";
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import Nav from "../Navbar/nav";
+import Footer from "../Footer/Footer";
 
 
 function User(props) {
@@ -30,16 +32,20 @@ function User(props) {
   
   return (
     <div>
-      <h1>User Details</h1>
+      <Nav />
+      <div style={{ padding: "40px 20px", maxWidth: "800px", margin: "0 auto" }}>
+        <h1>User Details</h1>
 
-      
-      <h2>Name:{name}</h2>
-      <h2>Gmail:{gmail}</h2>
-      <h2>Age:{age}</h2>
-      {address && <h2>Address:{address}</h2>}
-      {role === 'customer' && <h2>Loyalty Points: {loyaltyPoints}</h2>}
-      <NavLink to={`/userdetails/${_id}`}>Update</NavLink>
-      <button onClick={deleteHandler}>Delete</button>
+        
+        <h2>Name:{name}</h2>
+        <h2>Gmail:{gmail}</h2>
+        <h2>Age:{age}</h2>
+        {address && <h2>Address:{address}</h2>}
+        {role === 'customer' && <h2>Loyalty Points: {loyaltyPoints}</h2>}
+        <NavLink to={`/userdetails/${_id}`}>Update</NavLink>
+        <button onClick={deleteHandler}>Delete</button>
+      </div>
+      <Footer />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import Nav from "../Navbar/nav"; // optional depending on your project
+import Footer from "../Footer/Footer";
 
 const DisplayProducts = () => {
   const navigate = useNavigate();
@@ -129,6 +130,7 @@ const DisplayProducts = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };

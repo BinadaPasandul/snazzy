@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Nav from '../Navbar/nav';
+import Footer from '../Footer/Footer';
 import './Home.css';
 import api from '../../utils/api';
 
@@ -143,8 +144,7 @@ function Home() {
 				</div>
 			</section>
 
-			<footer className="mini-footer">
-			</footer>
+			<Footer />
 		</div>
 	);
 }

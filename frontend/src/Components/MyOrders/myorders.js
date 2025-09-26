@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/api"; // your axios instance with JWT
 import ChatPopup from "../Payment/ChatPopup"; // Import chat popup component
+import Nav from "../Navbar/nav";
+import Footer from "../Footer/Footer";
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -108,6 +110,9 @@ function MyOrders() {
 
   return (
     <div>
+       <Nav />
+    <div>
+     
       <h2>My Orders</h2>
       {orders.length === 0 ? (
         <p>No orders found</p>
@@ -319,6 +324,9 @@ function MyOrders() {
           </div>
         </div>
       )}
+      
+    </div>
+    <Footer />
     </div>
   );
 }

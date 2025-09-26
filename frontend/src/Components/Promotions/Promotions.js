@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import Nav from '../Navbar/nav';
+import Footer from '../Footer/Footer';
 import './Promotion.css'; // Modern CSS
 
 function Promotions() {
@@ -61,7 +63,9 @@ function Promotions() {
   if (error) return <div>Error loading promotions: {error}</div>;
 
   return (
-    <div className="promotions-container">
+    <div>
+      <Nav />
+      <div className="promotions-container">
       {promotions.length === 0 ? (
         <div>No promotions available.</div>
       ) : (
@@ -87,6 +91,8 @@ function Promotions() {
           </div>
         ))
       )}
+      </div>
+      <Footer />
     </div>
   );
 }

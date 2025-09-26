@@ -33,7 +33,7 @@ function Userdetails() {
 
   return (
     <div className="user-profile-container"> 
-      <Nav/>
+      
       
 
       <div ref={ComponentsRef}>

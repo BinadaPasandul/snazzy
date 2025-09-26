@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/api";
 import Nav from "../Navbar/nav";
+
+import Footer from "../Footer/Footer";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
@@ -249,6 +251,7 @@ const DisplayProducts = () => {
           ))}
         </div>
       </div>
+      <Footer />
     </div>
   );
 };
