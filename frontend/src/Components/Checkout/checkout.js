@@ -7,7 +7,7 @@ function Checkout() {
   const location = useLocation();
 
   // ✅ Get product data from ProductDetail
-  const { productCode, productPrice, productname } = location.state || {};
+  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion } = location.state || {};
 
   const [form, setForm] = useState({
     customer_name: "",
@@ -20,12 +20,30 @@ function Checkout() {
   });
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentId, setPaymentId] = useState(null);
+  const [useLoyaltyPoints, setUseLoyaltyPoints] = useState(false);
+  const [userLoyaltyPoints, setUserLoyaltyPoints] = useState(0);
+  const [loyaltyValidationError, setLoyaltyValidationError] = useState("");
 
   useEffect(() => {
     if (productCode) {
       setForm((prev) => ({ ...prev, product_id: productCode }));
     }
   }, [productCode]);
+
+  // Fetch user's loyalty points
+  useEffect(() => {
+    const fetchUserLoyaltyPoints = async () => {
+      try {
+        const response = await api.get("/user/me");
+        if (response.data && response.data.user) {
+          setUserLoyaltyPoints(response.data.user.loyaltyPoints || 0);
+        }
+      } catch (error) {
+        console.error("Error fetching loyalty points:", error);
+      }
+    };
+    fetchUserLoyaltyPoints();
+  }, []);
 
   // Listen for payment success messages from iframe
   useEffect(() => {
@@ -53,7 +71,14 @@ function Checkout() {
 
         const orderData = {
           ...form,
-          total_price: form.quantity * productPrice,
+          total_price: totalPrice,
+          base_price: originalBasePrice,
+          promotion_discount: promotionDiscount,
+          has_promotion: hasPromotion,
+          promotion_title: promotion?.title || null,
+          promotion_id: promotion?.id || null,
+          loyalty_discount: loyaltyDiscount,
+          used_loyalty_points: useLoyaltyPoints,
           payment_id: receivedPaymentId, // Include payment ID
         };
 
@@ -62,7 +87,18 @@ function Checkout() {
         try {
           const orderResponse = await api.post("/orders", orderData);
           console.log('Order submitted successfully:', orderResponse.data);
-          alert("✅ Order placed successfully!");
+          
+          // Update loyalty points in state
+          if (orderResponse.data.loyaltyPoints !== undefined) {
+            setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
+          }
+          
+          // Show success message with loyalty points info
+          const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
+            ? `✅ Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
+            : `✅ Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
+          
+          alert(loyaltyMessage);
           navigate("/myorders");
         } catch (err) {
           console.error("Order failed:", err.response?.data || err.message);
@@ -83,6 +119,18 @@ function Checkout() {
     });
   };
 
+  const handleLoyaltyPointsChange = (e) => {
+    const isChecked = e.target.checked;
+    setUseLoyaltyPoints(isChecked);
+    setLoyaltyValidationError("");
+
+    // Validate loyalty points when checkbox is checked
+    if (isChecked && userLoyaltyPoints < 5) {
+      setLoyaltyValidationError("You don't have enough loyalty points. You need at least 5 points to use this feature.");
+      setUseLoyaltyPoints(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -93,13 +141,31 @@ function Checkout() {
 
     const orderData = {
       ...form,
-      total_price: form.quantity * productPrice,
+      total_price: totalPrice,
+      base_price: originalBasePrice,
+      promotion_discount: promotionDiscount,
+      has_promotion: hasPromotion,
+      promotion_title: promotion?.title || null,
+      promotion_id: promotion?.id || null,
+      loyalty_discount: loyaltyDiscount,
+      used_loyalty_points: useLoyaltyPoints,
       payment_id: paymentId, // Include payment ID if available
     };
 
     try {
-      await api.post("/orders", orderData);
-      alert("✅ Order placed successfully!");
+      const orderResponse = await api.post("/orders", orderData);
+      
+      // Update loyalty points in state
+      if (orderResponse.data.loyaltyPoints !== undefined) {
+        setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
+      }
+      
+      // Show success message with loyalty points info
+      const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
+        ? `✅ Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
+        : `✅ Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
+      
+      alert(loyaltyMessage);
       navigate("/myorders");
     } catch (err) {
       console.error("Order failed:", err.response?.data || err.message);
@@ -107,8 +173,12 @@ function Checkout() {
     }
   };
 
-  // ✅ derived value for total price
-  const totalPrice = productPrice ? form.quantity * productPrice : 0;
+  // ✅ derived value for total price with both promotion and loyalty discounts
+  const originalBasePrice = originalPrice ? form.quantity * originalPrice : (productPrice ? form.quantity * productPrice : 0);
+  const promotionDiscount = hasPromotion ? originalBasePrice * (promotion?.discount / 100) : 0;
+  const priceAfterPromotion = originalBasePrice - promotionDiscount;
+  const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0; // 5% discount on price after promotion
+  const totalPrice = priceAfterPromotion - loyaltyDiscount;
   
   // ✅ Check if all required fields are completed
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
@@ -373,18 +443,60 @@ function Checkout() {
                     </div>
                   )}
                   
+                  {originalBasePrice > 0 && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '0.75rem 0',
+                      borderTop: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ color: '#6b7280' }}>Subtotal ({form.quantity} items):</span>
+                      <span style={{ fontWeight: '500', color: '#111827' }}>${originalBasePrice.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {hasPromotion && promotionDiscount > 0 && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '0.75rem 0',
+                      borderTop: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ color: '#dc2626', fontWeight: '500' }}>Promotion Discount ({promotion?.discount}%):</span>
+                      <span style={{ fontWeight: '500', color: '#dc2626' }}>-${promotionDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+
+                  {useLoyaltyPoints && loyaltyDiscount > 0 && (
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      padding: '0.75rem 0',
+                      borderTop: '1px solid #e2e8f0'
+                    }}>
+                      <span style={{ color: '#f59e0b', fontWeight: '500' }}>Loyalty Points Discount (5%):</span>
+                      <span style={{ fontWeight: '500', color: '#f59e0b' }}>-${loyaltyDiscount.toFixed(2)}</span>
+                    </div>
+                  )}
+                  
                   <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     padding: '0.75rem 0',
-                    borderTop: '1px solid #e2e8f0'
+                    borderTop: '2px solid #e2e8f0',
+                    backgroundColor: (useLoyaltyPoints || hasPromotion) ? '#fef3c7' : 'transparent',
+                    borderRadius: '0.5rem',
+                    marginTop: '0.5rem'
                   }}>
                     <span style={{ fontWeight: '600', color: '#111827' }}>Total Price:</span>
                     <span style={{ 
                       fontWeight: 'bold', 
                       fontSize: '1.125rem',
-                      color: '#4f46e5' 
+                      color: (useLoyaltyPoints || hasPromotion) ? '#f59e0b' : '#4f46e5'
                     }}>
                       ${totalPrice.toFixed(2)}
                     </span>
@@ -427,6 +539,95 @@ function Checkout() {
                     <option value="cash">Cash on Delivery</option>
                     <option value="card">Card Payment</option>
                   </select>
+                </div>
+
+                {/* Loyalty Points Checkbox */}
+                <div style={{
+                  backgroundColor: '#f8fafc',
+                  borderRadius: '0.75rem',
+                  padding: '1.5rem',
+                  border: '1px solid #e2e8f0'
+                }}>
+                  <h3 style={{
+                    fontSize: '1rem',
+                    fontWeight: '600',
+                    color: '#111827',
+                    marginBottom: '1rem',
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}>
+                    <svg style={{ width: '1.25rem', height: '1.25rem', marginRight: '0.5rem', color: '#f59e0b' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                    </svg>
+                    Loyalty Points
+                  </h3>
+                  
+                  <div style={{ marginBottom: '1rem' }}>
+                    <p style={{ 
+                      color: '#6b7280', 
+                      fontSize: '0.875rem',
+                      marginBottom: '0.5rem'
+                    }}>
+                      Current Loyalty Points: <strong style={{ color: '#f59e0b' }}>{userLoyaltyPoints}</strong>
+                    </p>
+                  </div>
+
+                  <label style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    padding: '0.75rem',
+                    borderRadius: '0.5rem',
+                    border: '2px solid #e5e7eb',
+                    backgroundColor: useLoyaltyPoints ? '#fef3c7' : '#fafafa',
+                    transition: 'all 0.2s'
+                  }}>
+                    <input
+                      type="checkbox"
+                      checked={useLoyaltyPoints}
+                      onChange={handleLoyaltyPointsChange}
+                      style={{
+                        width: '1.25rem',
+                        height: '1.25rem',
+                        marginRight: '0.75rem',
+                        accentColor: '#f59e0b'
+                      }}
+                    />
+                    <div>
+                      <div style={{ 
+                        fontWeight: '500', 
+                        color: '#111827',
+                        marginBottom: '0.25rem'
+                      }}>
+                        Use 5 Loyalty Points for 5% Discount
+                      </div>
+                      <div style={{ 
+                        fontSize: '0.875rem', 
+                        color: '#6b7280' 
+                      }}>
+                        Save ${loyaltyDiscount.toFixed(2)} on this order
+                      </div>
+                    </div>
+                  </label>
+
+                  {loyaltyValidationError && (
+                    <div style={{
+                      backgroundColor: '#fef2f2',
+                      border: '1px solid #fecaca',
+                      color: '#dc2626',
+                      padding: '0.75rem',
+                      borderRadius: '0.5rem',
+                      marginTop: '0.75rem',
+                      fontSize: '0.875rem',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                      <svg style={{ width: '1rem', height: '1rem', marginRight: '0.5rem', flexShrink: 0 }} fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {loyaltyValidationError}
+                    </div>
+                  )}
                 </div>
 
                 {/* Submit Button for Cash */}

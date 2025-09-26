@@ -42,6 +42,19 @@ const orderSchema = new Schema({
      //New field to store the total amount from checkout
      total_price: { type: Number, required: true },
      
+     // Discount information
+     base_price: { type: Number, required: false },
+     
+     // Loyalty points discount information
+     loyalty_discount: { type: Number, required: false, default: 0 },
+     used_loyalty_points: { type: Boolean, required: false, default: false },
+     
+     // Promotion discount information
+     promotion_discount: { type: Number, required: false, default: 0 },
+     has_promotion: { type: Boolean, required: false, default: false },
+     promotion_title: { type: String, required: false },
+     promotion_id: { type: String, required: false },
+     
      payment_id:{
          type:String,//data type
          required:false,//optional for cash payments

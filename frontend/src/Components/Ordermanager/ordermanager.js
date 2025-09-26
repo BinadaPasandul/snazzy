@@ -98,10 +98,69 @@ function OrderManager() {
     }
   };
 
+  // Calculate discount statistics
+  const discountStats = orders.reduce((stats, order) => {
+    if (order.used_loyalty_points) {
+      stats.loyaltyDiscounts += 1;
+      stats.loyaltyDiscountAmount += order.loyalty_discount || 0;
+    }
+    if (order.has_promotion) {
+      stats.promotionDiscounts += 1;
+      stats.promotionDiscountAmount += order.promotion_discount || 0;
+    }
+    stats.totalDiscountAmount += (order.loyalty_discount || 0) + (order.promotion_discount || 0);
+    return stats;
+  }, { 
+    loyaltyDiscounts: 0, 
+    loyaltyDiscountAmount: 0,
+    promotionDiscounts: 0,
+    promotionDiscountAmount: 0,
+    totalDiscountAmount: 0
+  });
+
   return (
     <div>
       <Nav />
       <h2>Order Manager - Display Order Details</h2>
+      
+      {/* Loyalty Points Statistics */}
+      {orders.length > 0 && (
+        <div style={{
+          backgroundColor: '#f8fafc',
+          border: '1px solid #e2e8f0',
+          borderRadius: '8px',
+          padding: '15px',
+          marginBottom: '20px',
+          display: 'flex',
+          justifyContent: 'space-around',
+          alignItems: 'center'
+        }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
+              {orders.length}
+            </div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Orders</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#dc2626' }}>
+              {discountStats.promotionDiscounts}
+            </div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Promotion Discounts</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b' }}>
+              {discountStats.loyaltyDiscounts}
+            </div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Loyalty Discounts</div>
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>
+              ${discountStats.totalDiscountAmount.toFixed(2)}
+            </div>
+            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Discounts Given</div>
+          </div>
+        </div>
+      )}
 
       {orders.length > 0 ? (
         <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
@@ -114,6 +173,9 @@ function OrderManager() {
               <th>Product Name</th>
               <th>Size</th>
               <th>Quantity</th>
+              <th>Base Price</th>
+              <th>Promotion Discount</th>
+              <th>Loyalty Discount</th>
               <th>Total Price</th>
               <th>Payment Type</th>
               <th>Status</th> {/* ✅ new column */}
@@ -130,7 +192,46 @@ function OrderManager() {
                 <td>{order.product_name}</td>
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
-                <td>{order.total_price}</td>
+                <td>
+                  {order.base_price ? `$${order.base_price.toFixed(2)}` : `$${order.total_price.toFixed(2)}`}
+                </td>
+                <td>
+                  {order.has_promotion && order.promotion_discount > 0 ? (
+                    <div>
+                      <span style={{ color: '#dc2626', fontWeight: 'bold' }}>
+                        -${order.promotion_discount.toFixed(2)}
+                      </span>
+                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                        {order.promotion_title || 'Promotion'}
+                      </div>
+                    </div>
+                  ) : (
+                    <span style={{ color: '#6b7280' }}>No promotion</span>
+                  )}
+                </td>
+                <td>
+                  {order.used_loyalty_points && order.loyalty_discount > 0 ? (
+                    <span style={{ color: '#f59e0b', fontWeight: 'bold' }}>
+                      -${order.loyalty_discount.toFixed(2)}
+                    </span>
+                  ) : (
+                    <span style={{ color: '#6b7280' }}>No loyalty discount</span>
+                  )}
+                </td>
+                <td>
+                  <span style={{ 
+                    fontWeight: 'bold',
+                    color: (order.used_loyalty_points || order.has_promotion) ? '#f59e0b' : '#111827'
+                  }}>
+                    ${order.total_price.toFixed(2)}
+                  </span>
+                  {(order.used_loyalty_points || order.has_promotion) && (
+                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                      {order.has_promotion && order.used_loyalty_points ? 'Promotion + Loyalty' : 
+                       order.has_promotion ? 'Promotion Applied' : 'Loyalty Points Used'}
+                    </div>
+                  )}
+                </td>
                 <td>{order.payment_type}</td>
                 <td>
                   <select
@@ -183,6 +284,38 @@ function OrderManager() {
             }}
           >
             <h3>Edit Order</h3>
+            
+            {/* Display discount information */}
+            {(editingOrder.used_loyalty_points || editingOrder.has_promotion) && (
+              <div style={{
+                backgroundColor: '#fef3c7',
+                border: '1px solid #f59e0b',
+                borderRadius: '6px',
+                padding: '10px',
+                marginBottom: '15px',
+                fontSize: '0.9rem'
+              }}>
+                <div style={{ fontWeight: 'bold', color: '#92400e', marginBottom: '5px' }}>
+                  🎉 Discounts Applied
+                </div>
+                <div style={{ color: '#6b7280' }}>
+                  Base Price: ${editingOrder.base_price?.toFixed(2) || editingOrder.total_price.toFixed(2)}<br/>
+                  {editingOrder.has_promotion && (
+                    <>
+                      Promotion Discount: -${editingOrder.promotion_discount?.toFixed(2) || '0.00'} 
+                      ({editingOrder.promotion_title || 'Promotion'})<br/>
+                    </>
+                  )}
+                  {editingOrder.used_loyalty_points && (
+                    <>
+                      Loyalty Points Discount: -${editingOrder.loyalty_discount?.toFixed(2) || '0.00'}<br/>
+                    </>
+                  )}
+                  Final Price: ${editingOrder.total_price.toFixed(2)}
+                </div>
+              </div>
+            )}
+            
             <form onSubmit={handleUpdate}>
               <input
                 type="text"

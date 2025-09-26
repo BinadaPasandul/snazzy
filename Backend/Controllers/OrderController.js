@@ -29,7 +29,7 @@ const addOrders = async (req, res) => {
 
     console.log("Incoming body:", req.body);
 
-    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, payment_id } = req.body;
+    const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, payment_id, base_price, loyalty_discount, used_loyalty_points, promotion_discount, has_promotion, promotion_title, promotion_id } = req.body;
 
     try {
         // optional: validate user exists
@@ -48,14 +48,35 @@ const addOrders = async (req, res) => {
             quantity,
             payment_type,
             total_price,
+            base_price: base_price || total_price,
+            promotion_discount: promotion_discount || 0,
+            has_promotion: has_promotion || false,
+            promotion_title: promotion_title || null,
+            promotion_id: promotion_id || null,
+            loyalty_discount: loyalty_discount || 0,
+            used_loyalty_points: used_loyalty_points || false,
             payment_id,
         });
 
         await order.save();
-        user.loyaltyPoints = (user.loyaltyPoints || 0) + 5;
+        
+        // Handle loyalty points logic
+        if (used_loyalty_points && user.loyaltyPoints >= 5) {
+            // Deduct 5 loyalty points for using the discount
+            user.loyaltyPoints = Math.max((user.loyaltyPoints || 0) - 5, 0);
+        } else {
+            // Add 5 loyalty points for new order (if not using loyalty points)
+            user.loyaltyPoints = (user.loyaltyPoints || 0) + 5;
+        }
+        
         await user.save();
 
-        return res.status(201).json({ order, loyaltyPoints: user.loyaltyPoints });
+        return res.status(201).json({ 
+            order, 
+            loyaltyPoints: user.loyaltyPoints,
+            loyaltyPointsUsed: used_loyalty_points || false,
+            loyaltyDiscount: loyalty_discount || 0
+        });
         
     } catch (err) {
         console.error(err);
