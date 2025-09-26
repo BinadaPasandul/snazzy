@@ -128,7 +128,7 @@ function MyOrders() {
        <Nav />
     <div>
      
-      <h2>My Orders</h2>
+      
     <div className="mo-container">
       <h2 className="mo-title">My Orders</h2>
       {orders.length === 0 ? (
