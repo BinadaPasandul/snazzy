@@ -146,66 +146,102 @@ function Nav() {
                                 </button>
                             </NavLink>
 
-                            {/* Role-based dashboard links */}
-                            {user.role === "admin" && (
-                                <NavLink 
-                                    to="/admin" 
-                                    className={({ isActive }) => (isActive ? "active" : "")}
-                                >
-                                    <button className="sidebar-btn">
-                                        <span className="btn-icon">⚙️</span>
-                                        Admin Dashboard
-                                    </button>
-                                </NavLink>
-                            )}
+                                    {/* Admin-only dashboard links */}
+                                    {user.role === "admin" && (
+                                        <>
+                                            <NavLink 
+                                                to="/admin" 
+                                                className={({ isActive }) => (isActive ? "active" : "")}
+                                            >
+                                                <button className="sidebar-btn">
+                                                    <span className="btn-icon">⚙️</span>
+                                                    Admin Dashboard
+                                                </button>
+                                            </NavLink>
 
-                            {user.role === "product_manager" && (
-                                <NavLink 
-                                    to="/productmanager" 
-                                    className={({ isActive }) => (isActive ? "active" : "")}
-                                >
-                                    <button className="sidebar-btn">
-                                        <span className="btn-icon">📦</span>
-                                        Product Manager
-                                    </button>
-                                </NavLink>
-                            )}
+                                            <NavLink 
+                                                to="/productmanager" 
+                                                className={({ isActive }) => (isActive ? "active" : "")}
+                                            >
+                                                <button className="sidebar-btn admin-access">
+                                                    <span className="btn-icon">📦</span>
+                                                    Product Dashboard
+                                                    <span className="admin-badge">ADMIN</span>
+                                                </button>
+                                            </NavLink>
 
-                            {user.role === "order_manager" && (
-                                <NavLink 
-                                    to="/ordermanager" 
-                                    className={({ isActive }) => (isActive ? "active" : "")}
-                                >
-                                    <button className="sidebar-btn">
-                                        <span className="btn-icon">📋</span>
-                                        Order Manager
-                                    </button>
-                                </NavLink>
-                            )}
+                                            <NavLink 
+                                                to="/ordermanager" 
+                                                className={({ isActive }) => (isActive ? "active" : "")}
+                                            >
+                                                <button className="sidebar-btn admin-access">
+                                                    <span className="btn-icon">📋</span>
+                                                    Order Dashboard
+                                                    <span className="admin-badge">ADMIN</span>
+                                                </button>
+                                            </NavLink>
 
-                            {user.role === "promotion_manager" && (
-                                <NavLink 
-                                    to="/promotionmanager" 
-                                    className={({ isActive }) => (isActive ? "active" : "")}
-                                >
-                                    <button className="sidebar-btn">
-                                        <span className="btn-icon">🎯</span>
-                                        Promotion Manager
-                                    </button>
-                                </NavLink>
-                            )}
+                                            <NavLink 
+                                                to="/promotiondashboard" 
+                                                className={({ isActive }) => (isActive ? "active" : "")}
+                                            >
+                                                <button className="sidebar-btn admin-access">
+                                                    <span className="btn-icon">🎯</span>
+                                                    Promotion Dashboard
+                                                    <span className="admin-badge">ADMIN</span>
+                                                </button>
+                                            </NavLink>
+                                        </>
+                                    )}
 
-                            {user.role === "financial_manager" && (
-                                <NavLink 
-                                    to="/financialmanager" 
-                                    className={({ isActive }) => (isActive ? "active" : "")}
-                                >
-                                    <button className="sidebar-btn">
-                                        <span className="btn-icon">💰</span>
-                                        Financial Manager
-                                    </button>
-                                </NavLink>
-                            )}
+                                    {/* Individual role dashboards for non-admin roles */}
+                                    {user.role === "product_manager" && (
+                                        <NavLink 
+                                            to="/productmanager" 
+                                            className={({ isActive }) => (isActive ? "active" : "")}
+                                        >
+                                            <button className="sidebar-btn">
+                                                <span className="btn-icon">📦</span>
+                                                Product Manager
+                                            </button>
+                                        </NavLink>
+                                    )}
+
+                                    {user.role === "order_manager" && (
+                                        <NavLink 
+                                            to="/ordermanager" 
+                                            className={({ isActive }) => (isActive ? "active" : "")}
+                                        >
+                                            <button className="sidebar-btn">
+                                                <span className="btn-icon">📋</span>
+                                                Order Manager
+                                            </button>
+                                        </NavLink>
+                                    )}
+
+                                    {user.role === "promotion_manager" && (
+                                        <NavLink 
+                                            to="/promotiondashboard" 
+                                            className={({ isActive }) => (isActive ? "active" : "")}
+                                        >
+                                            <button className="sidebar-btn">
+                                                <span className="btn-icon">🎯</span>
+                                                Promotion Manager
+                                            </button>
+                                        </NavLink>
+                                    )}
+
+                                    {user.role === "financial_manager" && (
+                                        <NavLink 
+                                            to="/financialmanager" 
+                                            className={({ isActive }) => (isActive ? "active" : "")}
+                                        >
+                                            <button className="sidebar-btn">
+                                                <span className="btn-icon">💰</span>
+                                                Financial Manager
+                                            </button>
+                                        </NavLink>
+                                    )}
 
                             <button className="sidebar-logout-btn" onClick={handleLogout}>
                                 <span className="btn-icon">🚪</span>

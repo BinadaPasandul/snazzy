@@ -9,8 +9,19 @@ const ProtectedRoute = ({ children, role }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (role && user.role !== role) {
-    return <Navigate to="/login" replace />;
+  // Handle multiple roles (array) or single role (string)
+  if (role) {
+    if (Array.isArray(role)) {
+      // If role is an array, check if user's role is in the array
+      if (!role.includes(user.role)) {
+        return <Navigate to="/login" replace />;
+      }
+    } else {
+      // If role is a string, check for exact match
+      if (user.role !== role) {
+        return <Navigate to="/login" replace />;
+      }
+    }
   }
 
   return children;

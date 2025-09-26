@@ -155,7 +155,7 @@ function App() {
           <Route
             path="/productmanager"
             element={
-              <ProtectedRoute role="product_manager">
+              <ProtectedRoute role={["admin", "product_manager"]}>
                 <Productmanager />
               </ProtectedRoute>
             }
@@ -163,7 +163,7 @@ function App() {
           <Route
             path="/ordermanager"
             element={
-              <ProtectedRoute role="order_manager">
+              <ProtectedRoute role={["admin", "order_manager"]}>
                 <Ordermanager />
               </ProtectedRoute>
             }
@@ -172,7 +172,7 @@ function App() {
           <Route
             path="/promotiondashboard"
             element={
-              <ProtectedRoute role="promotion_manager">
+              <ProtectedRoute role={["admin", "promotion_manager"]}>
                 <Promotionmanager />
               </ProtectedRoute>
             }
@@ -181,7 +181,7 @@ function App() {
           <Route
             path="/insertpromotion"
             element={
-              <ProtectedRoute role="promotion_manager">
+              <ProtectedRoute role={["admin", "promotion_manager"]}>
                 <InsertPromotion />
               </ProtectedRoute>
             }
@@ -189,7 +189,7 @@ function App() {
           <Route
             path="/EditPromotion/:id"
             element={
-              <ProtectedRoute role="promotion_manager">
+              <ProtectedRoute role={["admin", "promotion_manager"]}>
                 <EditPromotion />
               </ProtectedRoute>
             }
@@ -239,7 +239,7 @@ function App() {
            <Route
             path="/products"
             element={
-              <ProtectedRoute role="product_manager">
+              <ProtectedRoute role={["admin", "product_manager"]}>
                 <DisplayProducts />
               </ProtectedRoute>
             }
@@ -259,7 +259,7 @@ function App() {
           <Route
             path="/products/:id/edit"
             element={
-              <ProtectedRoute role="product_manager">
+              <ProtectedRoute role={["admin", "product_manager"]}>
                 <UpdateProduct />
               </ProtectedRoute>
             }
