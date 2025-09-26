@@ -3,6 +3,7 @@ import api from "../../utils/api"; // your axios instance with JWT
 import ChatPopup from "../Payment/ChatPopup"; // Import chat popup component
 import Nav from "../Navbar/nav";
 import Footer from "../Footer/Footer";
+import "./myorders.css";
 
 function MyOrders() {
   const [orders, setOrders] = useState([]);
@@ -104,8 +105,22 @@ function MyOrders() {
     }
   };
 
+  const stats = orders.reduce(
+    (acc, o) => {
+      acc.total += 1;
+      const status = o.status || "Processing";
+      if (status === "Delivered") acc.delivered += 1;
+      else if (status === "Delivering") acc.delivering += 1;
+      else acc.processing += 1;
+      const price = typeof o.total_price === "number" ? o.total_price : parseFloat(o.total_price) || 0;
+      acc.spent += price;
+      return acc;
+    },
+    { total: 0, delivered: 0, delivering: 0, processing: 0, spent: 0 }
+  );
+
   if (loading) {
-    return <p>Loading orders...</p>;
+    return <p className="mo-loading">Loading your orders…</p>;
   }
 
   return (
@@ -114,14 +129,35 @@ function MyOrders() {
     <div>
      
       <h2>My Orders</h2>
+    <div className="mo-container">
+      <h2 className="mo-title">My Orders</h2>
       {orders.length === 0 ? (
-        <p>No orders found</p>
+        <p className="mo-empty">You have no orders yet.</p>
       ) : (
-        <table
-          border="1"
-          cellPadding="8"
-          style={{ marginTop: "20px", borderCollapse: "collapse", width: "100%" }}
-        >
+        <>
+          <div className="mo-stats">
+            <div className="mo-stat">
+              <div className="mo-stat-value">{stats.total}</div>
+              <div className="mo-stat-label">Total Orders</div>
+            </div>
+            <div className="mo-stat">
+              <div className="mo-stat-value badge-green">{stats.delivered}</div>
+              <div className="mo-stat-label">Delivered</div>
+            </div>
+            <div className="mo-stat">
+              <div className="mo-stat-value badge-orange">{stats.delivering}</div>
+              <div className="mo-stat-label">Delivering</div>
+            </div>
+            <div className="mo-stat">
+              <div className="mo-stat-value badge-blue">{stats.processing}</div>
+              <div className="mo-stat-label">Processing</div>
+            </div>
+            <div className="mo-stat">
+              <div className="mo-stat-value">${stats.spent.toFixed(2)}</div>
+              <div className="mo-stat-label">Total Spent</div>
+            </div>
+          </div>
+        <table className="mo-table">
           <thead>
             <tr>
               <th>Order ID</th>
@@ -139,75 +175,43 @@ function MyOrders() {
           <tbody>
             {orders.map((order) => (
               <tr key={order._id}>
-                <td>{order._id}</td>
+                 <td className="mo-mono">{order._id}</td>
                 <td>{order.product_name}</td>
-                <td>{order.product_id}</td>
+                 <td className="mo-mono">{order.product_id}</td>
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
-                <td>{order.total_price}</td>
+                 <td>${order.total_price?.toFixed ? order.total_price.toFixed(2) : order.total_price}</td>
                 <td>{order.customer_address}</td>
                 <td>{order.payment_type}</td>
                 <td>
-                  <span
-                    style={{
-                      padding: "4px 8px",
-                      borderRadius: "4px",
-                      color: "white",
-                      backgroundColor: getStatusColor(order.status),
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {order.status || "Processing"}
-                  </span>
+                   <span className={`badge ${
+                     getStatusColor(order.status) === "green" ? "badge-green" :
+                     getStatusColor(order.status) === "orange" ? "badge-orange" : "badge-blue"
+                   }`}>
+                     {order.status || "Processing"}
+                   </span>
                 </td>
                 <td>
                   {/* Show refund button only if no refund request exists and order has payment_id */}
                   {!getRefundStatus(order._id) && order.payment_id && (
-                    <button
-                      onClick={() => handleRefundClick(order._id, order.payment_id)}
-                      style={{
-                        backgroundColor: "red",
-                        color: "white",
-                        border: "none",
-                        padding: "6px 10px",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Refund
-                    </button>
+                     <button className="btn btn-danger btn-sm" onClick={() => handleRefundClick(order._id, order.payment_id)}>
+                       Refund
+                     </button>
                   )}
                   
                   {/* Show refund status if refund request exists */}
                   {getRefundStatus(order._id) && (
-                    <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                      <span
-                        style={{
-                          padding: "4px 8px",
-                          borderRadius: "4px",
-                          color: "white",
-                          backgroundColor: getRefundStatusColor(getRefundStatus(order._id)),
-                          fontWeight: "bold",
-                          fontSize: "12px",
-                        }}
-                      >
-                        Refund: {getRefundStatus(order._id)}
-                      </span>
+                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                       <span className={`badge ${
+                         getRefundStatusColor(getRefundStatus(order._id)) === "green" ? "badge-green" :
+                         getRefundStatusColor(getRefundStatus(order._id)) === "red" ? "badge-red" : "badge-orange"
+                       }`}>
+                         Refund: {getRefundStatus(order._id)}
+                       </span>
                       {order.payment_id && (
-                        <button
-                          onClick={() => setOpenChatForPayment(order.payment_id)}
-                          style={{
-                            backgroundColor: "#007bff",
-                            color: "white",
-                            border: "none",
-                            padding: "4px 8px",
-                            borderRadius: "4px",
-                            cursor: "pointer",
-                            fontSize: "12px",
-                          }}
-                        >
-                          💬 Chat
-                        </button>
+                         <button className="btn btn-chat btn-sm" onClick={() => setOpenChatForPayment(order.payment_id)}>
+                           💬 Chat
+                         </button>
                       )}
                     </div>
                   )}
@@ -216,6 +220,7 @@ function MyOrders() {
             ))}
           </tbody>
         </table>
+        </>
       )}
 
       {/* Chat Popup for refund requests */}
@@ -325,6 +330,8 @@ function MyOrders() {
         </div>
       )}
       
+    </div>
+    
     </div>
     <Footer />
     </div>

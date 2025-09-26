@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Nav from "../Navbar/nav";
 import api from "../../utils/api"; // axios instance with JWT
+import "./ordermanager.css";
 
 function OrderManager() {
   const [orders, setOrders] = useState([]);
   const [editingOrder, setEditingOrder] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [formData, setFormData] = useState({
     customer_name: "",
     customer_address: "",
@@ -118,55 +120,68 @@ function OrderManager() {
     totalDiscountAmount: 0
   });
 
+  const normalizedQuery = searchQuery.trim().toLowerCase();
+  const filteredOrders = normalizedQuery
+    ? orders.filter((order) => {
+        const fields = [
+          order._id,
+          order.customer_name,
+          order.customer_address,
+          order.product_id,
+          order.product_name,
+          order.size,
+          String(order.quantity),
+          order.payment_type,
+          order.status,
+        ]
+          .filter(Boolean)
+          .map((v) => String(v).toLowerCase());
+        return fields.some((f) => f.includes(normalizedQuery));
+      })
+    : orders;
+
   return (
-    <div>
+    <div className="om-container">
       <Nav />
-      <h2>Order Manager - Display Order Details</h2>
-      
-      {/* Loyalty Points Statistics */}
+      <div className="om-header">
+        <h2 className="om-title">Order Manager</h2>
+        <div className="om-search">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search by ID, customer, product, status..."
+            aria-label="Search orders"
+          />
+        </div>
+      </div>
+
       {orders.length > 0 && (
-        <div style={{
-          backgroundColor: '#f8fafc',
-          border: '1px solid #e2e8f0',
-          borderRadius: '8px',
-          padding: '15px',
-          marginBottom: '20px',
-          display: 'flex',
-          justifyContent: 'space-around',
-          alignItems: 'center'
-        }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#111827' }}>
-              {orders.length}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Orders</div>
+        <div className="om-stats">
+          <div className="om-stat">
+            <div className="om-stat-value">{orders.length}</div>
+            <div className="om-stat-label">Total Orders</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#dc2626' }}>
-              {discountStats.promotionDiscounts}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Promotion Discounts</div>
+          <div className="om-stat">
+            <div className="om-stat-value om-danger">{discountStats.promotionDiscounts}</div>
+            <div className="om-stat-label">Promotion Discounts</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b' }}>
-              {discountStats.loyaltyDiscounts}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Loyalty Discounts</div>
+          <div className="om-stat">
+            <div className="om-stat-value om-warn">{discountStats.loyaltyDiscounts}</div>
+            <div className="om-stat-label">Loyalty Discounts</div>
           </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>
-              ${discountStats.totalDiscountAmount.toFixed(2)}
-            </div>
-            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>Total Discounts Given</div>
+          <div className="om-stat">
+            <div className="om-stat-value om-success">${discountStats.totalDiscountAmount.toFixed(2)}</div>
+            <div className="om-stat-label">Total Discounts Given</div>
           </div>
         </div>
       )}
 
-      {orders.length > 0 ? (
-        <table border="1" cellPadding="8" style={{ marginTop: "20px" }}>
+      {filteredOrders.length > 0 ? (
+        <table className="om-table">
           <thead>
             <tr>
-              <th>Order ID</th> {/* ✅ Added column */}
+              <th>Order ID</th>
               <th>Customer Name</th>
               <th>Address</th>
               <th>Product ID</th>
@@ -178,17 +193,17 @@ function OrderManager() {
               <th>Loyalty Discount</th>
               <th>Total Price</th>
               <th>Payment Type</th>
-              <th>Status</th> {/* ✅ new column */}
+              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {orders.map((order) => (
+            {filteredOrders.map((order) => (
               <tr key={order._id}>
-                <td>{order._id}</td> {/* ✅ Show Order ID */}
+                <td className="om-mono">{order._id}</td>
                 <td>{order.customer_name}</td>
                 <td>{order.customer_address}</td>
-                <td>{order.product_id}</td>
+                <td className="om-mono">{order.product_id}</td>
                 <td>{order.product_name}</td>
                 <td>{order.size}</td>
                 <td>{order.quantity}</td>
@@ -198,43 +213,38 @@ function OrderManager() {
                 <td>
                   {order.has_promotion && order.promotion_discount > 0 ? (
                     <div>
-                      <span style={{ color: '#dc2626', fontWeight: 'bold' }}>
-                        -${order.promotion_discount.toFixed(2)}
-                      </span>
-                      <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                        {order.promotion_title || 'Promotion'}
-                      </div>
+                      <span className="om-badge om-danger">-{order.promotion_discount.toFixed(2)}</span>
+                      <div className="om-subtext">{order.promotion_title || "Promotion"}</div>
                     </div>
                   ) : (
-                    <span style={{ color: '#6b7280' }}>No promotion</span>
+                    <span className="om-subtext">No promotion</span>
                   )}
                 </td>
                 <td>
                   {order.used_loyalty_points && order.loyalty_discount > 0 ? (
-                    <span style={{ color: '#f59e0b', fontWeight: 'bold' }}>
-                      -${order.loyalty_discount.toFixed(2)}
-                    </span>
+                    <span className="om-badge om-warn">-{order.loyalty_discount.toFixed(2)}</span>
                   ) : (
-                    <span style={{ color: '#6b7280' }}>No loyalty discount</span>
+                    <span className="om-subtext">No loyalty discount</span>
                   )}
                 </td>
                 <td>
-                  <span style={{ 
-                    fontWeight: 'bold',
-                    color: (order.used_loyalty_points || order.has_promotion) ? '#f59e0b' : '#111827'
-                  }}>
+                  <span className={`om-price ${order.used_loyalty_points || order.has_promotion ? "om-warn" : ""}`}>
                     ${order.total_price.toFixed(2)}
                   </span>
                   {(order.used_loyalty_points || order.has_promotion) && (
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                      {order.has_promotion && order.used_loyalty_points ? 'Promotion + Loyalty' : 
-                       order.has_promotion ? 'Promotion Applied' : 'Loyalty Points Used'}
+                    <div className="om-subtext">
+                      {order.has_promotion && order.used_loyalty_points
+                        ? "Promotion + Loyalty"
+                        : order.has_promotion
+                        ? "Promotion Applied"
+                        : "Loyalty Points Used"}
                     </div>
                   )}
                 </td>
                 <td>{order.payment_type}</td>
                 <td>
                   <select
+                    className="status-select"
                     value={order.status || "Packing"}
                     onChange={(e) => handleStatusChange(order._id, e.target.value)}
                   >
@@ -244,79 +254,43 @@ function OrderManager() {
                   </select>
                 </td>
                 <td>
-                  <button onClick={() => openEditModal(order)}>Edit</button>
-                  <button
-                    style={{ marginLeft: 8 }}
-                    onClick={() => handleDelete(order._id)}
-                  >
-                    Delete
-                  </button>
+                  <button className="btn btn-edit" onClick={() => openEditModal(order)}>Edit</button>
+                  <button className="btn btn-delete" onClick={() => handleDelete(order._id)}>Delete</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       ) : (
-        <p>No orders found</p>
+        <p className="empty-state">{orders.length > 0 ? "No orders match your search." : "No orders found"}</p>
       )}
 
-      {/* Edit Modal */}
       {editingOrder && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "#fff",
-              padding: "20px",
-              borderRadius: "8px",
-              width: "400px",
-            }}
-          >
+        <div className="om-modal-backdrop">
+          <div className="om-modal">
             <h3>Edit Order</h3>
-            
-            {/* Display discount information */}
+
             {(editingOrder.used_loyalty_points || editingOrder.has_promotion) && (
-              <div style={{
-                backgroundColor: '#fef3c7',
-                border: '1px solid #f59e0b',
-                borderRadius: '6px',
-                padding: '10px',
-                marginBottom: '15px',
-                fontSize: '0.9rem'
-              }}>
-                <div style={{ fontWeight: 'bold', color: '#92400e', marginBottom: '5px' }}>
-                  🎉 Discounts Applied
-                </div>
-                <div style={{ color: '#6b7280' }}>
-                  Base Price: ${editingOrder.base_price?.toFixed(2) || editingOrder.total_price.toFixed(2)}<br/>
+              <div className="om-discount-card">
+                <div className="om-discount-title">🎉 Discounts Applied</div>
+                <div className="om-subtext">
+                  Base Price: ${editingOrder.base_price?.toFixed(2) || editingOrder.total_price.toFixed(2)}<br />
                   {editingOrder.has_promotion && (
                     <>
-                      Promotion Discount: -${editingOrder.promotion_discount?.toFixed(2) || '0.00'} 
-                      ({editingOrder.promotion_title || 'Promotion'})<br/>
+                      Promotion Discount: -${editingOrder.promotion_discount?.toFixed(2) || "0.00"} ({editingOrder.promotion_title || "Promotion"})<br />
                     </>
                   )}
                   {editingOrder.used_loyalty_points && (
                     <>
-                      Loyalty Points Discount: -${editingOrder.loyalty_discount?.toFixed(2) || '0.00'}<br/>
+                      Loyalty Points Discount: -${editingOrder.loyalty_discount?.toFixed(2) || "0.00"}<br />
                     </>
                   )}
                   Final Price: ${editingOrder.total_price.toFixed(2)}
                 </div>
               </div>
             )}
-            
-            <form onSubmit={handleUpdate}>
+
+            <form onSubmit={handleUpdate} className="om-form">
               <input
                 type="text"
                 name="customer_name"
@@ -365,22 +339,14 @@ function OrderManager() {
                 placeholder="Payment Type"
                 required
               />
-              {/* ✅ Status field in modal */}
-              <select
-                name="status"
-                value={formData.status}
-                onChange={handleChange}
-                style={{ marginTop: "10px", width: "100%" }}
-              >
+              <select name="status" value={formData.status} onChange={handleChange} className="status-select">
                 <option value="Packing">Processing</option>
                 <option value="Delivering">Delivering</option>
                 <option value="Delivered">Delivered</option>
               </select>
-              <div style={{ marginTop: "10px" }}>
-                <button type="submit">Save</button>
-                <button type="button" onClick={closeModal} style={{ marginLeft: "10px" }}>
-                  Cancel
-                </button>
+              <div className="om-form-actions">
+                <button type="submit" className="btn btn-primary">Save</button>
+                <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
               </div>
             </form>
           </div>

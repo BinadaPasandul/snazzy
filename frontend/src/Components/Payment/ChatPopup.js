@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../../utils/api";
+import "./ChatPopup.css";
 
 const ChatPopup = ({ paymentId, onClose }) => {
   const [messages, setMessages] = useState([]);
@@ -56,100 +57,36 @@ const ChatPopup = ({ paymentId, onClose }) => {
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 20,
-        right: 20,
-        width: 320,
-        height: 420,
-        backgroundColor: "#fff",
-        border: "1px solid #ccc",
-        borderRadius: 8,
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 1000,
-      }}
-    >
-      {/* Header */}
-      <div
-        style={{
-          padding: 10,
-          borderBottom: "1px solid #ccc",
-          fontWeight: "bold",
-        }}
-      >
-        Chat (Payment #{paymentId})
-        <button onClick={onClose} style={{ float: "right" }}>
-          X
-        </button>
+    <div className="chat-popup">
+      <div className="chat-header">
+        <span>Chat (Payment #{paymentId})</span>
+        <button className="chat-close" onClick={onClose}>✕</button>
       </div>
-
-      {/* Messages */}
-      <div style={{ flex: 1, padding: 10, overflowY: "auto" }}>
+      <div className="chat-messages">
         {messages.map((msg, idx) => (
-          <div
-            key={idx}
-            style={{
-              marginBottom: 10,
-              textAlign: msg.from === "user" ? "right" : "left",
-            }}
-          >
-            <div
-              style={{
-                display: "inline-block",
-                padding: "5px 10px",
-                borderRadius: 8,
-                backgroundColor:
-                  msg.from === "user"
-                    ? "#d1e7dd"
-                    : msg.from === "ai"
-                    ? "#cfe2ff"
-                    : "#f8d7da",
-              }}
-            >
-              {/* Message text */}
+          <div key={idx} className="msg-row" style={{ textAlign: msg.from === "user" ? "right" : "left" }}>
+            <div className={`msg ${msg.from === "user" ? "msg-user" : msg.from === "ai" ? "msg-ai" : "msg-admin"}`}>
               {msg.message}
-
-              {/* Image handling */}
               {msg.fileUrl && msg.fileType?.startsWith("image/") && (
-                <div style={{ marginTop: 5 }}>
-                  <img
-                    src={`${api.defaults.baseURL}${msg.fileUrl}`} // prepend backend URL
-                    alt="uploaded"
-                    style={{ maxWidth: "150px", borderRadius: 6 }}
-                  />
+                <div>
+                  <img src={`${api.defaults.baseURL}${msg.fileUrl}`} alt="uploaded" />
                 </div>
               )}
-
-              {/* AI label */}
-              {msg.from === "ai" && (
-                <div style={{ fontSize: 10, color: "#555" }}>AI</div>
-              )}
+              {msg.from === "ai" && <div className="msg-meta">AI</div>}
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
-
-      {/* Input */}
-      <div style={{ padding: 10, borderTop: "1px solid #ccc" }}>
+      <div className="chat-input">
         <input
           type="text"
           placeholder="Type a message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          style={{ width: "100%", marginBottom: 5 }}
         />
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          onChange={(e) => setImage(e.target.files[0])}
-        />
-        <button onClick={handleSend} style={{ marginTop: 5, width: "100%" }}>
-          Send
-        </button>
+        <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => setImage(e.target.files[0])} />
+        <button className="chat-send" onClick={handleSend}>Send</button>
       </div>
     </div>
   );
