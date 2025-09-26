@@ -219,7 +219,7 @@ const DisplayProducts = () => {
                       style={{
                         margin: "4px",
                         padding: "8px",
-                        background: "#facc15",
+                        background: "#f2d14eff",
                         color: "#000",
                         border: "none",
                         borderRadius: "6px",
@@ -233,7 +233,7 @@ const DisplayProducts = () => {
                       style={{
                         margin: "4px",
                         padding: "8px",
-                        background: "#ef4444",
+                        background: "#e86060ff",
                         color: "#fff",
                         border: "none",
                         borderRadius: "6px",

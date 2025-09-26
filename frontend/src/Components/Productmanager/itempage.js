@@ -32,7 +32,7 @@ const DisplayProducts = () => {
       <Nav />
 
       <div style={{ padding: "40px 20px", maxWidth: "1000px", margin: "0 auto" }}>
-        <h1 style={{ textAlign: "center", marginBottom: "30px" }}>Product List</h1>
+        <h1 style={{ textAlign: "center", marginBottom: "30px" }}>Shop All</h1>
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 

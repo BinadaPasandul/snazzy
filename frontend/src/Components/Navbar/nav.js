@@ -51,6 +51,12 @@ function Nav() {
                                 >
                                     <button className="nav-btn">Product Manager</button>
                                 </NavLink>
+                                 <NavLink 
+                                    to="/products" 
+                                    className={({ isActive }) => (isActive ? "active" : "")}
+                                >
+                                    <button className="nav-btn">Product Catalog</button>
+                                </NavLink>
                             </li>
                         )}
 

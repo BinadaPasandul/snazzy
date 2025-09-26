@@ -40,6 +40,7 @@ import ProductDetail from  "./Components/Productmanager/productdetail";
 
 import Checkout from "./Components/Checkout/checkout";
 import MyOrders from "./Components/MyOrders/myorders";
+import Home from "./Components/Home/home";
 
 // Initialize Stripe
 const stripePromise = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
@@ -88,11 +89,15 @@ function App() {
 
           {/* Protected Routes */}
           <Route
+            path="/home"
+            element={
+                <Home />
+            }
+          />
+          <Route
             path="/"
             element={
-              <ProtectedRoute>
-                <Login />
-              </ProtectedRoute>
+                <Home />
             }
           />
           <Route
