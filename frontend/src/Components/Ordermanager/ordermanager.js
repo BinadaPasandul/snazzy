@@ -142,8 +142,9 @@ function OrderManager() {
     : orders;
 
   return (
+    <div><Nav />
     <div className="om-container">
-      <Nav />
+      
       <div className="om-header">
         <h2 className="om-title">Order Manager</h2>
         <div className="om-search">
@@ -160,110 +161,126 @@ function OrderManager() {
       {orders.length > 0 && (
         <div className="om-stats">
           <div className="om-stat">
-            <div className="om-stat-value">{orders.length}</div>
-            <div className="om-stat-label">Total Orders</div>
+            <div className="om-stat-info">
+              <div className="om-stat-label">Total Orders</div>
+              <div className="om-stat-value">{orders.length}</div>
+            </div>
+            <div className="om-stat-icon">📋</div>
           </div>
           <div className="om-stat">
-            <div className="om-stat-value om-danger">{discountStats.promotionDiscounts}</div>
-            <div className="om-stat-label">Promotion Discounts</div>
+            <div className="om-stat-info">
+              <div className="om-stat-label">Promotion Discounts</div>
+              <div className="om-stat-value om-danger">{discountStats.promotionDiscounts}</div>
+            </div>
+            <div className="om-stat-icon">🎯</div>
           </div>
           <div className="om-stat">
-            <div className="om-stat-value om-warn">{discountStats.loyaltyDiscounts}</div>
-            <div className="om-stat-label">Loyalty Discounts</div>
+            <div className="om-stat-info">
+              <div className="om-stat-label">Loyalty Discounts</div>
+              <div className="om-stat-value om-warn">{discountStats.loyaltyDiscounts}</div>
+            </div>
+            <div className="om-stat-icon">⭐</div>
           </div>
           <div className="om-stat">
-            <div className="om-stat-value om-success">${discountStats.totalDiscountAmount.toFixed(2)}</div>
-            <div className="om-stat-label">Total Discounts Given</div>
+            <div className="om-stat-info">
+              <div className="om-stat-label">Total Discounts Given</div>
+              <div className="om-stat-value om-success">${discountStats.totalDiscountAmount.toFixed(2)}</div>
+            </div>
+            <div className="om-stat-icon">💰</div>
           </div>
         </div>
       )}
 
       {filteredOrders.length > 0 ? (
-        <table className="om-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer Name</th>
-              <th>Address</th>
-              <th>Product ID</th>
-              <th>Product Name</th>
-              <th>Size</th>
-              <th>Quantity</th>
-              <th>Base Price</th>
-              <th>Promotion Discount</th>
-              <th>Loyalty Discount</th>
-              <th>Total Price</th>
-              <th>Payment Type</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredOrders.map((order) => (
-              <tr key={order._id}>
-                <td className="om-mono">{order._id}</td>
-                <td>{order.customer_name}</td>
-                <td>{order.customer_address}</td>
-                <td className="om-mono">{order.product_id}</td>
-                <td>{order.product_name}</td>
-                <td>{order.size}</td>
-                <td>{order.quantity}</td>
-                <td>
-                  {order.base_price ? `$${order.base_price.toFixed(2)}` : `$${order.total_price.toFixed(2)}`}
-                </td>
-                <td>
-                  {order.has_promotion && order.promotion_discount > 0 ? (
-                    <div>
-                      <span className="om-badge om-danger">-{order.promotion_discount.toFixed(2)}</span>
-                      <div className="om-subtext">{order.promotion_title || "Promotion"}</div>
-                    </div>
-                  ) : (
-                    <span className="om-subtext">No promotion</span>
-                  )}
-                </td>
-                <td>
-                  {order.used_loyalty_points && order.loyalty_discount > 0 ? (
-                    <span className="om-badge om-warn">-{order.loyalty_discount.toFixed(2)}</span>
-                  ) : (
-                    <span className="om-subtext">No loyalty discount</span>
-                  )}
-                </td>
-                <td>
-                  <span className={`om-price ${order.used_loyalty_points || order.has_promotion ? "om-warn" : ""}`}>
-                    ${order.total_price.toFixed(2)}
-                  </span>
-                  {(order.used_loyalty_points || order.has_promotion) && (
-                    <div className="om-subtext">
-                      {order.has_promotion && order.used_loyalty_points
-                        ? "Promotion + Loyalty"
-                        : order.has_promotion
-                        ? "Promotion Applied"
-                        : "Loyalty Points Used"}
-                    </div>
-                  )}
-                </td>
-                <td>{order.payment_type}</td>
-                <td>
-                  <select
-                    className="status-select"
-                    value={order.status || "Packing"}
-                    onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                  >
-                    <option value="Packing">Processing</option>
-                    <option value="Delivering">Delivering</option>
-                    <option value="Delivered">Delivered</option>
-                  </select>
-                </td>
-                <td>
-                  <button className="btn btn-edit" onClick={() => openEditModal(order)}>Edit</button>
-                  <button className="btn btn-delete" onClick={() => handleDelete(order._id)}>Delete</button>
-                </td>
+        <div className="om-table-container">
+          <table className="om-table">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer Name</th>
+                <th>Address</th>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Size</th>
+                <th>Quantity</th>
+                <th>Base Price</th>
+                <th>Promotion Discount</th>
+                <th>Loyalty Discount</th>
+                <th>Total Price</th>
+                <th>Payment Type</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filteredOrders.map((order) => (
+                <tr key={order._id}>
+                  <td className="om-mono">{order._id}</td>
+                  <td>{order.customer_name}</td>
+                  <td>{order.customer_address}</td>
+                  <td className="om-mono">{order.product_id}</td>
+                  <td>{order.product_name}</td>
+                  <td>{order.size}</td>
+                  <td>{order.quantity}</td>
+                  <td>
+                    {order.base_price ? `$${order.base_price.toFixed(2)}` : `$${order.total_price.toFixed(2)}`}
+                  </td>
+                  <td>
+                    {order.has_promotion && order.promotion_discount > 0 ? (
+                      <div>
+                        <span className="om-badge om-danger">-{order.promotion_discount.toFixed(2)}</span>
+                        <div className="om-subtext">{order.promotion_title || "Promotion"}</div>
+                      </div>
+                    ) : (
+                      <span className="om-subtext">No promotion</span>
+                    )}
+                  </td>
+                  <td>
+                    {order.used_loyalty_points && order.loyalty_discount > 0 ? (
+                      <span className="om-badge om-warn">-{order.loyalty_discount.toFixed(2)}</span>
+                    ) : (
+                      <span className="om-subtext">No loyalty discount</span>
+                    )}
+                  </td>
+                  <td>
+                    <span className={`om-price ${order.used_loyalty_points || order.has_promotion ? "om-warn" : ""}`}>
+                      ${order.total_price.toFixed(2)}
+                    </span>
+                    {(order.used_loyalty_points || order.has_promotion) && (
+                      <div className="om-subtext">
+                        {order.has_promotion && order.used_loyalty_points
+                          ? "Promotion + Loyalty"
+                          : order.has_promotion
+                          ? "Promotion Applied"
+                          : "Loyalty Points Used"}
+                      </div>
+                    )}
+                  </td>
+                  <td>{order.payment_type}</td>
+                  <td>
+                    <select
+                      className="status-select"
+                      value={order.status || "Packing"}
+                      onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                    >
+                      <option value="Packing">Processing</option>
+                      <option value="Delivering">Delivering</option>
+                      <option value="Delivered">Delivered</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button className="btn btn-edit" onClick={() => openEditModal(order)}>Edit</button>
+                    <button className="btn btn-delete" onClick={() => handleDelete(order._id)}>Delete</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       ) : (
-        <p className="empty-state">{orders.length > 0 ? "No orders match your search." : "No orders found"}</p>
+        <div className="empty-state-container">
+          <p className="empty-state">{orders.length > 0 ? "No orders match your search." : "No orders found"}</p>
+        </div>
       )}
 
       {editingOrder && (
@@ -353,7 +370,9 @@ function OrderManager() {
           </div>
         </div>
       )}
-      <Footer/>
+      
+    </div>
+    <Footer/>
     </div>
   );
 }
