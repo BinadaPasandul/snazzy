@@ -30,6 +30,7 @@ const Login = () => {
           JSON.stringify({
             name: response.name,
             role: response.role,
+            gmail: user.gmail, // Store the email used for login
           })
         );
 

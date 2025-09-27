@@ -83,6 +83,7 @@ function OrderManager() {
     }
   };
 
+
   // ✅ handle inline status change from table
   const handleStatusChange = async (id, newStatus) => {
     try {
@@ -191,6 +192,17 @@ function OrderManager() {
         </div>
       )}
 
+      {/* Orders Section */}
+      <div className="orders-section">
+        <div className="orders-header">
+          <h2 className="orders-title">Orders Management</h2>
+          <div className="orders-info">
+            <span className="orders-count">
+              {filteredOrders.length} of {orders.length} orders
+            </span>
+          </div>
+        </div>
+
       {filteredOrders.length > 0 ? (
         <div className="om-table-container">
           <table className="om-table">
@@ -282,6 +294,7 @@ function OrderManager() {
           <p className="empty-state">{orders.length > 0 ? "No orders match your search." : "No orders found"}</p>
         </div>
       )}
+      </div>
 
       {editingOrder && (
         <div className="om-modal-backdrop">

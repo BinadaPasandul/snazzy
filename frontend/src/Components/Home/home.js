@@ -210,7 +210,9 @@ function Home() {
 					{featured.map((p) => (
 						<div key={p._id} className="card">
 							<div className="card-media">
-								{p.image ? (
+								{(p.images && p.images.length > 0) ? (
+									<img src={`http://localhost:5000${p.images[0]}`} alt={p.pname} />
+								) : p.image ? (
 									<img src={`http://localhost:5000${p.image}`} alt={p.pname} />
 								) : (
 									<div className="placeholder">No Image</div>

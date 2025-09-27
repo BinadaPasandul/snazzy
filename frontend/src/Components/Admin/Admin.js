@@ -10,9 +10,25 @@ function Admin() {
     const history = useNavigate();
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
-    const [report, setReport] = useState(null);
-    const [loadingReport, setLoadingReport] = useState(false);
-    const [reportError, setReportError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+
+    // Password validation function
+    const validatePassword = (password) => {
+        if (password.length < 5) {
+            return "Password must be at least 5 characters long";
+        }
+        if (!/[A-Z]/.test(password)) {
+            return "Password must contain at least one uppercase letter";
+        }
+        if (!/[a-z]/.test(password)) {
+            return "Password must contain at least one lowercase letter";
+        }
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+            return "Password must contain at least one symbol";
+        }
+        return "";
+    };
+
     const [editForm, setEditForm] = useState({ name: "", gmail: "", age: "", address: "", role: "" });
     const [userStats, setUserStats] = useState({
         customers: 0,
@@ -70,24 +86,17 @@ function Admin() {
 
     useEffect(() => {
         fetchUsers().catch(() => setUsers([]));
-        (async ()=>{
-            try {
-                setLoadingReport(true);
-                setReportError("");
-                const token = localStorage.getItem("token");
-                const response = await axios.get("http://localhost:5000/user/report", { headers: { Authorization: token } });
-                setReport(response.data);
-            } catch (e) {
-                setReportError(e?.response?.data?.message || e.message || "Failed to load report");
-            } finally {
-                setLoadingReport(false);
-            }
-        })();
     }, []);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUser((prevUser) => ({ ...prevUser, [name]: value }));
+        
+        // Validate password in real-time
+        if (name === "password") {
+            const validationError = validatePassword(value);
+            setPasswordError(validationError);
+        }
     };
 
     const handleRoleSearch = (role) => {
@@ -124,7 +133,7 @@ function Admin() {
         setFilteredUsers(users);
     };
 
-    // PDF Component for download
+    // PDF Component for download - uses filtered users
     const PDFReport = () => (
         <div className="pdf-report">
             <div className="pdf-header">
@@ -135,11 +144,21 @@ function Admin() {
                 <div className="pdf-report-info">
                     <h2 className="pdf-report-title">User Report</h2>
                     <p className="pdf-date">Generated on: {new Date().toLocaleDateString()}</p>
+                    {(searchRole || searchEmail) && (
+                        <div className="pdf-filters">
+                            <p><strong>Applied Filters:</strong></p>
+                            {searchRole && <p>• Role: {searchRole}</p>}
+                            {searchEmail && <p>• Email contains: {searchEmail}</p>}
+                            <p><strong>Total Filtered Results: {filteredUsers.length}</strong></p>
+                        </div>
+                    )}
                 </div>
             </div>
             
             <div className="pdf-content">
-                <h3 className="pdf-section-title">Users</h3>
+                <h3 className="pdf-section-title">
+                    {filteredUsers.length === users.length ? 'All Users' : 'Filtered Users'}
+                </h3>
                 <table className="pdf-table">
                     <thead>
                         <tr>
@@ -152,7 +171,7 @@ function Admin() {
                         </tr>
                     </thead>
                     <tbody>
-                        {users.map((user, index) => (
+                        {filteredUsers.map((user, index) => (
                             <tr key={user._id}>
                                 <td>{user.name}</td>
                                 <td>{user.gmail}</td>
@@ -170,6 +189,13 @@ function Admin() {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+
+        // Validate password before submission
+        const passwordValidationError = validatePassword(user.password);
+        if (passwordValidationError) {
+            setPasswordError(passwordValidationError);
+            return;
+        }
 
         sendRequest().then(() => {
             alert("Staff Member Added Successfully");
@@ -330,7 +356,16 @@ function Admin() {
                         value={user.password}
                         required
                         placeholder="Enter your password"
+                        style={passwordError ? { borderColor: '#dc3545' } : {}}
                     />
+                    {passwordError && (
+                        <div className="password-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                            {passwordError}
+                        </div>
+                    )}
+                    <div className="password-requirements" style={{ fontSize: '0.8rem', color: '#6c757d', marginTop: '4px' }}>
+                        Password must be at least 5 characters with uppercase, lowercase, and symbol
+                    </div>
                 </div>
 
                 <div className="form-group">
@@ -402,7 +437,7 @@ function Admin() {
                                     <option value="product_manager">Product Manager</option>
                                     <option value="order_manager">Order Manager</option>
                                     <option value="promotion_manager">Promotion Manager</option>
-                                    <option value="financial_manager">Financial Manager</option>
+                                    
                                 </select>
                             </div>
                             
@@ -538,11 +573,19 @@ function Admin() {
                                                                         <div class="pdf-report-info">
                                                                             <h2 class="pdf-report-title">User Report</h2>
                                                                             <p class="pdf-date">Generated on: ${new Date().toLocaleDateString()}</p>
+                                                                            ${(searchRole || searchEmail) ? `
+                                                                                <div class="pdf-filters">
+                                                                                    <p><strong>Applied Filters:</strong></p>
+                                                                                    ${searchRole ? `<p>• Role: ${searchRole}</p>` : ''}
+                                                                                    ${searchEmail ? `<p>• Email contains: ${searchEmail}</p>` : ''}
+                                                                                    <p><strong>Total Filtered Results: ${filteredUsers.length}</strong></p>
+                                                                                </div>
+                                                                            ` : ''}
                                                                         </div>
                                                                     </div>
                                                                     
                                                                     <div class="pdf-content">
-                                                                        <h3 class="pdf-section-title">Users</h3>
+                                                                        <h3 class="pdf-section-title">${filteredUsers.length === users.length ? 'All Users' : 'Filtered Users'}</h3>
                                                                         <table class="pdf-table">
                                                                             <thead>
                                                                                 <tr>
@@ -555,7 +598,7 @@ function Admin() {
                                                                                 </tr>
                                                                             </thead>
                                                                             <tbody>
-                                                                                ${users.map(user => `
+                                                                                ${filteredUsers.map(user => `
                                                                                     <tr>
                                                                                         <td>${user.name}</td>
                                                                                         <td>${user.gmail}</td>
@@ -579,7 +622,7 @@ function Admin() {
                                                 }
                                             }}
                                         >
-                                            📄 Download PDF
+                                            📄 Download {filteredUsers.length === users.length ? 'All Users' : 'Filtered Users'} PDF
                                         </button>
                                     </th>
                                 </tr>

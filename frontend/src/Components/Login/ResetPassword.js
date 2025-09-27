@@ -11,9 +11,44 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  // Password validation function
+  const validatePassword = (password) => {
+    if (password.length < 5) {
+      return "Password must be at least 5 characters long";
+    }
+    if (!/[A-Z]/.test(password)) {
+      return "Password must contain at least one uppercase letter";
+    }
+    if (!/[a-z]/.test(password)) {
+      return "Password must contain at least one lowercase letter";
+    }
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      return "Password must contain at least one symbol";
+    }
+    return "";
+  };
+
+  const handlePasswordChange = (e) => {
+    const value = e.target.value;
+    setPassword(value);
+    
+    // Validate password in real-time
+    const validationError = validatePassword(value);
+    setPasswordError(validationError);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate password before submission
+    const passwordValidationError = validatePassword(password);
+    if (passwordValidationError) {
+      setPasswordError(passwordValidationError);
+      return;
+    }
+    
     try {
       const res = await axios.post(`http://localhost:5000/user/reset-password/${token}`, { password });
       setMessage(res.data.message);
@@ -59,11 +94,20 @@ const ResetPassword = () => {
                     type="password"
                     id="password"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     required
                     className="reset-password-input"
+                    style={passwordError ? { borderColor: '#dc3545' } : {}}
                     placeholder="Enter your new password"
                   />
+                  {passwordError && (
+                    <div className="password-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                      {passwordError}
+                    </div>
+                  )}
+                  <div className="password-requirements" style={{ fontSize: '0.8rem', color: '#6c757d', marginTop: '4px' }}>
+                    Password must be at least 5 characters with uppercase, lowercase, and symbol
+                  </div>
                 </div>
 
                 <button type="submit" className="reset-password-submit-btn">

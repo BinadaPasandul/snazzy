@@ -14,7 +14,7 @@ const AddProducts = () => {
     pdescription: ""
   });
   const [variants, setVariants] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -55,7 +55,13 @@ const AddProducts = () => {
 
   // handle file
   const handleFileChange = (e) => {
-    setImageFile(e.target.files[0]);
+    const files = Array.from(e.target.files);
+    setImageFiles(prev => [...prev, ...files]);
+  };
+
+  // Remove image from preview
+  const removeImage = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
 
   // handle drag and drop
@@ -72,9 +78,9 @@ const AddProducts = () => {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragOver(false);
-    const files = e.dataTransfer.files;
+    const files = Array.from(e.dataTransfer.files);
     if (files.length > 0) {
-      setImageFile(files[0]);
+      setImageFiles(prev => [...prev, ...files]);
     }
   };
 
@@ -107,8 +113,8 @@ const AddProducts = () => {
       }
     }
 
-    if (!imageFile) {
-      setError("Product image is required");
+    if (imageFiles.length === 0) {
+      setError("At least one product image is required");
       setIsSubmitting(false);
       return;
     }
@@ -120,7 +126,11 @@ const AddProducts = () => {
       formData.append("pamount", product.pamount);
       formData.append("pdescription", product.pdescription);
       formData.append("variants", JSON.stringify(variants));
-      formData.append("image", imageFile);
+      
+      // Append all image files
+      imageFiles.forEach((file, index) => {
+        formData.append("images", file);
+      });
 
       const res = await api.post("/products", formData);
 
@@ -272,8 +282,8 @@ const AddProducts = () => {
 
           {/* Image upload area */}
           <div className="image-upload-area">
-            <label htmlFor="image" className="upload-label">
-              Choose Product Image:
+            <label htmlFor="images" className="upload-label">
+              Choose Product Images (Multiple):
             </label>
             
             <div 
@@ -284,28 +294,43 @@ const AddProducts = () => {
             >
               <input
                 type="file"
-                id="image"
-                name="image"
+                id="images"
+                name="images"
                 accept="image/*"
+                multiple
                 onChange={handleFileChange}
                 required
                 className="file-input"
               />
               <div className="upload-icon">📁</div>
-              <div className="upload-text">Drop your image here or click to browse</div>
-              <div className="upload-subtext">Supports: JPG, PNG, GIF (Max 10MB)</div>
+              <div className="upload-text">Drop your images here or click to browse</div>
+              <div className="upload-subtext">Supports: JPG, PNG, GIF (Max 3MB each, up to 10 images)</div>
             </div>
           </div>
 
-          {/* Image preview */}
-          {imageFile && (
+          {/* Image previews */}
+          {imageFiles.length > 0 && (
             <div className="image-preview-container">
-              <div className="preview-label">Preview:</div>
-              <img
-                src={URL.createObjectURL(imageFile)}
-                alt="Preview"
-                className="image-preview"
-              />
+              <div className="preview-label">Preview ({imageFiles.length} images):</div>
+              <div className="image-preview-grid">
+                {imageFiles.map((file, index) => (
+                  <div key={index} className="image-preview-item">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index + 1}`}
+                      className="image-preview"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="remove-image-btn"
+                    >
+                      ✕
+                    </button>
+                    <div className="image-order">#{index + 1}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
