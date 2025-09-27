@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 import Nav from '../Navbar/nav'; // Ensure correct path
+import api from '../../utils/api';
 
 function EditPromotion() {
     const { id } = useParams();
@@ -19,14 +19,13 @@ function EditPromotion() {
         bannerFile: null // new file to upload
     });
 
-    const BACKEND_URL = 'http://localhost:5000';
 
     useEffect(() => {
         const fetchPromotion = async () => {
             setLoading(true);
             setError('');
             try {
-                const res = await axios.get(`${BACKEND_URL}/Promotions/${id}`);
+                const res = await api.get(`/Promotions/${id}`);
                 const p = res.data?.promotion;
                 if (p) {
                     setFormData({
@@ -90,7 +89,7 @@ function EditPromotion() {
                 data.append('bannerImage', bannerFile);
             }
 
-            await axios.put(`${BACKEND_URL}/Promotions/${id}`, data, {
+            await api.put(`/Promotions/${id}`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
@@ -209,7 +208,7 @@ function EditPromotion() {
                                 {formData.bannerImage && (
                                     <div style={{ marginBottom: '12px', borderRadius: '8px', overflow: 'hidden' }}>
                                         <img
-                                            src={`${BACKEND_URL}${formData.bannerImage}`}
+                                            src={`http://localhost:5000${formData.bannerImage}`}
                                             alt="Current Banner"
                                             style={{
                                                 width: '200px',
