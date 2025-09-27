@@ -36,7 +36,7 @@ const Login = () => {
         alert("Login Success");
         // Redirect by role
         if (response.role === "customer") {
-          history("/userdetails");
+          history("/home");
         } else if (response.role === "admin") {
           history("/admin");
         } else if (response.role === "product_manager") {
@@ -51,10 +51,24 @@ const Login = () => {
           alert("Unknown role");
         }
       } else {
-        alert("Login error: " + response.err);
+        // Handle specific login errors
+        if (response.err && response.err.includes("Invalid email or password")) {
+          alert("Invalid email or password. Please check your credentials and try again.");
+        } else {
+          alert("Login error: " + response.err);
+        }
       }
     } catch (err) {
-      alert("Error: " + err.message);
+      // Handle network or other errors
+      if (err.response && err.response.data && err.response.data.err) {
+        if (err.response.data.err.includes("Invalid email or password")) {
+          alert("Invalid email or password. Please check your credentials and try again.");
+        } else {
+          alert("Login error: " + err.response.data.err);
+        }
+      } else {
+        alert("Network error. Please check your connection and try again.");
+      }
     }
   };
 

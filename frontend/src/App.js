@@ -41,6 +41,7 @@ import ProductDetail from  "./Components/Productmanager/ProductDetail";
 import Checkout from "./Components/Checkout/checkout";
 import MyOrders from "./Components/MyOrders/myorders";
 import Home from "./Components/Home/home";
+import ContactUs from "./Components/ContactUs/ContactUs";
 
 // Initialize Stripe
 const stripePromise = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
@@ -84,6 +85,10 @@ function App() {
                 <ResetPassword />
               </PublicOnlyRoute>
             }
+          />
+          <Route
+            path="/contact"
+            element={<ContactUs />}
           />
           
 

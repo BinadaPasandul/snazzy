@@ -384,10 +384,10 @@
 .users-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 20px;
   flex-wrap: wrap;
-  gap: 15px;
+  gap: 20px;
 }
 
 .users-title {
@@ -403,23 +403,31 @@
 
 .search-container {
   display: flex;
-  align-items: center;
-  gap: 20px;
+  align-items: flex-start;
+  gap: 25px;
   flex-wrap: wrap;
+  background: #ffffff;
+  padding: 25px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  min-width: 500px;
 }
 
 .role-search-container {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  min-width: 200px;
 }
 
 .email-search-container {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
-  flex-wrap: wrap;
+  min-width: 250px;
 }
 
 .search-label {
@@ -430,15 +438,15 @@
 }
 
 .role-search-select {
-  padding: 8px 12px;
+  padding: 10px 15px;
   border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 0.9rem;
   background: #ffffff;
   color: #2d3748;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 150px;
+  width: 150px;
 }
 
 .role-search-select:focus {
@@ -448,14 +456,14 @@
 }
 
 .email-search-input {
-  padding: 8px 12px;
+  padding: 10px 15px;
   border: 2px solid #e2e8f0;
-  border-radius: 8px;
+  border-radius: 4px;
   font-size: 0.9rem;
   background: #ffffff;
   color: #2d3748;
   transition: all 0.2s ease;
-  min-width: 200px;
+  width: 200px;
 }
 
 .email-search-input:focus {
@@ -482,6 +490,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  align-self: flex-start;
+  margin-top: 8px;
 }
 
 .clear-all-filters-btn:hover {

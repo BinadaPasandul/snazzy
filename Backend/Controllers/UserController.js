@@ -88,7 +88,7 @@ const getById = async (req, res, next) => {
 
     let user;
     try {
-        user = await Register.findById(id).select("-password");
+        user = await Register.findById(id).select("password");
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -341,8 +341,63 @@ const updateLoyaltyPoints = async (userId) => {
 
 exports.updateLoyaltyPoints = updateLoyaltyPoints;
 
-// ...existing code...
+// Get current logged in user
+const getCurrentUser = async (req, res) => {
+  try {
+    const currentUser = await Register.findById(req.user.id).select("-password");
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ user: currentUser });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: "Server error while fetching current user" });
+  }
+};
+
+// Update user with authorization check
+const updateUserWithAuth = async (req, res, next) => {
+  try {
+    const requesterId = req.user && req.user.id;
+    const requesterRole = req.user && req.user.role;
+    const targetId = req.params.id;
+
+    if (requesterRole === 'admin' || requesterId === targetId) {
+      return updateUser(req, res, next);
+    }
+
+    return res.status(403).json({ message: "You can only update your own account" });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error while updating user" });
+  }
+};
+
+// Delete user with authorization check
+const deleteUserWithAuth = async (req, res, next) => {
+  try {
+    const requesterId = req.user && req.user.id;
+    const requesterRole = req.user && req.user.role;
+    const targetId = req.params.id;
+
+    // Admins can delete any user
+    if (requesterRole === 'admin') {
+      return deleteUser(req, res, next);
+    }
+
+    // Customers can delete only themselves
+    if (requesterRole === 'customer' && requesterId === targetId) {
+      return deleteUser(req, res, next);
+    }
+
+    return res.status(403).json({ message: "Forbidden: you cannot delete this account" });
+  } catch (err) {
+    return res.status(500).json({ message: "Server error while deleting user" });
+  }
+};
 
 exports.exportUsersPdf = exportUsersPdf;
 exports.forgotPassword = forgotPassword;
 exports.resetPassword = resetPassword;
+exports.getCurrentUser = getCurrentUser;
+exports.updateUserWithAuth = updateUserWithAuth;
+exports.deleteUserWithAuth = deleteUserWithAuth;
