@@ -15,6 +15,7 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedVariant, setSelectedVariant] = useState(null);
   const [quantity, setQuantity] = useState(1);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -98,6 +99,37 @@ const ProductDetail = () => {
     }
   };
 
+  // Get all available images
+  const getAllImages = () => {
+    if (!product) return [];
+    if (product.images && product.images.length > 0) {
+      return product.images;
+    }
+    if (product.image) {
+      return [product.image];
+    }
+    return [];
+  };
+
+  // Handle image navigation
+  const handlePreviousImage = () => {
+    const images = getAllImages();
+    setCurrentImageIndex(prev => 
+      prev === 0 ? images.length - 1 : prev - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    const images = getAllImages();
+    setCurrentImageIndex(prev => 
+      prev === images.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const handleImageSelect = (index) => {
+    setCurrentImageIndex(index);
+  };
+
   const handleBuyNow = () => {
     if (!selectedVariant) {
       alert("Please select a size and color first!");
@@ -147,17 +179,72 @@ const ProductDetail = () => {
         {/* LEFT SIDE - IMAGE GALLERY */}
         <div className="image-gallery">
           <div className="image-gallery-sticky">
-            {product.image ? (
-              <div className="product-image-container">
-                <img
-                  src={`http://localhost:5000${product.image}`}
-                  alt={product.pname}
-                  className="product-image"
-                />
-              </div>
-            ) : (
-              <div className="no-image-placeholder">
-                No Image Available
+            {/* Main Image Display */}
+            <div className="product-image-container">
+              {(() => {
+                const images = getAllImages();
+                if (images.length > 0) {
+                  return (
+                    <>
+                      <img
+                        src={`http://localhost:5000${images[currentImageIndex]}`}
+                        alt={product.pname}
+                        className="product-image"
+                      />
+                      
+                      {/* Navigation arrows - only show if multiple images */}
+                      {images.length > 1 && (
+                        <>
+                          <button 
+                            className="image-nav-btn image-nav-prev"
+                            onClick={handlePreviousImage}
+                            aria-label="Previous image"
+                          >
+                            ‹
+                          </button>
+                          <button 
+                            className="image-nav-btn image-nav-next"
+                            onClick={handleNextImage}
+                            aria-label="Next image"
+                          >
+                            ›
+                          </button>
+                        </>
+                      )}
+                      
+                      {/* Image counter */}
+                      {images.length > 1 && (
+                        <div className="image-counter">
+                          {currentImageIndex + 1} / {images.length}
+                        </div>
+                      )}
+                    </>
+                  );
+                } else {
+                  return (
+                    <div className="no-image-placeholder">
+                      No Image Available
+                    </div>
+                  );
+                }
+              })()}
+            </div>
+            
+            {/* Image Thumbnails - only show if multiple images */}
+            {getAllImages().length > 1 && (
+              <div className="image-thumbnails">
+                {getAllImages().map((image, index) => (
+                  <button
+                    key={index}
+                    className={`image-thumbnail ${currentImageIndex === index ? 'active' : ''}`}
+                    onClick={() => handleImageSelect(index)}
+                  >
+                    <img
+                      src={`http://localhost:5000${image}`}
+                      alt={`${product.pname} view ${index + 1}`}
+                    />
+                  </button>
+                ))}
               </div>
             )}
             

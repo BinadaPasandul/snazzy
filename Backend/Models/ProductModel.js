@@ -7,7 +7,8 @@ const ProductSchema = new Schema({
   pcode:       { type: String, required: true },
   pamount:     { type: Number, required: true },
   pdescription:{ type: String, required: true },
-  image:       { type: String },
+  image:       { type: String }, // Keep for backward compatibility - will store first image
+  images:      [{ type: String }], // Array of image paths for multiple images
   variants:    [{
     size:       { type: Number, required: true, min: 35, max: 44 },
     color:      { type: String, required: true },

@@ -4,7 +4,19 @@ const Promotion = require("../Models/PromotionModel");
 //Data Insert 
 const addProducts = async (req, res) => {
   const { pname, pcode, pamount, pdescription, variants } = req.body;
-  const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
+  
+  // Handle multiple images
+  let imagePaths = [];
+  let firstImagePath = null;
+  
+  if (req.files && req.files.length > 0) {
+    imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+    firstImagePath = imagePaths[0]; // First image for backward compatibility
+  } else if (req.file) {
+    // Single file upload (backward compatibility)
+    firstImagePath = `/uploads/${req.file.filename}`;
+    imagePaths = [firstImagePath];
+  }
 
   try {
     // Parse variants if it's a string (from form data)
@@ -34,7 +46,8 @@ const addProducts = async (req, res) => {
       pamount,
       pdescription,
       variants: parsedVariants,
-      image: imagePath
+      image: firstImagePath, // For backward compatibility
+      images: imagePaths // Multiple images
     });
     await product.save();
     return res.status(201).json({ product });
@@ -72,7 +85,22 @@ const updateProduct = async (req, res) => {
       updateData.variants = parsedVariants;
     }
 
-    if (req.file) updateData.image = `/uploads/${req.file.filename}`;
+    // Handle multiple images update
+    if (req.files && req.files.length > 0) {
+      const imagePaths = req.files.map(file => `/uploads/${file.filename}`);
+      updateData.image = imagePaths[0]; // First image for backward compatibility
+      updateData.images = imagePaths; // Multiple images
+    } else if (req.file) {
+      // Single file upload (backward compatibility)
+      updateData.image = `/uploads/${req.file.filename}`;
+      // Keep existing images array or create new one with single image
+      const existingProduct = await Product.findById(id);
+      if (existingProduct && existingProduct.images && existingProduct.images.length > 0) {
+        updateData.images = [...existingProduct.images, `/uploads/${req.file.filename}`];
+      } else {
+        updateData.images = [`/uploads/${req.file.filename}`];
+      }
+    }
 
     const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
     if (!product) return res.status(404).json({ message: "Product not found" });
