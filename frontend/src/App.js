@@ -35,7 +35,7 @@ import EditPromotion from "./Components/Promotionmanager/EditPromotion";
 import DisplayProducts from "./Components/Productmanager/displayproducts";
 import UpdateProduct from  "./Components/Productmanager/UpdateProduct";
 import ItemDisplay from  "./Components/Productmanager/itempage";
-import ProductDetail from  "./Components/Productmanager/productdetail";
+import ProductDetail from  "./Components/Productmanager/ProductDetail";
 
 
 import Checkout from "./Components/Checkout/checkout";
