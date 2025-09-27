@@ -144,9 +144,9 @@ function App() {
             }
           />
           <Route
-            path="/admin/refunds"
+            path="/refunds"
             element={
-              <ProtectedRoute role="admin">
+              <ProtectedRoute role="ordermanager">
                 <AdminRefundRequest />
               </ProtectedRoute>
             }

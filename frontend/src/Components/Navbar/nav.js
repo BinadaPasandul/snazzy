@@ -196,6 +196,7 @@ function Nav() {
 
                                     {/* Individual role dashboards for non-admin roles */}
                                     {user.role === "product_manager" && (
+                                        <>
                                         <NavLink 
                                             to="/productmanager" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
@@ -205,6 +206,18 @@ function Nav() {
                                                 Product Manager
                                             </button>
                                         </NavLink>
+                                        <NavLink 
+                                                to="/products" 
+                                                className={({ isActive }) => (isActive ? "active" : "")}
+                                            >
+                                                <button className="sidebar-btn admin-access">
+                                                    
+                                                    Products
+                                                  
+                                                </button>
+                                            </NavLink>
+
+                                            </>
                                     )}
 
                                     {user.role === "order_manager" && (
