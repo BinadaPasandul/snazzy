@@ -14,8 +14,8 @@ router.post('/request/:paymentId', authMiddleware('customer'), createRefundReque
 router.get('/my-requests', authMiddleware('customer'), getUserRefunds);
 
 // Admin routes
-router.get('/all', authMiddleware('admin'), getAllRefunds);
-router.put('/handle/:requestId', authMiddleware('admin'), handleRefund);
+router.get('/all', authMiddleware('order_manager'), getAllRefunds);
+router.put('/handle/:requestId', authMiddleware('order_manager'), handleRefund);
 
 //Test
 router.get('/test',(req, res) => {

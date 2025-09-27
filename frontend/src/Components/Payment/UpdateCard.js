@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import api from '../../utils/api';
+import Nav from "../Navbar/nav";
+import Footer from "../Footer/Footer";
 
 const UpdateCard = () => {
   const { cardId } = useParams();
@@ -92,6 +94,8 @@ const UpdateCard = () => {
 
   if (!cardData) {
     return (
+      
+
       <div style={{
         minHeight: '100vh',
         backgroundColor: '#f9fafb',
@@ -130,6 +134,8 @@ const UpdateCard = () => {
   }
 
   return (
+
+    <div><Nav/>
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#f9fafb',
@@ -598,6 +604,8 @@ const UpdateCard = () => {
           to { transform: rotate(360deg); }
         }
       `}</style>
+    </div>
+    <Footer/>
     </div>
   );
 };

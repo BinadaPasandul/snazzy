@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './insertpromotion.css';
 import api from '../../utils/api';
+import Nav from '../Navbar/nav';
 
 function InsertPromotion() {
   const [formData, setFormData] = useState({
@@ -88,7 +89,9 @@ function InsertPromotion() {
   };
 
   return (
-    <div className="promotion-form-container">
+    <>
+      <Nav />
+      <div className="promotion-form-container">
       <div className="promotion-form">
         <div className="form-header">
           <h2>Create New Promotion</h2>
@@ -198,6 +201,7 @@ function InsertPromotion() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

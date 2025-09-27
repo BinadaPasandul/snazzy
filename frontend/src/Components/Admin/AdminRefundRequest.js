@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import api from "../../utils/api";
-import AdminChatPopup from "./AdminChatPopup"; 
+import AdminChatPopup from "./AdminChatPopup";
+import "./AdminRefundRequest.css"; 
+import Nav from "../Navbar/nav";
+import Footer from '../Footer/Footer';
 
 
 const AdminRefundRequests = () => {
@@ -35,78 +38,92 @@ const AdminRefundRequests = () => {
     fetchRefunds();
   }, []);
 
-  if (loading) return <p className="p-4">Loading refund requests...</p>;
-  if (error) return <p className="p-4 text-red-500">{error}</p>;
+  if (loading) return <div className="admin-refund-loading">Loading refund requests...</div>;
+  if (error) return <div className="admin-refund-error">{error}</div>;
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Refund Requests</h1>
+
+    <div><Nav/>
+    <div className="admin-refund-container">
+      <div className="admin-refund-header">
+        <h1 className="admin-refund-title">Refund Requests</h1>
+      </div>
 
       {refunds.length === 0 ? (
-        <p>No refund requests found</p>
+        <div className="admin-refund-empty">No refund requests found</div>
       ) : (
-        <table className="w-full border border-gray-300 rounded-lg">
-          <thead className="bg-gray-100">
-            <tr>
-              <th className="p-2 border">User</th>
-              <th className="p-2 border">Payment</th>
-              <th className="p-2 border">Reason</th>
-              <th className="p-2 border">Status</th>
-              <th className="p-2 border">Created At</th>
-              <th className="p-2 border">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {refunds.map((req) => (
-              <tr key={req._id} className="text-center">
-                <td className="p-2 border">{req.userId}</td>
-                <td className="p-2 border">{req.paymentId?._id}</td>
-                <td className="p-2 border">{req.reason || "—"}</td>
-                <td className="p-2 border font-semibold">
-                  {req.status === "pending" && (
-                    <span className="text-yellow-600">Pending</span>
-                  )}
-                  {req.status === "approved" && (
-                    <span className="text-green-600">Approved</span>
-                  )}
-                  {req.status === "rejected" && (
-                    <span className="text-red-600">Rejected</span>
-                  )}
-                </td>
-                <td className="p-2 border">
-                  {new Date(req.createdAt).toLocaleString()}
-                </td>
-                <td className="p-2 border">
-                  <div className="flex gap-2 justify-center">
-                    {req.status === "pending" && (
-                      <>
-                        <button
-                          onClick={() => handleAction(req._id, "approve")}
-                          className="px-3 py-1 bg-green-500 text-white rounded"
-                        >
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleAction(req._id, "reject")}
-                          className="px-3 py-1 bg-red-500 text-white rounded"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {/* Chat button */}
-                    <button
-                      onClick={() => setChatPaymentId(req.paymentId?._id)}
-                      className="px-3 py-1 bg-blue-500 text-white rounded"
-                    >
-                      Chat
-                    </button>
-                  </div>
-                </td>
+        <div className="admin-refund-table-container">
+          <table className="admin-refund-table">
+            <thead>
+              <tr>
+                <th>User</th>
+                <th>Payment</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Actions</th>
+                <th>Chat</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {refunds.map((req) => (
+                <tr key={req._id}>
+                  <td>
+                    <div className="admin-refund-user-id">{req.userId}</div>
+                  </td>
+                  <td>
+                    <div className="admin-refund-payment-id">{req.paymentId?._id}</div>
+                  </td>
+                  <td>
+                    <div className="admin-refund-reason">{req.reason || "—"}</div>
+                  </td>
+                  <td>
+                    <span className={`admin-refund-status ${req.status}`}>
+                      {req.status === "pending" && "Pending"}
+                      {req.status === "approved" && "Approved"}
+                      {req.status === "rejected" && "Rejected"}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="admin-refund-date">
+                      {new Date(req.createdAt).toLocaleString()}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="admin-refund-actions">
+                      {req.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => handleAction(req._id, "approve")}
+                            className="admin-refund-btn approve"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleAction(req._id, "reject")}
+                            className="admin-refund-btn reject"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  <td>
+                    <div className="admin-refund-chat">
+                      <button
+                        onClick={() => setChatPaymentId(req.paymentId?._id)}
+                        className="admin-refund-btn chat"
+                      >
+                        Chat
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {/* Chat popup */}
@@ -116,6 +133,8 @@ const AdminRefundRequests = () => {
           onClose={() => setChatPaymentId(null)}
         />
       )}
+    </div>
+    <Footer/>
     </div>
   );
 };

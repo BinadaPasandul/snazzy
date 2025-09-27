@@ -15,7 +15,7 @@ router.post("/send", authMiddleware(), upload.single("image"), sendMessage);
 // Admin 
 router.post(
   "/admin-reply/:paymentId",
-  authMiddleware("admin"),
+  authMiddleware("order_manager"),
   upload.single("image"),
   adminReply
 );

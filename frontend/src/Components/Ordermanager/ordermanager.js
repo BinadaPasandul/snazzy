@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Nav from "../Navbar/nav";
+import Footer from '../Footer/Footer';
 import api from "../../utils/api"; // axios instance with JWT
 import "./ordermanager.css";
 
@@ -352,6 +353,7 @@ function OrderManager() {
           </div>
         </div>
       )}
+      <Footer/>
     </div>
   );
 }
