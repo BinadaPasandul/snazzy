@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../utils/api";
+import Nav from "../Navbar/nav";
+import Footer from "../Footer/Footer";
 
 const CardList = () => {
   const [cards, setCards] = useState([]);
@@ -102,7 +104,10 @@ const CardList = () => {
     return `${month}/${year}`;
   };
 
-  return (
+  return ( 
+    <div>
+      <Nav/>
+    
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#f9fafb',
@@ -502,6 +507,8 @@ const CardList = () => {
           </div>
         </div>
       )}
+    </div>
+    <Footer />
     </div>
   );
 };
