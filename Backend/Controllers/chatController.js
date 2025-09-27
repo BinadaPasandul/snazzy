@@ -65,7 +65,7 @@ const adminReply = async (req, res) => {
     if (!chat) return res.status(404).json({ error: "Chat not found" });
 
     chat.messages.push({
-      from: "admin",
+      from: "order_manager",
       message: message || null,
       fileUrl: req.file ? `/uploads/${req.file.filename}` : null,
       fileType: req.file ? req.file.mimetype : null,

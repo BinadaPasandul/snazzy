@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import api from '../../utils/api';
+import Nav from "../Navbar/nav";
+import Footer from '../Footer/Footer';
 
 const AddCard = () => {
   const stripe = useStripe();
@@ -48,6 +50,9 @@ const AddCard = () => {
   };
 
   return (
+    <div>
+      <Nav/>
+    
     <div style={{
       minHeight: '100vh',
       backgroundColor: '#f9fafb',
@@ -402,6 +407,8 @@ const AddCard = () => {
           to { transform: rotate(360deg); }
         }
       `}</style>
+    </div>
+    <Footer/>
     </div>
   );
 };

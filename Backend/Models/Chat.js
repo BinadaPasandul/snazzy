@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const messageSchema = new mongoose.Schema({
-  from: { type: String, enum: ["user", "admin", "ai"], required: true },
+  from: { type: String, enum: ["user", "order_manager", "ai"], required: true },
   message: { type: String },
   fileUrl: { type: String },
   fileType: { type: String },

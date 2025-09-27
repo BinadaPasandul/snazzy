@@ -146,7 +146,7 @@ function App() {
           <Route
             path="/refunds"
             element={
-              <ProtectedRoute role="ordermanager">
+              <ProtectedRoute role="order_manager">
                 <AdminRefundRequest />
               </ProtectedRoute>
             }

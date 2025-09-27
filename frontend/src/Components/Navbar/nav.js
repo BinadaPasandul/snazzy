@@ -221,6 +221,7 @@ function Nav() {
                                     )}
 
                                     {user.role === "order_manager" && (
+                                        <>
                                         <NavLink 
                                             to="/ordermanager" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
@@ -230,6 +231,16 @@ function Nav() {
                                                 Order Manager
                                             </button>
                                         </NavLink>
+
+                                        <NavLink 
+                                            to="/refunds" 
+                                            className={({ isActive }) => (isActive ? "active" : "")}
+                                        >
+                                            <button className="sidebar-btn">
+                                                <span className="btn-icon">📦</span>
+                                                Refund Requests
+                                            </button>
+                                        </NavLink> </>
                                     )}
 
                                     {user.role === "promotion_manager" && (
