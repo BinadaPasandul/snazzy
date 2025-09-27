@@ -209,11 +209,54 @@ const DisplayProducts = () => {
                     {p.pname}
                   </h2>
                   <p><strong>Code:</strong> {p.pcode}</p>
-                  <p><strong>Amount:</strong> {p.pamount}</p>
-                  <p><strong>Size:</strong> {p.psize}</p>
-                  <p><strong>Color:</strong> {p.pcolor}</p>
-                    <p><strong>Quantity:</strong> {p.quantity}</p>
-                  <p>{p.pdescription}</p>
+                  <p><strong>Amount:</strong> ${p.pamount}</p>
+                  
+                  {/* Display variants or legacy fields */}
+                  {p.variants && p.variants.length > 0 ? (
+                    <div style={{ margin: "8px 0" }}>
+                      <p><strong>Available Variants:</strong></p>
+                      <div style={{ 
+                        maxHeight: "120px", 
+                        overflowY: "auto", 
+                        background: "#f8f9fa", 
+                        padding: "8px", 
+                        borderRadius: "6px",
+                        border: "1px solid #e9ecef"
+                      }}>
+                        {p.variants.map((variant, index) => (
+                          <div key={index} style={{ 
+                            display: "flex", 
+                            justifyContent: "space-between", 
+                            alignItems: "center",
+                            padding: "4px 0",
+                            borderBottom: index < p.variants.length - 1 ? "1px solid #dee2e6" : "none"
+                          }}>
+                            <span style={{ fontSize: "12px", color: "#495057" }}>
+                              Size {variant.size} - {variant.color}
+                            </span>
+                            <span style={{ 
+                              fontSize: "12px", 
+                              fontWeight: "bold",
+                              color: variant.quantity > 0 ? "#28a745" : "#dc3545"
+                            }}>
+                              Qty: {variant.quantity}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <p style={{ fontSize: "12px", color: "#6c757d", margin: "4px 0 0 0" }}>
+                        Total Stock: {p.variants.reduce((sum, variant) => sum + variant.quantity, 0)}
+                      </p>
+                    </div>
+                  ) : (
+                    <>
+                      <p><strong>Size:</strong> {p.psize || "N/A"}</p>
+                      <p><strong>Color:</strong> {p.pcolor || "N/A"}</p>
+                      <p><strong>Quantity:</strong> {p.quantity || 0}</p>
+                    </>
+                  )}
+                  
+                  <p style={{ margin: "8px 0", fontSize: "14px", color: "#666" }}>{p.pdescription}</p>
                   {/* ACTION BUTTONS */}
                   <div>
                     <button

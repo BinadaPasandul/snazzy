@@ -6,11 +6,17 @@ const ProductSchema = new Schema({
   pname:       { type: String, required: true },
   pcode:       { type: String, required: true },
   pamount:     { type: Number, required: true },
-  psize:       { type: Number, required: true },
-  pcolor:      { type: String, required: true },
   pdescription:{ type: String, required: true },
   image:       { type: String },
-  quantity:    { type: Number, required: true, default: 0 }
+  variants:    [{
+    size:       { type: Number, required: true, min: 35, max: 44 },
+    color:      { type: String, required: true },
+    quantity:   { type: Number, required: true, default: 0, min: 0 }
+  }],
+  // Legacy fields for backward compatibility (deprecated)
+  psize:       { type: Number },
+  pcolor:      { type: String },
+  quantity:    { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model("ProductModel", ProductSchema);

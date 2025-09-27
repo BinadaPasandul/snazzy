@@ -3,18 +3,37 @@ const Promotion = require("../Models/PromotionModel");
 
 //Data Insert 
 const addProducts = async (req, res) => {
-  const { pname, pcode, pamount, psize, pcolor, pdescription, quantity  } = req.body;
+  const { pname, pcode, pamount, pdescription, variants } = req.body;
   const imagePath = req.file ? `/uploads/${req.file.filename}` : null;
 
   try {
+    // Parse variants if it's a string (from form data)
+    let parsedVariants = variants;
+    if (typeof variants === 'string') {
+      parsedVariants = JSON.parse(variants);
+    }
+
+    // Validate variants
+    if (!parsedVariants || !Array.isArray(parsedVariants) || parsedVariants.length === 0) {
+      return res.status(400).json({ message: "At least one variant (size/color combination) is required" });
+    }
+
+    // Validate each variant
+    for (const variant of parsedVariants) {
+      if (!variant.size || !variant.color || variant.quantity === undefined) {
+        return res.status(400).json({ message: "Each variant must have size, color, and quantity" });
+      }
+      if (variant.size < 35 || variant.size > 44) {
+        return res.status(400).json({ message: "Size must be between 35 and 44" });
+      }
+    }
+
     const product = new Product({
       pname,
       pcode,
       pamount,
-      psize,
-      pcolor,
       pdescription,
-      quantity: quantity || 0,
+      variants: parsedVariants,
       image: imagePath
     });
     await product.save();
@@ -28,15 +47,33 @@ const addProducts = async (req, res) => {
 //Data Update
 const updateProduct = async (req, res) => {
   const id = req.params.id;
-  const { pname, pcode, pamount, psize, pcolor, pdescription, quantity } = req.body;
-
-  const updateData = { pname, pcode, pamount, psize, pcolor, pdescription };
-
-  if (typeof quantity !== "undefined") updateData.quantity = quantity; // ✅
-
-  if (req.file) updateData.image = `/uploads/${req.file.filename}`;
+  const { pname, pcode, pamount, pdescription, variants } = req.body;
 
   try {
+    // Parse variants if it's a string (from form data)
+    let parsedVariants = variants;
+    if (variants && typeof variants === 'string') {
+      parsedVariants = JSON.parse(variants);
+    }
+
+    const updateData = { pname, pcode, pamount, pdescription };
+
+    // Update variants if provided
+    if (parsedVariants && Array.isArray(parsedVariants) && parsedVariants.length > 0) {
+      // Validate each variant
+      for (const variant of parsedVariants) {
+        if (!variant.size || !variant.color || variant.quantity === undefined) {
+          return res.status(400).json({ message: "Each variant must have size, color, and quantity" });
+        }
+        if (variant.size < 35 || variant.size > 44) {
+          return res.status(400).json({ message: "Size must be between 35 and 44" });
+        }
+      }
+      updateData.variants = parsedVariants;
+    }
+
+    if (req.file) updateData.image = `/uploads/${req.file.filename}`;
+
     const product = await Product.findByIdAndUpdate(id, updateData, { new: true });
     if (!product) return res.status(404).json({ message: "Product not found" });
     return res.status(200).json({ product });
