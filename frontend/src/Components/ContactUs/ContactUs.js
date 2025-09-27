@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Nav from '../Navbar/nav';
 import Footer from '../Footer/Footer';
 import axios from 'axios';
 import './ContactUs.css';
 
 const ContactUs = () => {
-  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -27,7 +25,7 @@ const ContactUs = () => {
       setFormData(prev => ({
         ...prev,
         name: userData.name || '',
-        email: userData.email || ''
+        email: userData.gmail || '' // Use gmail field from localStorage
       }));
     }
   }, [isLoggedIn, userData]);
@@ -40,6 +38,22 @@ const ContactUs = () => {
     }));
   };
 
+  // Helper function to decode JWT token and get user ID
+  const getUserIdFromToken = () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return null;
+      
+      // Decode JWT token (simple base64 decode for payload)
+      const payload = token.split('.')[1];
+      const decoded = JSON.parse(atob(payload));
+      return decoded.id;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -48,19 +62,20 @@ const ContactUs = () => {
     try {
       const response = await axios.post('http://localhost:5000/contact/submit', {
         ...formData,
-        userId: isLoggedIn ? userData?.id : null,
+        userId: isLoggedIn ? getUserIdFromToken() : null,
         isRegisteredUser: !!isLoggedIn
       });
 
       if (response.data.status === 'success') {
         setSubmitStatus('success');
-        setFormData({
-          name: '',
-          email: '',
+        // Reset form but keep pre-filled data for logged-in users
+        setFormData(prev => ({
+          name: isLoggedIn && userData ? userData.name : '',
+          email: isLoggedIn && userData ? userData.gmail : '',
           subject: '',
           message: '',
           phone: ''
-        });
+        }));
       } else {
         setSubmitStatus('error');
       }
@@ -85,6 +100,7 @@ const ContactUs = () => {
           {isLoggedIn && (
             <div className="user-info">
               <p className="user-status">✓ Logged in as: {userData?.name || 'User'}</p>
+              <p className="user-note">Your name and email are pre-filled below</p>
             </div>
           )}
         </div>
@@ -121,6 +137,8 @@ const ContactUs = () => {
                       required
                       className="form-input"
                       placeholder="Enter your full name"
+                      readOnly={isLoggedIn}
+                      style={isLoggedIn ? { backgroundColor: '#f8f9fa', cursor: 'not-allowed' } : {}}
                     />
                   </div>
                   
@@ -137,6 +155,8 @@ const ContactUs = () => {
                       required
                       className="form-input"
                       placeholder="Enter your email address"
+                      readOnly={isLoggedIn}
+                      style={isLoggedIn ? { backgroundColor: '#f8f9fa', cursor: 'not-allowed' } : {}}
                     />
                   </div>
                 </div>

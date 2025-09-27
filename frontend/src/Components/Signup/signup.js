@@ -17,10 +17,34 @@ const Signup = () => {
         role: "customer" // Default role
     });
     const [error, setError] = useState(null);
+    const [passwordError, setPasswordError] = useState("");
+
+    // Password validation function
+    const validatePassword = (password) => {
+        if (password.length < 5) {
+            return "Password must be at least 5 characters long";
+        }
+        if (!/[A-Z]/.test(password)) {
+            return "Password must contain at least one uppercase letter";
+        }
+        if (!/[a-z]/.test(password)) {
+            return "Password must contain at least one lowercase letter";
+        }
+        if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+            return "Password must contain at least one symbol";
+        }
+        return "";
+    };
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUser((prevUser) => ({ ...prevUser, [name]: value }));
+        
+        // Validate password in real-time
+        if (name === "password") {
+            const validationError = validatePassword(value);
+            setPasswordError(validationError);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -30,6 +54,13 @@ const Signup = () => {
         // Validate inputs
         if (!user.name || !user.gmail || !user.password || !user.age || !user.address) {
             setError("All fields are required");
+            return;
+        }
+
+        // Validate password
+        const passwordValidationError = validatePassword(user.password);
+        if (passwordValidationError) {
+            setPasswordError(passwordValidationError);
             return;
         }
 
@@ -127,7 +158,16 @@ const Signup = () => {
                                         required
                                         className="signup-input"
                                         placeholder="Enter your password"
+                                        style={passwordError ? { borderColor: '#dc3545' } : {}}
                                     />
+                                    {passwordError && (
+                                        <div className="password-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                                            {passwordError}
+                                        </div>
+                                    )}
+                                    <div className="password-requirements" style={{ fontSize: '0.8rem', color: '#6c757d', marginTop: '4px' }}>
+                                        Password must be at least 5 characters with uppercase, lowercase, and symbol
+                                    </div>
                                 </div>
 
                                 <div className="signup-form-group">
