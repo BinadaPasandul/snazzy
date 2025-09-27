@@ -193,6 +193,7 @@ function Nav() {
                                         Promotion Manager
                                     </button>
                                 </NavLink>
+                                
                             )}
 
                             {user.role === "financial_manager" && (
