@@ -129,7 +129,8 @@ exports.deleteCard = async (req, res) => {
     try {
       await stripe.paymentMethods.detach(card.stripePaymentMethodId);
     } catch (stripeError) {
-      console.error('Stripe detach error:', stripeError);
+      // Log only the error message, not the full error object
+      console.log('Stripe detach warning:', stripeError.message || 'Payment method may already be detached');
       // Continue with database deletion even if Stripe fails
       // This handles cases where the payment method was already detached
     }
