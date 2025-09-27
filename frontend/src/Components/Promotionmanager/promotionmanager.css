@@ -1,99 +1,849 @@
-/* promotionmanager.css */
-
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", Roboto, sans-serif;
-}
-
-/* Page wrapper */
-.user-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 40px;
-  background: #f4f6f8;
+/* ==============================
+   Promotion Dashboard Container
+   ============================== */
+.promotion-dashboard {
   min-height: 100vh;
+  background: #ffffff;
+  padding: 0;
+  margin: 0;
 }
 
-/* Card */
-.user-card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  max-width: 480px;
-  width: 100%;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.user-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-}
-
-/* Heading */
-.user-card h1 {
-  font-size: 24px;
-  font-weight: 600;
-  color: #222;
-  margin-bottom: 20px;
+/* ==============================
+   Dashboard Header
+   ============================== */
+.promotion-header {
+  background: #ffffff;
+  padding: 30px 0;
   text-align: center;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  position: relative;
 }
 
-/* User details */
-.user-card h2 {
-  font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 12px;
-  color: #444;
+.promotion-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  background: linear-gradient(135deg, #ed64a6, #d53f8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.user-card h2 span {
-  font-weight: 600;
-  color: #111;
+.promotion-subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+  margin-top: 10px;
+  font-weight: 400;
 }
 
-/* Buttons & Links */
-.user-actions {
-  margin-top: 20px;
+/* ==============================
+   Dashboard Content
+   ============================== */
+.promotion-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 30px 20px;
+  background: #f8fafc;
+  border-radius: 0;
+  margin-top: 0;
+  position: relative;
+}
+
+.promotion-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: transparent;
+  pointer-events: none;
+  border-radius: 0;
+}
+
+/* ==============================
+   Statistics Section
+   ============================== */
+.promotion-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.promotion-stat {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 25px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+.promotion-stat::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.promotion-stat:hover::before {
+  opacity: 1;
+}
+
+.promotion-stat:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.promotion-stat-info {
+  flex: 1;
+  z-index: 1;
+  position: relative;
+}
+
+.promotion-stat-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin: 0 0 8px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.promotion-stat-value {
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #2d3748;
+  margin: 0;
+  line-height: 1;
+}
+
+.promotion-stat-icon {
+  font-size: 2.5rem;
+  opacity: 0.8;
+  transition: all 0.3s ease;
+  z-index: 1;
+  position: relative;
+}
+
+.promotion-stat:hover .promotion-stat-icon {
+  transform: scale(1.1);
+  opacity: 1;
+}
+
+/* Individual Stat Card Colors - Promotion Theme */
+.promotion-stat:nth-child(1) {
+  background: linear-gradient(135deg, #fdf2f8, #fce7f3);
+  border-color: #ed64a6;
+}
+
+.promotion-stat:nth-child(1)::before {
+  background: linear-gradient(135deg, rgba(237, 100, 166, 0.1), rgba(237, 100, 166, 0.05));
+}
+
+.promotion-stat:nth-child(1):hover {
+  border-color: #d53f8c;
+}
+
+.promotion-stat:nth-child(2) {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-color: #f59e0b;
+}
+
+.promotion-stat:nth-child(2)::before {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(245, 158, 11, 0.05));
+}
+
+.promotion-stat:nth-child(2):hover {
+  border-color: #d97706;
+}
+
+.promotion-stat:nth-child(3) {
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+  border-color: #3b82f6;
+}
+
+.promotion-stat:nth-child(3)::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05));
+}
+
+.promotion-stat:nth-child(3):hover {
+  border-color: #2563eb;
+}
+
+.promotion-stat:nth-child(4) {
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+  border-color: #22c55e;
+}
+
+.promotion-stat:nth-child(4)::before {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05));
+}
+
+.promotion-stat:nth-child(4):hover {
+  border-color: #16a34a;
+}
+
+/* ==============================
+   Search Section
+   ============================== */
+.promotion-search {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 2px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.promotion-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-color: #e2e8f0;
+}
+
+.promotion-search::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #ed64a6, #d53f8c);
+}
+
+.promotion-search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.promotion-search-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  background: linear-gradient(135deg, #ed64a6, #d53f8c);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.add-promotion-btn {
+  background: linear-gradient(135deg, #ed64a6, #d53f8c);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(237, 100, 166, 0.3);
+}
+
+.add-promotion-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(237, 100, 166, 0.4);
+}
+
+.promotion-search-container {
+  position: relative;
+  max-width: 500px;
+}
+
+.promotion-search-input {
+  width: 100%;
+  padding: 14px 20px 14px 50px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #ffffff;
+  color: #1e293b;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.promotion-search-input:focus {
+  outline: none;
+  border-color: #ed64a6;
+  box-shadow: 0 0 0 4px rgba(237, 100, 166, 0.1), 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.promotion-search-input:hover {
+  border-color: #cbd5e0;
+}
+
+.promotion-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 18px;
+  z-index: 1;
+}
+
+.promotion-search-clear {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.promotion-search-clear:hover {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.promotion-search-info {
+  margin-top: 12px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ==============================
+   Promotions Grid Section
+   ============================== */
+.promotions-section {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border: 2px solid #f1f5f9;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.promotions-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-color: #e2e8f0;
+}
+
+.promotions-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
+}
+
+.promotions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.promotions-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin: 0;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.promotions-count {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 2px solid #fbbf24;
+}
+
+.promotions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+}
+
+/* ==============================
+   Promotion Cards
+   ============================== */
+.promotion-card {
+  background: #ffffff;
+  border: 2px solid #f1f5f9;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.promotion-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: #ed64a6;
+}
+
+.promotion-card-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+}
+
+.promotion-card-no-image {
+  width: 100%;
+  height: 200px;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #64748b;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.promotion-card-content {
+  padding: 24px;
+}
+
+.promotion-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+  line-height: 1.3;
+}
+
+.promotion-product-info {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  border: 1px solid #e2e8f0;
+}
+
+.promotion-product-name {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.promotion-product-details {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin: 0 0 12px 0;
+  line-height: 1.4;
+}
+
+.promotion-price-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.promotion-original-price {
+  color: #ef4444;
+  text-decoration: line-through;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.promotion-discounted-price {
+  color: #059669;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.promotion-save-badge {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.promotion-details {
+  margin-bottom: 16px;
+}
+
+.promotion-detail-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.promotion-detail-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.promotion-detail-value {
+  color: #6b7280;
+}
+
+.promotion-performance {
+  background: #f0f9ff;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 16px;
+  border: 1px solid #bae6fd;
+}
+
+.promotion-performance-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #0369a1;
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.promotion-performance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.promotion-performance-item {
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.promotion-performance-label {
+  font-weight: 600;
+  color: #0369a1;
+}
+
+.promotion-performance-value {
+  color: #0c4a6e;
+  font-weight: 500;
+}
+
+.promotion-discount-total {
+  background: #fef3c7;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #92400e;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 8px;
+}
+
+.promotion-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
   gap: 12px;
 }
 
-.user-actions a,
-.user-actions button {
-  flex: 1;
-  text-align: center;
-  padding: 12px;
+.promotion-btn {
+  padding: 10px 16px;
   border-radius: 8px;
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 500;
-  transition: background 0.3s ease, color 0.3s ease;
+  border: 2px solid transparent;
+  background: #f8fafc;
+  color: #334155;
   cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  flex: 1;
 }
 
-/* Update button */
-.user-actions a {
-  background: #007bff;
-  color: #fff;
+.promotion-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.5s ease;
 }
 
-.user-actions a:hover {
-  background: #0056b3;
+.promotion-btn:hover::before {
+  left: 100%;
 }
 
-/* Delete button */
-.user-actions button {
+.promotion-btn:hover { 
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.promotion-btn-edit { 
+  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); 
+  color: #1e40af; 
+  border-color: #bfdbfe;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+.promotion-btn-edit:hover {
+  background: linear-gradient(135deg, #bfdbfe 0%, #93c5fd 100%);
+  border-color: #93c5fd;
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3);
+}
+
+.promotion-btn-delete { 
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); 
+  color: #dc2626; 
+  border-color: #fecaca;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.promotion-btn-delete:hover {
+  background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+  border-color: #fca5a5;
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
+}
+
+/* ==============================
+   Empty State
+   ============================== */
+.empty-state-container {
+  background: #ffffff;
+  border: 2px solid #f1f5f9;
+  border-radius: 20px;
+  padding: 60px 40px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+}
+
+.empty-state-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-state-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #374151;
+  margin: 0 0 8px 0;
+}
+
+.empty-state-message {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0 0 24px 0;
+}
+
+.clear-search-btn {
+  background: linear-gradient(135deg, #ed64a6, #d53f8c);
+  color: white;
   border: none;
-  background: #dc3545;
-  color: #fff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(237, 100, 166, 0.3);
 }
 
-.user-actions button:hover {
-  background: #a71d2a;
+.clear-search-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(237, 100, 166, 0.4);
+}
+
+/* ==============================
+   Loading State
+   ============================== */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  background: #ffffff;
+  border-radius: 20px;
+  margin: 20px 0;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid #ed64a6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-left: 16px;
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==============================
+   Error State
+   ============================== */
+.error-container {
+  background: #ffffff;
+  border: 2px solid #fecaca;
+  border-radius: 20px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  margin: 20px 0;
+}
+
+.error-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  color: #ef4444;
+}
+
+.error-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #dc2626;
+  margin: 0 0 8px 0;
+}
+
+.error-message {
+  color: #6b7280;
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* ==============================
+   Responsive Design
+   ============================== */
+@media (max-width: 768px) {
+  .promotion-content {
+    padding: 20px 10px;
+  }
+  
+  .promotion-title {
+    font-size: 2.2rem;
+  }
+  
+  .promotion-stats {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+  }
+  
+  .promotion-stat {
+    padding: 20px;
+  }
+  
+  .promotion-stat-value {
+    font-size: 1.8rem;
+  }
+  
+  .promotion-stat-icon {
+    font-size: 2rem;
+  }
+  
+  .promotion-search-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .promotions-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+  
+  .promotion-card-content {
+    padding: 20px;
+  }
+  
+  .promotion-actions {
+    flex-direction: column;
+  }
+  
+  .promotion-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .promotion-title {
+    font-size: 1.8rem;
+  }
+  
+  .promotion-stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .promotion-stat {
+    padding: 15px;
+  }
+  
+  .promotion-stat-value {
+    font-size: 1.6rem;
+  }
+  
+  .promotion-stat-icon {
+    font-size: 1.8rem;
+  }
+  
+  .promotion-stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .promotions-title {
+    font-size: 1.5rem;
+  }
+  
+  .promotion-card-content {
+    padding: 16px;
+  }
 }
