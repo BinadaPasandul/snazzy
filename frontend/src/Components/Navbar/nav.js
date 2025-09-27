@@ -160,7 +160,7 @@ function Nav() {
                                             </NavLink>
 
                                             <NavLink 
-                                                to="/productmanager" 
+                                                to="/products" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
                                                 <button className="sidebar-btn admin-access">
