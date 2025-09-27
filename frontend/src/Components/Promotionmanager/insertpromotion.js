@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './insertpromotion.css';
+import api from '../../utils/api';
 
 function InsertPromotion() {
   const [formData, setFormData] = useState({
@@ -64,7 +64,7 @@ function InsertPromotion() {
       data.append('endDate', endDate);
       data.append('bannerImage', bannerFile); // attach file
 
-      await axios.post('http://localhost:5000/Promotions', data, {
+      await api.post('/Promotions', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
 
