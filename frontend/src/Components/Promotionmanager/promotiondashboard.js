@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Nav from '../Navbar/nav';
 import api from '../../utils/api';
+import './promotiondashboard.css';
 
 function PromotionDashboard() {
     const [promotions, setPromotions] = useState([]);
@@ -38,7 +39,7 @@ function PromotionDashboard() {
             } finally {
                 setLoading(false);
             }
-        };
+        }; 
         fetchData();
     }, []);
 
