@@ -2,126 +2,209 @@ import React, { useEffect, useRef, useState } from 'react'
 import Nav from '../Navbar/nav';
 import Footer from '../Footer/Footer';
 import axios from "axios";
-import User from '../User/User';
 import { useReactToPrint } from 'react-to-print';
 import './Userdetails.css';
-
-
-
 
 const URL = "http://localhost:5000/user/me";
 const fetchCurrentUser = async () => {
   const token = localStorage.getItem('token');
   return await axios.get(URL, {
     headers: {
-      // Backend reads req.headers["authorization"] directly (no Bearer prefix)
       Authorization: token || ""
     }
   }).then((res) => res.data)
 }
-function Userdetails() {
 
+function Userdetails() {
   const [users, setUsers] = useState();
-  useEffect(()=> {
-    fetchCurrentUser().then((data) => setUsers([data.user]));
-  },[])
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        setLoading(true);
+        const data = await fetchCurrentUser();
+        setUsers([data.user]);
+      } catch (err) {
+        setError('Failed to load user profile');
+        console.error('Error loading user:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadUser();
+  }, []);
 
   const ComponentsRef = useRef();
   const handlePrint = useReactToPrint({
     content: () => ComponentsRef.current,
-    DocumentTitle:"Users Report",
-    onafterprint:()=>alert("Users report successfully downloaded!")
+    DocumentTitle: "User Profile Report",
+    onafterprint: () => alert("Profile report successfully downloaded!")
   });
+
+  if (loading) {
+    return (
+      <div className="user-profile-container">
+        <Nav />
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading your profile...</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="user-profile-container">
+        <Nav />
+        <div className="error-container">
+          <div className="error-icon">⚠️</div>
+          <h3>Oops! Something went wrong</h3>
+          <p>{error}</p>
+          <button onClick={() => window.location.reload()} className="retry-btn">
+            Try Again
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="user-profile-container"> 
       <Nav />
       
-      <div className="user-profile-card">
-        <div className="profile-header">
-          <h1 className="profile-title">User Profile</h1>
-          <p className="profile-subtitle">Manage your account information and preferences</p>
-        </div>
-
-      <div ref={ComponentsRef}>
-        {users && users.map((user, i)=> (
-            <div key={i} className="user-info">
-              <div className="info-section">
-                <span className="info-label">Full Name</span>
-                <p className="info-value">{user.name}</p>
+      <div className="profile-wrapper">
+        <div className="user-profile-card">
+          <div className="profile-header">
+            <div className="profile-avatar">
+              <div className="avatar-circle">
+                <span className="avatar-text">
+                  {users && users[0]?.name?.charAt(0)?.toUpperCase()}
+                </span>
               </div>
-              
-              <div className="info-section">
-                <span className="info-label">Email Address</span>
-                <p className="info-value">{user.gmail}</p>
+            </div>
+            <div className="profile-info">
+              <h1 className="profile-title">{users && users[0]?.name}</h1>
+              <p className="profile-subtitle">{users && users[0]?.gmail}</p>
+              <div className="profile-badge">
+                <span className="badge-text">{users && users[0]?.role}</span>
               </div>
-              
-              <div className="info-section">
-                <span className="info-label">Age</span>
-                <p className="info-value">{user.age}</p>
-              </div>
-              
-              {user.address && (
-                <div className="info-section">
-                  <span className="info-label">Address</span>
-                  <p className="info-value">{user.address}</p>
-                </div>
-              )}
-              
-              <div className="info-section role-section">
-                <span className="info-label">Account Type</span>
-                <p className="info-value">{user.role}</p>
-              </div>
-              
-              {user.role === 'customer' && user.loyaltyPoints && (
-                <div className="info-section loyalty-section">
-                  <span className="info-label">Loyalty Points</span>
-                  <p className="info-value">{user.loyaltyPoints}</p>
-                </div>
-              )}
+            </div>
           </div>
-        ))}
-      </div>
 
-        <div className="action-buttons">
-      {users && users.map((user, i) => (
-            <div key={i} style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <div ref={ComponentsRef} className="profile-content">
+            <div className="info-grid">
+              <div className="info-card">
+                <div className="info-icon">👤</div>
+                <div className="info-content">
+                  <h3 className="info-label">Full Name</h3>
+                  <p className="info-value">{users && users[0]?.name}</p>
+                </div>
+              </div>
+              
+              <div className="info-card">
+                <div className="info-icon">📧</div>
+                <div className="info-content">
+                  <h3 className="info-label">Email Address</h3>
+                  <p className="info-value">{users && users[0]?.gmail}</p>
+                </div>
+              </div>
+              
+              <div className="info-card">
+                <div className="info-icon">🎂</div>
+                <div className="info-content">
+                  <h3 className="info-label">Age</h3>
+                  <p className="info-value">{users && users[0]?.age} years old</p>
+                </div>
+              </div>
+              
+              {users && users[0]?.address && (
+                <div className="info-card">
+                  <div className="info-icon">📍</div>
+                  <div className="info-content">
+                    <h3 className="info-label">Address</h3>
+                    <p className="info-value">{users[0].address}</p>
+                  </div>
+                </div>
+              )}
+              
+              {users && users[0]?.role === 'customer' && users[0]?.loyaltyPoints && (
+                <div className="info-card loyalty-card">
+                  <div className="info-icon">⭐</div>
+                  <div className="info-content">
+                    <h3 className="info-label">Loyalty Points</h3>
+                    <p className="info-value">{users[0].loyaltyPoints} points</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="action-section">
+            <div className="action-buttons">
               <button 
-                className="action-btn secondary"
-                onClick={() => window.location.href = `/userdetails/${user._id}`}
+                className="action-btn primary"
+                onClick={() => window.location.href = `/userdetails/${users && users[0]?._id}`}
               >
-                <span className="btn-icon">✏️</span>
-                Update Profile
+                <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Edit Profile
               </button>
               
-              {user.role === 'customer' && (
+              {users && users[0]?.role === 'customer' && (
                 <>
-                  <a href="/myorders" className="action-btn">
-                    <span className="btn-icon">📦</span>
+                  <a href="/myorders" className="action-btn secondary">
+                    <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+                      <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
+                    </svg>
                     My Orders
                   </a>
                   <a href="/cardlist" className="action-btn secondary">
-                    <span className="btn-icon">💳</span>
-                    My Cards
+                    <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    Payment Cards
                   </a>
                 </>
               )}
+              
+              <button 
+                className="action-btn print-btn"
+                onClick={handlePrint}
+              >
+                <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6,9 6,2 18,2 18,9"></polyline>
+                  <path d="M6,18H4a2,2,0,0,1-2-2V11a2,2,0,0,1,2-2H20a2,2,0,0,1,2,2v5a2,2,0,0,1-2,2H18"></path>
+                  <rect x="6" y="14" width="12" height="8"></rect>
+                </svg>
+                Print Profile
+              </button>
               
               <button 
                 className="action-btn danger"
                 onClick={() => {
                   const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
                   if (confirmed) {
-                    // Add delete functionality here
                     console.log("Delete account");
                   }
                 }}
               >
-                <span className="btn-icon">🗑️</span>
+                <svg className="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="3,6 5,6 21,6"></polyline>
+                  <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2V6"></path>
+                </svg>
                 Delete Account
               </button>
             </div>
-          ))}
+          </div>
         </div>
       </div>
       
