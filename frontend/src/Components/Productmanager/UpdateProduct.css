@@ -158,13 +158,13 @@
 }
 
 /* Headers */
-.form-header {
+.form-headerup {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 32px;
   padding-bottom: 12px;
-  color: #0a0a0a;
+  color: #0f0f0f;
   border-bottom: 2px solid #fcfcfc;
   background: transparent;
 }
@@ -199,7 +199,7 @@
   gap: 10px;
 }
 
-.section-title {
+.section-titleup {
   font-size: 18px;
   font-weight: 600;
   color: #4a5568;
@@ -451,18 +451,18 @@
   gap: 10px;
 }
 
-.variants-title {
+.variants-titleup {
   font-size: 18px;
   font-weight: 600;
   color: #4a5568;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #000000 0%, #060606 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.add-variant-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.add-variant-btnup {
+  background: linear-gradient(135deg, #000000 0%, #060606 100%);
   color: white;
   border: none;
   padding: 8px 16px;
@@ -765,10 +765,10 @@
 }
 
 /* Buttons */
-.submit-button {
+.submit-buttonup {
   flex: 1;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #090909 0%, #0c0c0c 100%);
   color: #ffffff;
   font-weight: 600;
   font-size: 16px;

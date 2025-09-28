@@ -129,7 +129,7 @@
 }
 
 /* Headers */
-.form-header {
+.form-headerpd {
   /* Layout */
   display: flex;
   align-items: center;
@@ -608,18 +608,18 @@
   gap: 10px;
 }
 
-.variants-title {
+.variants-titlepd {
   font-size: 18px;
   font-weight: 600;
   color: #4a5568;
   margin: 0;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #070707 0%, #0b0b0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.add-variant-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.add-variant-btnpd {
+  background: linear-gradient(135deg, #050505 0%, #0b0b0b 100%);
   color: white;
   border: none;
   padding: 8px 16px;
