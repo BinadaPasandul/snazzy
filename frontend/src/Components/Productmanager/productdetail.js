@@ -180,7 +180,7 @@ const ProductDetail = () => {
         <div className="image-gallery">
           <div className="image-gallery-sticky">
             {/* Main Image Display */}
-            <div className="product-image-container">
+            <div className="product-image-containernew">
               {(() => {
                 const images = getAllImages();
                 if (images.length > 0) {
@@ -189,7 +189,7 @@ const ProductDetail = () => {
                       <img
                         src={`http://localhost:5000${images[currentImageIndex]}`}
                         alt={product.pname}
-                        className="product-image"
+                        className="product-imagenew "
                       />
                       
                       {/* Navigation arrows - only show if multiple images */}
@@ -222,7 +222,7 @@ const ProductDetail = () => {
                   );
                 } else {
                   return (
-                    <div className="no-image-placeholder">
+                    <div className="no-image-placeholder-new">
                       No Image Available
                     </div>
                   );
@@ -232,11 +232,11 @@ const ProductDetail = () => {
             
             {/* Image Thumbnails - only show if multiple images */}
             {getAllImages().length > 1 && (
-              <div className="image-thumbnails">
+              <div className="image-thumbnailsnew">
                 {getAllImages().map((image, index) => (
                   <button
                     key={index}
-                    className={`image-thumbnail ${currentImageIndex === index ? 'active' : ''}`}
+                    className={`image-thumbnailnew ${currentImageIndex === index ? 'active' : ''}`}
                     onClick={() => handleImageSelect(index)}
                   >
                     <img
@@ -325,7 +325,7 @@ const ProductDetail = () => {
           {/* Size Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="size-section">
-              <h3 className="section-title">
+              <h3 className="section-title1">
                 Select Size
               </h3>
               <div className="size-grid">
@@ -348,7 +348,7 @@ const ProductDetail = () => {
           {/* Color Selection */}
           {product.variants && product.variants.length > 0 && (
             <div className="color-section">
-              <h3 className="section-title">
+              <h3 className="section-title1">
                 Select Color
               </h3>
               <div className="color-options">

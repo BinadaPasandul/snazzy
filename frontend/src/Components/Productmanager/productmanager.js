@@ -158,7 +158,7 @@ const AddProducts = () => {
       <div className="content-wrapper">
         {/* Left Container - Form Fields */}
         <div className="form-container">
-          <div className="form-header">
+          <div className="form-headerpd">
             <h1 className="form-title">
               Add New Product
             </h1>
@@ -202,11 +202,11 @@ const AddProducts = () => {
           {/* Variants Section */}
           <div className="variants-section">
             <div className="variants-header">
-              <h3 className="variants-title">Size & Color</h3>
+              <h3 className="variants-titlepd">Size & Color</h3>
               <button
                 type="button"
                 onClick={addVariant}
-                className="add-variant-btn"
+                className="add-variant-btnpd"
               >
                 + Add Colors & Sizes
               </button>

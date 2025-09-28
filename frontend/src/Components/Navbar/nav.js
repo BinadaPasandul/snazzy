@@ -140,7 +140,7 @@ function Nav() {
                                 to="/userdetails" 
                                 className={({ isActive }) => (isActive ? "active" : "")}
                             >
-                                <button className="sidebar-btn">
+                                <button className="sidebar-btn9">
                                     <span className="btn-icon">👤</span>
                                     Profile
                                 </button>
@@ -153,7 +153,7 @@ function Nav() {
                                                 to="/admin" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
-                                                <button className="sidebar-btn">
+                                                <button className="sidebar-btn9">
                                                     <span className="btn-icon">⚙️</span>
                                                     Admin Dashboard
                                                 </button>
@@ -163,7 +163,7 @@ function Nav() {
                                                 to="/products" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
-                                                <button className="sidebar-btn admin-access">
+                                                <button className="sidebar-btn9 admin-access">
                                                     <span className="btn-icon">📦</span>
                                                     Product Dashboard
                                                     <span className="admin-badge">ADMIN</span>
@@ -174,7 +174,7 @@ function Nav() {
                                                 to="/ordermanager" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
-                                                <button className="sidebar-btn admin-access">
+                                                <button className="sidebar-btn9 admin-access">
                                                     <span className="btn-icon">📋</span>
                                                     Order Dashboard
                                                     <span className="admin-badge">ADMIN</span>
@@ -185,7 +185,7 @@ function Nav() {
                                                 to="/promotiondashboard" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
-                                                <button className="sidebar-btn admin-access">
+                                                <button className="sidebar-btn9 admin-access">
                                                     <span className="btn-icon">🎯</span>
                                                     Promotion Dashboard
                                                     <span className="admin-badge">ADMIN</span>
@@ -201,7 +201,7 @@ function Nav() {
                                             to="/products" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
                                         >
-                                            <button className="sidebar-btn">
+                                            <button className="sidebar-btn9">
                                                 <span className="btn-icon">📦</span>
                                                 Product Manager
                                             </button>
@@ -211,7 +211,7 @@ function Nav() {
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
                                         
-                                                <button className="sidebar-btn admin-access">
+                                                <button className="sidebar-btn9 admin-access">
                                                     <span className="btn-icon">📦</span>
                                                     Products
                                                   
@@ -227,7 +227,7 @@ function Nav() {
                                             to="/ordermanager" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
                                         >
-                                            <button className="sidebar-btn">
+                                            <button className="sidebar-btn9">
                                                 <span className="btn-icon">📋</span>
                                                 Order Manager
                                             </button>
@@ -237,7 +237,7 @@ function Nav() {
                                             to="/refunds" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
                                         >
-                                            <button className="sidebar-btn">
+                                            <button className="sidebar-btn9">
                                                 <span className="btn-icon">📦</span>
                                                 Refund Requests
                                             </button>
@@ -249,7 +249,7 @@ function Nav() {
                                             to="/promotiondashboard" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
                                         >
-                                            <button className="sidebar-btn">
+                                            <button className="sidebar-btn9">
                                                 <span className="btn-icon">🎯</span>
                                                 Promotion Manager
                                             </button>
@@ -261,7 +261,7 @@ function Nav() {
                                             to="/financialmanager" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
                                         >
-                                            <button className="sidebar-btn">
+                                            <button className="sidebar-btn9">
                                                 <span className="btn-icon">💰</span>
                                                 Financial Manager
                                             </button>

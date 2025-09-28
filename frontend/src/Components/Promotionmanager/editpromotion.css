@@ -1,7 +1,7 @@
 /* ==============================
-   Modern Insert Promotion - Two Container Layout
+   Modern Edit Promotion - Two Container Layout
    ============================== */
-.promotion-form-container6 {
+.edit-promotion-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 0;
@@ -14,7 +14,7 @@
 /* ==============================
    Animated Background Elements
    ============================== */
-.promotion-form-container6::before {
+.edit-promotion-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -36,8 +36,11 @@
 /* ==============================
    Form Wrapper - Two Container Layout
    ============================== */
-.promotion-form6 {
-  max-width: 700px;
+.promotion-form-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two columns */
+  gap: 40px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 40px 20px;
   min-height: calc(100vh - 120px); /* Adjust for Nav and Footer */
@@ -73,15 +76,15 @@
 /* ==============================
    Form Header
    ============================== */
-.form-header6 {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+.form-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 40px 40px 30px;
   text-align: center;
   position: relative;
   overflow: hidden;
 }
 
-.form-header6::before {
+.form-header::before {
   content: '';
   position: absolute;
   top: 0;
@@ -98,20 +101,23 @@
   50% { opacity: 0.6; }
 }
 
-.form-header6 h2 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  color: white;
-  margin-bottom: 12px;
-  letter-spacing: -1px;
+.header-icon {
+  margin-bottom: 20px;
   position: relative;
   z-index: 2;
 }
 
-.form-header6 p {
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 1.1rem;
-  margin: 0;
+.header-icon svg {
+  color: #667eea;
+  filter: drop-shadow(0 2px 10px rgba(102, 126, 234, 0.2));
+}
+
+.form-title {
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin-bottom: 8px;
+  color: #1f2937;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   position: relative;
   z-index: 2;
 }
@@ -128,7 +134,7 @@
 /* ==============================
    Form Body
    ============================== */
-.form-body6 {
+.form-body {
   padding: 40px;
   background: white;
 }
@@ -136,40 +142,49 @@
 /* ==============================
    Form Grid
    ============================== */
-.form-group6 {
-  margin-bottom: 32px;
-  position: relative;
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
 }
 
-.form-group6 label {
-  display: block;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #2d3748;
-  margin-bottom: 12px;
-  letter-spacing: 0.3px;
-  position: relative;
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.form-group6 label::after {
-  content: ' *';
-  color: #e53e3e;
-  font-weight: 700;
-}
-
-.form-group6:has(textarea) label::after {
-  content: '';
+.form-group.full-width {
+  grid-column: 1 / -1;
 }
 
 /* ==============================
    Form Labels
    ============================== */
-.form-group6 input,
-.form-group6 textarea {
-  width: 100%;
-  padding: 18px 24px;
-  border: 2px solid #e2e8f0;
-  border-radius: 16px;
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.label-icon {
+  color: #6b7280;
+  flex-shrink: 0;
+}
+
+/* ==============================
+   Form Inputs
+   ============================== */
+.form-input,
+.form-textarea {
+  padding: 16px 20px;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
   font-size: 1rem;
   font-family: inherit;
   transition: all 0.3s ease;
@@ -178,50 +193,132 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.form-group6 input:focus,
-.form-group6 textarea:focus {
+.form-input:focus,
+.form-textarea:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
   transform: translateY(-1px);
 }
 
-.form-group6 input::placeholder,
-.form-group6 textarea::placeholder {
-  color: #a0aec0;
-  font-weight: 400;
-  transition: color 0.3s ease;
+.form-input:hover,
+.form-textarea:hover {
+  border-color: #d1d5db;
 }
 
-.form-group6 input:focus::placeholder,
-.form-group6 textarea:focus::placeholder {
-  color: #cbd5e0;
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: #9ca3af;
+  font-style: italic;
 }
 
-.form-group6 textarea {
+.form-textarea {
   resize: vertical;
   min-height: 100px;
   line-height: 1.6;
 }
 
 /* ==============================
+   Current Banner Display
+   ============================== */
+.current-banner {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.current-banner-img {
+  width: 200px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.current-banner-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* ==============================
    File Input
    ============================== */
-.submit-btn6 {
-  width: 100%;
-  padding: 20px 32px;
-  background: linear-gradient(135deg, #667eea, #764ba2);
-  color: white;
-  border: none;
-  border-radius: 16px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+.file-input-wrapper {
   position: relative;
 }
 
-.submit-btn6::before {
+.file-input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.file-input-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 2px dashed #d1d5db;
+  border-radius: 12px;
+  background: #f9fafb;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.file-input-label:hover {
+  border-color: #667eea;
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.file-input-label svg {
+  color: #9ca3af;
+  transition: color 0.3s ease;
+}
+
+.file-input-label:hover svg {
+  color: #6b7280;
+}
+
+/* ==============================
+   Form Actions
+   ============================== */
+.form-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ==============================
+   Buttons
+   ============================== */
+.btn {
+  padding: 16px 32px;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
   content: '';
   position: absolute;
   top: 0;
@@ -232,27 +329,17 @@
   transition: left 0.5s ease;
 }
 
-.submit-btn6:hover::before {
+.btn:hover::before {
   left: 100%;
 }
 
-.submit-btn6:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
-  background: linear-gradient(135deg, #5a67d8, #6b46c1);
-}
-
-.submit-btn6:active {
-  transform: translateY(-1px);
-}
-
-.submit-btn6:disabled {
-  opacity: 0.7;
+.btn:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
   transform: none;
 }
 
-.submit-btn6:disabled:hover {
+.btn:disabled:hover {
   transform: none;
 }
 
@@ -285,20 +372,11 @@
 /* ==============================
    Loading States
    ============================== */
-.submit-btn6.loading6 {
-  position: relative;
-  color: transparent;
-}
-
-.submit-btn6.loading6::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 24px;
-  height: 24px;
-  border: 3px solid rgba(255, 255, 255, 0.3);
+.btn-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
@@ -508,6 +586,80 @@
 }
 
 /* ==============================
+   Loading & Error States
+   ============================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(102, 126, 234, 0.1);
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-container p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.error-container h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.error-container p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.retry-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* ==============================
    Responsive Design
    ============================== */
 @media (max-width: 1024px) {
@@ -525,67 +677,69 @@
 }
 
 @media (max-width: 768px) {
-  .promotion-form-container6 {
-    padding: 20px 16px;
+  .promotion-form-wrapper {
+    padding: 20px 15px;
   }
   
-  .promotion-form6 {
-    border-radius: 20px;
+  .form-header,
+  .preview-header {
+    padding: 30px 20px;
   }
   
-  .form-header6 {
-    padding: 32px 24px 24px;
+  .form-title {
+    font-size: 1.8rem;
   }
   
-  .form-header6 h2 {
-    font-size: 2rem;
+  .form-body {
+    padding: 30px 20px;
   }
   
-  .form-body6 {
-    padding: 32px 24px;
+  .preview-card {
+    padding: 20px;
   }
   
-  .form-group6 {
-    margin-bottom: 28px;
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
   
-  .form-group6 input,
-  .form-group6 textarea {
-    padding: 16px 20px;
-    font-size: 0.95rem;
+  .form-actions {
+    flex-direction: column;
+    align-items: center;
   }
   
-  .submit-btn6 {
-    padding: 18px 28px;
-    font-size: 1rem;
+  .btn {
+    width: 100%;
+    max-width: 300px;
+  }
+  
+  .current-banner-img {
+    width: 150px;
+    height: 75px;
   }
 }
 
 @media (max-width: 480px) {
-  .promotion-form-container6 {
-    padding: 16px 12px;
+  .form-header,
+  .preview-header {
+    padding: 25px 15px;
   }
   
-  .form-header6 {
-    padding: 24px 20px 20px;
+  .form-title {
+    font-size: 1.6rem;
   }
   
-  .form-header6 h2 {
-    font-size: 1.75rem;
+  .form-body {
+    padding: 25px 15px;
   }
   
-  .form-body6 {
-    padding: 24px 20px;
+  .preview-card {
+    padding: 15px;
   }
   
-  .form-group6 input,
-  .form-group6 textarea {
-    padding: 14px 18px;
-    font-size: 0.9rem;
-  }
-  
-  .submit-btn6 {
-    padding: 16px 24px;
+  .form-input,
+  .form-textarea {
+    padding: 14px 16px;
     font-size: 0.95rem;
   }
   
@@ -596,6 +750,11 @@
   
   .preview-banner {
     height: 150px;
+  }
+  
+  .current-banner-img {
+    width: 120px;
+    height: 60px;
   }
 }
 
@@ -613,17 +772,67 @@
   }
 }
 
-.promotion-form6 {
-  animation: fadeInUp 0.8s ease-out;
-}
-
-.form-group6 {
+.form-container,
+.preview-container {
   animation: fadeInUp 0.6s ease-out;
 }
 
-.form-group6:nth-child(1) { animation-delay: 0.1s; }
-.form-group6:nth-child(2) { animation-delay: 0.2s; }
-.form-group6:nth-child(3) { animation-delay: 0.3s; }
-.form-group6:nth-child(4) { animation-delay: 0.4s; }
-.form-group6:nth-child(5) { animation-delay: 0.5s; }
-.form-group6:nth-child(6) { animation-delay: 0.6s; }
+.form-group {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(5) { animation-delay: 0.5s; }
+.form-group:nth-child(6) { animation-delay: 0.6s; }
+.form-group:nth-child(7) { animation-delay: 0.7s; }
+
+/* ==============================
+   Focus States
+   ============================== */
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
+}
+
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+/* ==============================
+   Print Styles
+   ============================== */
+@media print {
+  .edit-promotion-container {
+    background: white;
+    padding: 0;
+  }
+  
+  .form-container,
+  .preview-container {
+    box-shadow: none;
+    border: 1px solid #ccc;
+    margin: 0;
+  }
+  
+  .form-header,
+  .preview-header {
+    background: #f8f9fa !important;
+    color: #333 !important;
+  }
+  
+  .form-header::before,
+  .preview-header::before {
+    display: none;
+  }
+  
+  .form-actions {
+    display: none;
+  }
+}
