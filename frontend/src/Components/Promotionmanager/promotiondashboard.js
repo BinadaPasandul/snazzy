@@ -4,6 +4,8 @@ import Nav from '../Navbar/nav';
 import Footer from '../Footer/Footer';
 import api from '../../utils/api';
 import './promotionmanager.css';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 function PromotionDashboard() {
     const [promotions, setPromotions] = useState([]);
@@ -127,6 +129,104 @@ function PromotionDashboard() {
         navigate(`/EditPromotion/${promotion._id}`);
     };
 
+    const generatePDF = () => {
+        const doc = new jsPDF();
+        const currentDate = new Date().toLocaleDateString();
+        
+        // Set up the document
+        doc.setFontSize(20);
+        doc.text('Promotion Dashboard Report', 20, 30);
+        
+        doc.setFontSize(12);
+        doc.text(`Generated on: ${currentDate}`, 20, 45);
+        doc.text(`Total Promotions: ${promotions.length}`, 20, 55);
+        
+        // Calculate summary statistics
+        const totalPromotionOrders = orders.filter(order => order.has_promotion).length;
+        const totalOrders = orders.length;
+        const overallConversionRate = totalOrders > 0 ? (totalPromotionOrders / totalOrders) * 100 : 0;
+        const totalPromotionRevenue = orders
+            .filter(order => order.has_promotion)
+            .reduce((sum, order) => sum + order.total_price, 0);
+        const totalDiscountGiven = orders
+            .filter(order => order.has_promotion)
+            .reduce((sum, order) => sum + (order.promotion_discount || 0), 0);
+        
+        // Add summary section
+        doc.setFontSize(14);
+        doc.text('Summary Statistics', 20, 75);
+        
+        doc.setFontSize(10);
+        doc.text(`Total Promotion Orders: ${totalPromotionOrders}`, 20, 85);
+        doc.text(`Overall Conversion Rate: ${overallConversionRate.toFixed(1)}%`, 20, 95);
+        doc.text(`Total Promotion Revenue: $${totalPromotionRevenue.toFixed(2)}`, 20, 105);
+        doc.text(`Total Discounts Given: $${totalDiscountGiven.toFixed(2)}`, 20, 115);
+        
+        // Prepare data for the table
+        const tableData = filteredPromotions.map(promotion => {
+            const product = getProductByCode(promotion.productId);
+            const performance = getPromotionPerformance(promotion);
+            const originalPrice = product ? product.pamount : 0;
+            const discountedPrice = originalPrice - (originalPrice * promotion.discount / 100);
+            
+            return [
+                promotion.title || 'N/A',
+                product ? product.pname : 'Product Not Found',
+                promotion.productId,
+                `${promotion.discount}%`,
+                `$${originalPrice.toFixed(2)}`,
+                `$${discountedPrice.toFixed(2)}`,
+                promotion.startDate ? new Date(promotion.startDate).toLocaleDateString() : 'N/A',
+                promotion.endDate ? new Date(promotion.endDate).toLocaleDateString() : 'N/A',
+                performance.orderCount.toString(),
+                `${performance.conversionRate.toFixed(1)}%`,
+                `$${performance.totalRevenue.toFixed(2)}`,
+                `$${performance.avgOrderValue.toFixed(2)}`
+            ];
+        });
+        
+        // Add promotions table
+        doc.setFontSize(14);
+        doc.text('Promotions Details', 20, 135);
+        
+        autoTable(doc, {
+            startY: 145,
+            head: [['Title', 'Product', 'Code', 'Discount', 'Original Price', 'Discounted Price', 'Start Date', 'End Date', 'Orders', 'Conversion', 'Revenue', 'Avg Order']],
+            body: tableData,
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [41, 128, 185] },
+            alternateRowStyles: { fillColor: [245, 245, 245] },
+            margin: { left: 20, right: 20 },
+            tableWidth: 'auto',
+            columnStyles: {
+                0: { cellWidth: 25 },
+                1: { cellWidth: 20 },
+                2: { cellWidth: 15 },
+                3: { cellWidth: 12 },
+                4: { cellWidth: 15 },
+                5: { cellWidth: 15 },
+                6: { cellWidth: 15 },
+                7: { cellWidth: 15 },
+                8: { cellWidth: 12 },
+                9: { cellWidth: 12 },
+                10: { cellWidth: 15 },
+                11: { cellWidth: 15 }
+            }
+        });
+        
+        // Add footer
+        const pageCount = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= pageCount; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.text(`Page ${i} of ${pageCount}`, 20, doc.internal.pageSize.height - 10);
+            doc.text('Snazzy Promotion Dashboard Report', doc.internal.pageSize.width - 80, doc.internal.pageSize.height - 10);
+        }
+        
+        // Save the PDF
+        doc.save(`promotion-dashboard-report-${currentDate.replace(/\//g, '-')}.pdf`);
+    };
+
     return (
         <>
             <Nav />
@@ -143,6 +243,13 @@ function PromotionDashboard() {
                             onClick={() => navigate('/insertpromotion')} 
                         >
                             Add Promotion
+                        </button>
+                        <button 
+                            className="pdf-export-btn5"
+                            onClick={generatePDF}
+                            disabled={loading || promotions.length === 0}
+                        >
+                            📄 Export PDF
                         </button>
                     </div>
                 </div>

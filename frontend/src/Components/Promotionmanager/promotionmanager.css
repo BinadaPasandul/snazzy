@@ -60,6 +60,10 @@
 
 .promotion-actions5 {
   margin-top: 8px;
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .add-promotion-btn5 {
@@ -83,6 +87,44 @@
 
 .add-promotion-btn5:active {
   transform: translateY(0);
+}
+
+.pdf-export-btn5 {
+  padding: 14px 24px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pdf-export-btn5:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+  background: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+.pdf-export-btn5:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.pdf-export-btn5:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  box-shadow: none;
+  opacity: 0.6;
+}
+
+.pdf-export-btn5:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 /* Search Section */
