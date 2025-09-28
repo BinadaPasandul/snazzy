@@ -210,8 +210,9 @@ function Nav() {
                                                 to="/products" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
+                                        
                                                 <button className="sidebar-btn admin-access">
-                                                    
+                                                    <span className="btn-icon">📦</span>
                                                     Products
                                                   
                                                 </button>
