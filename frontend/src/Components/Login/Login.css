@@ -6,7 +6,7 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: #f8fafc;
+  background: #000000;
 }
 
 .login-container {
@@ -16,7 +16,7 @@
   justify-content: center;
   font-family: 'Poppins', sans-serif;
   padding: 40px 20px;
-  background: #f8fafc;
+  background: #000000;
 }
 
 .login-wrapper {
@@ -174,7 +174,7 @@
 
 .login-forgot-link {
   font-size: 0.9rem;
-  color: #e53e3e;
+  color: #060606;
   text-decoration: none;
   margin-top: 5px;
   transition: color 0.3s ease;
