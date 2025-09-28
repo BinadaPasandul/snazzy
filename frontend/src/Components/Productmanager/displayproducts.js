@@ -61,7 +61,7 @@ const DisplayProducts = () => {
     }
   };
 
-  // Update filtered products when products or search query changes
+  // Update filtered products when query changes
   useEffect(() => {
     handleSearch(searchQuery);
   }, [products]);
@@ -146,7 +146,7 @@ const DisplayProducts = () => {
       }
     }, 0);
 
-    // Add summary above the table
+    // summary 
     doc.setFontSize(12);
     doc.text("Summary:", 14, 45);
     
@@ -411,7 +411,7 @@ const DisplayProducts = () => {
             }}>
               <div>
                 <div style={{ fontSize: "0.9rem", fontWeight: "600", color: "#4a5568", margin: "0 0 8px 0", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                  With Variants
+                  With Colors & Sizes
                 </div>
                 <div style={{ fontSize: "2.2rem", fontWeight: "800", color: "#f59e0b", margin: 0, lineHeight: 1 }}>
                   {productStats.withVariants}
@@ -815,8 +815,8 @@ const DisplayProducts = () => {
                       onClick={() => handleEdit(p)}
                       style={{
                         padding: "8px 16px",
-                        background: "linear-gradient(135deg, #f2d14e, #e6c547)",
-                        color: "#000",
+                        background: "linear-gradient(135deg, #0a0a0aff, #080808ff)",
+                        color: "#f8f3f3ff",
                         border: "none",
                         borderRadius: "8px",
                         cursor: "pointer",
