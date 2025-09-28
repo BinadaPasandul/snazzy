@@ -88,7 +88,7 @@ const getById = async (req, res, next) => {
 
     let user;
     try {
-        user = await Register.findById(id).select("password");
+        user = await Register.findById(id).select("-password");
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
