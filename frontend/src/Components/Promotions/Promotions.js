@@ -191,7 +191,7 @@ function Promotions() {
                     )}
                     
                     <div className="promotion-info">
-                      <h3 className="promotion-title">{p.title}</h3>
+                      <h3 className="promotiontitle">{p.title}</h3>
                       {p.description && (
                         <p className="promotion-description">{p.description}</p>
                       )}

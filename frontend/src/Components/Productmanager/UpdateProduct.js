@@ -233,7 +233,7 @@ const UpdateProduct = () => {
       <div className="content-wrapper">
         {/* Left Container - Form Fields */}
         <div className="form-container">
-          <div className="form-header">
+          <div className="form-headerup">
             <h1 className="form-title">
               Update Product
             </h1>
@@ -276,7 +276,7 @@ const UpdateProduct = () => {
           {existingImages.length > 0 && (
             <div className="existing-images-section">
               <div className="section-header">
-                <h3 className="section-title">Current Images</h3>
+                <h3 className="section-titleup">Current Images</h3>
                 <span className="image-count">({existingImages.length} images)</span>
               </div>
               <div className="existing-images-grid">
@@ -305,7 +305,7 @@ const UpdateProduct = () => {
           {deletedImages.length > 0 && (
             <div className="deleted-images-section">
               <div className="section-header">
-                <h3 className="section-title">Deleted Images</h3>
+                <h3 className="section-titleup">Deleted Images</h3>
                 <span className="image-count">({deletedImages.length} images)</span>
               </div>
               <div className="deleted-images-grid">
@@ -333,11 +333,11 @@ const UpdateProduct = () => {
           {/* Variants Section */}
           <div className="variants-section">
             <div className="variants-header">
-              <h3 className="variants-title">Size & Color</h3>
+              <h3 className="variants-titleup">Size & Color</h3>
               <button
                 type="button"
                 onClick={addVariant}
-                className="add-variant-btn"
+                className="add-variant-btnup"
               >
                 + Add Colors & Sizes
               </button>
@@ -463,7 +463,7 @@ const UpdateProduct = () => {
             <div className="button-group">
               <button
                 type="submit"
-                className="submit-button"
+                className="submit-buttonup"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (

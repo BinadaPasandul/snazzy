@@ -303,11 +303,11 @@ function MyOrders() {
             </div>
 
             <div className="dialog-actions">
-              <button className="dialog-btn cancel-btn" onClick={handleCancelRefund}>
+              <button className="dialog-btn cancl-btn" onClick={handleCancelRefund}>
                 Cancel
               </button>
               <button 
-                className={`dialog-btn submit-btn ${!selectedReason ? 'disabled' : ''}`}
+                className={`dialog-btn submt-btn ${!selectedReason ? 'disabled' : ''}`}
                 onClick={handleRefundSubmit}
                 disabled={!selectedReason}
               >
