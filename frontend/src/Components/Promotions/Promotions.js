@@ -3,12 +3,13 @@ import axios from 'axios';
 import './Promotion.css'; // Modern CSS
 import Nav from '../Navbar/nav';
 import Footer from '../Footer/Footer';
-import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Promotions() {
   const [promotions, setPromotions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const BACKEND_URL = 'http://localhost:5000'; // Your backend host
 
@@ -24,7 +25,34 @@ function Promotions() {
       setLoading(false);
     }
   };
-  
+
+  // Handle navigation to ProductDetail page based on product code
+  const handleViewDetails = async (promotion) => {
+    try {
+      // If promotion has productId (which is actually pcode), find the real product _id
+      if (promotion.productId) {
+        const response = await axios.get(`${BACKEND_URL}/products`);
+        const products = response.data.products || [];
+        const product = products.find(p => p.pcode === promotion.productId);
+        
+        if (product) {
+          // Navigate to ProductDetail page with the real product _id
+          navigate(`/products/${product._id}`);
+        } else {
+          // If product not found, show error or navigate to items page
+          console.error('Product not found for code:', promotion.productId);
+          navigate('/items');
+        }
+      } else {
+        // If no product code, navigate to items page
+        navigate('/items');
+      }
+    } catch (error) {
+      console.error('Error finding product:', error);
+      // Fallback navigation
+      navigate('/items');
+    }
+  };
 
   useEffect(() => {
     fetchPromotions();
@@ -104,13 +132,13 @@ function Promotions() {
             Shop smarter and save more with Snazzy promotions.
           </p>
           <div className="promotions-actions">
-            <button className="btn-primary">
+            <button className="btn-primary" onClick={() => navigate('/items')}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
               </svg>
               View Hot Deals
             </button>
-            <button className="btn-secondary">
+            <button className="btn-secondary" onClick={() => navigate('/items')}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
               </svg>
@@ -184,8 +212,7 @@ function Promotions() {
                         )}
                       </div>
                       
-                      <button className="promotion-btn" 
-                      >
+                      <button className="promotion-btn" onClick={() => handleViewDetails(p)}>
                         <span>View Details</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                           <path d="M5 12h14M12 5l7 7-7 7"></path>
