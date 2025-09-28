@@ -1,7 +1,7 @@
 /* ==============================
    Modern Creative Insert Promotion Form
    ============================== */
-.promotion-form-container {
+.promotion-form-container6 {
   min-height: 100vh;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 40px 20px;
@@ -13,7 +13,7 @@
 /* ==============================
    Animated Background Elements
    ============================== */
-.promotion-form-container::before {
+.promotion-form-container6::before {
   content: '';
   position: absolute;
   top: -50%;
@@ -34,7 +34,7 @@
 /* ==============================
    Form Container
    ============================== */
-.promotion-form {
+.promotion-form6 {
   max-width: 700px;
   margin: 0 auto;
   background: rgba(255, 255, 255, 0.95);
@@ -50,7 +50,7 @@
 /* ==============================
    Form Header
    ============================== */
-.form-header {
+.form-header6 {
   background: linear-gradient(135deg, #667eea, #764ba2);
   padding: 40px 40px 30px;
   text-align: center;
@@ -58,7 +58,7 @@
   overflow: hidden;
 }
 
-.form-header::before {
+.form-header6::before {
   content: '';
   position: absolute;
   top: 0;
@@ -74,7 +74,7 @@
   50% { opacity: 0.6; }
 }
 
-.form-header h2 {
+.form-header6 h2 {
   font-size: 2.5rem;
   font-weight: 800;
   color: white;
@@ -85,7 +85,7 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.form-header p {
+.form-header6 p {
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
   margin: 0;
@@ -97,7 +97,7 @@
 /* ==============================
    Form Body
    ============================== */
-.form-body {
+.form-body6 {
   padding: 40px;
   background: white;
 }
@@ -105,12 +105,12 @@
 /* ==============================
    Form Groups
    ============================== */
-.form-group {
+.form-group6 {
   margin-bottom: 32px;
   position: relative;
 }
 
-.form-group label {
+.form-group6 label {
   display: block;
   font-size: 1rem;
   font-weight: 600;
@@ -120,21 +120,21 @@
   position: relative;
 }
 
-.form-group label::after {
+.form-group6 label::after {
   content: ' *';
   color: #e53e3e;
   font-weight: 700;
 }
 
-.form-group:has(textarea) label::after {
+.form-group6:has(textarea) label::after {
   content: '';
 }
 
 /* ==============================
    Input Fields
    ============================== */
-.form-group input,
-.form-group textarea {
+.form-group6 input,
+.form-group6 textarea {
   width: 100%;
   padding: 18px 24px;
   border: 2px solid #e2e8f0;
@@ -148,8 +148,8 @@
   position: relative;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.form-group6 input:focus,
+.form-group6 textarea:focus {
   outline: none;
   border-color: #667eea;
   background: white;
@@ -157,19 +157,19 @@
   transform: translateY(-2px);
 }
 
-.form-group input::placeholder,
-.form-group textarea::placeholder {
+.form-group6 input::placeholder,
+.form-group6 textarea::placeholder {
   color: #a0aec0;
   font-weight: 400;
   transition: color 0.3s ease;
 }
 
-.form-group input:focus::placeholder,
-.form-group textarea:focus::placeholder {
+.form-group6 input:focus::placeholder,
+.form-group6 textarea:focus::placeholder {
   color: #cbd5e0;
 }
 
-.form-group textarea {
+.form-group6 textarea {
   resize: vertical;
   min-height: 120px;
   line-height: 1.6;
@@ -178,7 +178,7 @@
 /* ==============================
    Submit Button
    ============================== */
-.submit-btn {
+.submit-btn6 {
   width: 100%;
   padding: 20px 32px;
   background: linear-gradient(135deg, #667eea, #764ba2);
@@ -196,7 +196,7 @@
   box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
 
-.submit-btn::before {
+.submit-btn6::before {
   content: '';
   position: absolute;
   top: 0;
@@ -207,27 +207,27 @@
   transition: left 0.5s ease;
 }
 
-.submit-btn:hover::before {
+.submit-btn6:hover::before {
   left: 100%;
 }
 
-.submit-btn:hover {
+.submit-btn6:hover {
   transform: translateY(-3px);
   box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
   background: linear-gradient(135deg, #5a67d8, #6b46c1);
 }
 
-.submit-btn:active {
+.submit-btn6:active {
   transform: translateY(-1px);
 }
 
-.submit-btn:disabled {
+.submit-btn6:disabled {
   opacity: 0.7;
   cursor: not-allowed;
   transform: none;
 }
 
-.submit-btn:disabled:hover {
+.submit-btn6:disabled:hover {
   transform: none;
   box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
 }
@@ -235,12 +235,12 @@
 /* ==============================
    Loading State
    ============================== */
-.submit-btn.loading {
+.submit-btn6.loading6 {
   position: relative;
   color: transparent;
 }
 
-.submit-btn.loading::after {
+.submit-btn6.loading6::after {
   content: '';
   position: absolute;
   top: 50%;
@@ -264,66 +264,66 @@
    Responsive Design
    ============================== */
 @media (max-width: 768px) {
-  .promotion-form-container {
+  .promotion-form-container6 {
     padding: 20px 16px;
   }
   
-  .promotion-form {
+  .promotion-form6 {
     border-radius: 20px;
   }
   
-  .form-header {
+  .form-header6 {
     padding: 32px 24px 24px;
   }
   
-  .form-header h2 {
+  .form-header6 h2 {
     font-size: 2rem;
   }
   
-  .form-body {
+  .form-body6 {
     padding: 32px 24px;
   }
   
-  .form-group {
+  .form-group6 {
     margin-bottom: 28px;
   }
   
-  .form-group input,
-  .form-group textarea {
+  .form-group6 input,
+  .form-group6 textarea {
     padding: 16px 20px;
     font-size: 0.95rem;
   }
   
-  .submit-btn {
+  .submit-btn6 {
     padding: 18px 28px;
     font-size: 1rem;
   }
 }
 
 @media (max-width: 480px) {
-  .promotion-form-container {
+  .promotion-form-container6 {
     padding: 16px 12px;
   }
   
-  .form-header {
+  .form-header6 {
     padding: 24px 20px 20px;
   }
   
-  .form-header h2 {
+  .form-header6 h2 {
     font-size: 1.75rem;
   }
   
-  .form-body {
+  .form-body6 {
     padding: 24px 20px;
   }
   
-  .form-group input,
-  .form-group textarea {
+  .form-group6 input,
+  .form-group6 textarea {
     padding: 14px 18px;
     font-size: 0.9rem;
   }
   
-  .submit-btn {
+  .submit-btn6 {
     padding: 16px 24px;
     font-size: 0.95rem;
   }
@@ -343,17 +343,17 @@
   }
 }
 
-.promotion-form {
+.promotion-form6 {
   animation: fadeInUp 0.8s ease-out;
 }
 
-.form-group {
+.form-group6 {
   animation: fadeInUp 0.6s ease-out;
 }
 
-.form-group:nth-child(1) { animation-delay: 0.1s; }
-.form-group:nth-child(2) { animation-delay: 0.2s; }
-.form-group:nth-child(3) { animation-delay: 0.3s; }
-.form-group:nth-child(4) { animation-delay: 0.4s; }
-.form-group:nth-child(5) { animation-delay: 0.5s; }
-.form-group:nth-child(6) { animation-delay: 0.6s; }
+.form-group6:nth-child(1) { animation-delay: 0.1s; }
+.form-group6:nth-child(2) { animation-delay: 0.2s; }
+.form-group6:nth-child(3) { animation-delay: 0.3s; }
+.form-group6:nth-child(4) { animation-delay: 0.4s; }
+.form-group6:nth-child(5) { animation-delay: 0.5s; }
+.form-group6:nth-child(6) { animation-delay: 0.6s; }

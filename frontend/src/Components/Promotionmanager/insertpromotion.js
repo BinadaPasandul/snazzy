@@ -63,7 +63,7 @@ function InsertPromotion() {
       data.append('discount', discountNumber);
       data.append('startDate', startDate);
       data.append('endDate', endDate);
-      data.append('bannerImage', bannerFile); // attach file
+      data.append('bannerImage', bannerFile);
 
       await api.post('/Promotions', data, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -91,116 +91,116 @@ function InsertPromotion() {
   return (
     <>
       <Nav />
-      <div className="promotion-form-container">
-      <div className="promotion-form">
-        <div className="form-header">
-          <h2>Create New Promotion</h2>
-          <p>Fill in the details below to create an amazing promotion</p>
-        </div>
-        
-        <div className="form-body">
-          <form onSubmit={handleSubmit}>
-            <div className="form-group">
-              <label htmlFor="title">Promotion Title</label>
-              <input 
-                type="text" 
-                id="title"
-                name="title" 
-                placeholder="Enter a catchy promotion title" 
-                value={formData.title} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
+      <div className="promotion-form-container6">
+        <div className="promotion-form6">
+          <div className="form-header6">
+            <h2>Create New Promotion</h2>
+            <p>Fill in the details below to create an amazing promotion</p>
+          </div>
+          
+          <div className="form-body6">
+            <form onSubmit={handleSubmit}>
+              <div className="form-group6">
+                <label htmlFor="title">Promotion Title</label>
+                <input 
+                  type="text" 
+                  id="title"
+                  name="title" 
+                  placeholder="Enter a catchy promotion title" 
+                  value={formData.title} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="productId">Product ID</label>
-              <input 
-                type="text" 
-                id="productId"
-                name="productId" 
-                placeholder="Enter the product ID" 
-                value={formData.productId} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
+              <div className="form-group6">
+                <label htmlFor="productId">Product ID</label>
+                <input 
+                  type="text" 
+                  id="productId"
+                  name="productId" 
+                  placeholder="Enter the product ID" 
+                  value={formData.productId} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea 
-                id="description"
-                name="description" 
-                placeholder="Describe your promotion in detail..." 
-                value={formData.description} 
-                onChange={handleChange}
-                rows={4}
-              />
-            </div>
+              <div className="form-group6">
+                <label htmlFor="description">Description</label>
+                <textarea 
+                  id="description"
+                  name="description" 
+                  placeholder="Describe your promotion in detail..." 
+                  value={formData.description} 
+                  onChange={handleChange}
+                  rows={4}
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="discount">Discount Percentage</label>
-              <input 
-                type="number" 
-                id="discount"
-                name="discount" 
-                placeholder="e.g., 25" 
-                value={formData.discount} 
-                onChange={handleChange} 
-                min="0"
-                max="100"
-                step="0.01"
-                required 
-              />
-            </div>
+              <div className="form-group6">
+                <label htmlFor="discount">Discount Percentage</label>
+                <input 
+                  type="number" 
+                  id="discount"
+                  name="discount" 
+                  placeholder="e.g., 25" 
+                  value={formData.discount} 
+                  onChange={handleChange} 
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  required 
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="startDate">Start Date</label>
-              <input 
-                type="date" 
-                id="startDate"
-                name="startDate" 
-                value={formData.startDate} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
+              <div className="form-group6">
+                <label htmlFor="startDate">Start Date</label>
+                <input 
+                  type="date" 
+                  id="startDate"
+                  name="startDate" 
+                  value={formData.startDate} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="endDate">End Date</label>
-              <input 
-                type="date" 
-                id="endDate"
-                name="endDate" 
-                value={formData.endDate} 
-                onChange={handleChange} 
-                required 
-              />
-            </div>
+              <div className="form-group6">
+                <label htmlFor="endDate">End Date</label>
+                <input 
+                  type="date" 
+                  id="endDate"
+                  name="endDate" 
+                  value={formData.endDate} 
+                  onChange={handleChange} 
+                  required 
+                />
+              </div>
 
-            <div className="form-group">
-              <label htmlFor="bannerImage">Banner Image</label>
-              <input 
-                type="file" 
-                id="bannerImage"
-                name="bannerImage" 
-                accept="image/*" 
-                onChange={handleFileChange} 
-                required
-              />
-            </div>
+              <div className="form-group6">
+                <label htmlFor="bannerImage">Banner Image</label>
+                <input 
+                  type="file" 
+                  id="bannerImage"
+                  name="bannerImage" 
+                  accept="image/*" 
+                  onChange={handleFileChange} 
+                  required
+                />
+              </div>
 
-            <button 
-              type="submit" 
-              className={`submit-btn ${isSubmitting ? 'loading' : ''}`}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? 'Creating Promotion...' : 'Create Promotion'}
-            </button>
-          </form>
+              <button 
+                type="submit" 
+                className={`submit-btn6 ${isSubmitting ? 'loading6' : ''}`}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Creating Promotion...' : 'Create Promotion'}
+              </button>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
     </>
   );
 }

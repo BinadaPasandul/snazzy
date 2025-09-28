@@ -20,7 +20,6 @@ function PromotionDashboard() {
             setLoading(true);
             setError('');
             try {
-                // Fetch promotions, products, and orders for performance tracking
                 const [promotionsRes, productsRes, ordersRes] = await Promise.all([
                     api.get('/Promotions'),
                     api.get('/products'),
@@ -34,7 +33,7 @@ function PromotionDashboard() {
                 setPromotions(promos);
                 setProducts(prods);
                 setOrders(orderData);
-                setFilteredPromotions(promos); // Initialize filtered promotions
+                setFilteredPromotions(promos);
             } catch (err) {
                 setError(err?.response?.data?.message || err.message);
             } finally {
@@ -44,7 +43,6 @@ function PromotionDashboard() {
         fetchData();
     }, []);
 
-    // Filter promotions based on search term
     useEffect(() => {
         if (!searchTerm.trim()) {
             setFilteredPromotions(promotions);
@@ -79,37 +77,28 @@ function PromotionDashboard() {
             setPromotions(promos);
             setProducts(prods);
             setOrders(orderData);
-            setFilteredPromotions(promos); // Update filtered promotions after refresh
+            setFilteredPromotions(promos);
         } catch (err) {
             setError(err?.response?.data?.message || err.message);
         }
     };
 
-    // Helper function to get product details by product code
     const getProductByCode = (productCode) => {
         return products.find(product => product.pcode === productCode);
     };
 
-    // Function to calculate promotion performance metrics
     const getPromotionPerformance = (promotion) => {
         const product = getProductByCode(promotion.productId);
-        
-        // Find orders that used this specific promotion
         const promotionOrders = orders.filter(order => 
             order.has_promotion && order.promotion_id === promotion._id
         );
         
-        // Calculate metrics
         const orderCount = promotionOrders.length;
         const totalRevenue = promotionOrders.reduce((sum, order) => sum + order.total_price, 0);
         const totalDiscountGiven = promotionOrders.reduce((sum, order) => sum + (order.promotion_discount || 0), 0);
         
-        // Calculate conversion rate
-        // For conversion rate, we'll use the total orders for this product vs promotion orders
         const totalProductOrders = orders.filter(order => order.product_id === promotion.productId).length;
         const conversionRate = totalProductOrders > 0 ? (orderCount / totalProductOrders) * 100 : 0;
-        
-        // Calculate average order value
         const avgOrderValue = orderCount > 0 ? totalRevenue / orderCount : 0;
         
         return {
@@ -142,15 +131,15 @@ function PromotionDashboard() {
         <>
             <Nav />
 
-            <div className="promotion-dashboard">
-                <div className="promotion-header">
-                    <div className="promotion-header-content">
-                        <h1 className="promotion-title">Promotion Manager Dashboard</h1>
-                        <p className="promotion-subtitle">Manage your promotional campaigns and track performance</p>
+            <div className="promotion-dashboard5">
+                <div className="promotion-header5">
+                    <div className="promotion-header-content5">
+                        <h1 className="promotion-title15">Promotion Manager Dashboard</h1>
+                        <p className="promotion-subtitle5">Manage your promotional campaigns and track performance</p>
                     </div>
-                    <div className="promotion-actions">
+                    <div className="promotion-actions5">
                         <button 
-                            className="add-promotion-btn"
+                            className="add-promotion-btn5"
                             onClick={() => navigate('/insertpromotion')} 
                         >
                             Add Promotion
@@ -159,30 +148,30 @@ function PromotionDashboard() {
                 </div>
 
                 {/* Search Section */}
-                <div className="promotion-search">
-                    <div className="promotion-search-header">
-                        <h3 className="promotion-search-title">Search Promotions</h3>
-                        <div className="promotion-search-info">
+                <div className="promotion-search5">
+                    <div className="promotion-search-header5">
+                        <h3 className="promotion-search-title5">Search Promotions</h3>
+                        <div className="promotion-search-info5">
                             {searchTerm && (
-                                <span className="search-results">
+                                <span className="search-results5">
                                     Showing {filteredPromotions.length} of {promotions.length} promotions
                                 </span>
                             )}
                         </div>
                     </div>
-                    <div className="promotion-search-container">
-                        <div className="search-input-wrapper">
+                    <div className="promotion-search-container5">
+                        <div className="search-input-wrapper5">
                             <input
                                 type="text"
-                                className="promotion-search-input"
+                                className="promotion-search-input5"
                                 placeholder="Search promotions by title, description, product ID, discount, or date..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            <div className="promotion-search-icon">🔍</div>
+                            <div className="promotion-search-icon5">🔍</div>
                             {searchTerm && (
                                 <button
-                                    className="promotion-search-clear"
+                                    className="promotion-search-clear5"
                                     onClick={() => setSearchTerm('')}
                                 >
                                     ✕
@@ -194,9 +183,8 @@ function PromotionDashboard() {
 
                 {/* Promotion Performance Summary */}
                 {!loading && promotions.length > 0 && (
-                    <div className="promotion-stats">
+                    <div className="promotion-stats5">
                         {(() => {
-                            // Calculate overall performance metrics
                             const totalPromotionOrders = orders.filter(order => order.has_promotion).length;
                             const totalOrders = orders.length;
                             const overallConversionRate = totalOrders > 0 ? (totalPromotionOrders / totalOrders) * 100 : 0;
@@ -209,33 +197,33 @@ function PromotionDashboard() {
                             
                             return (
                                 <>
-                                    <div className="promotion-stat">
-                                        <div className="promotion-stat-info">
-                                            <div className="promotion-stat-label">Total Promotions</div>
-                                            <div className="promotion-stat-value">{promotions.length}</div>
+                                    <div className="promotion-stat5">
+                                        <div className="promotion-stat-info5">
+                                            <div className="promotion-stat-label5">Total Promotions</div>
+                                            <div className="promotion-stat-value5">{promotions.length}</div>
                                         </div>
-                                        <div className="promotion-stat-icon">🎯</div>
+                                        <div className="promotion-stat-icon5">🎯</div>
                                     </div>
-                                    <div className="promotion-stat">
-                                        <div className="promotion-stat-info">
-                                            <div className="promotion-stat-label">Promotion Orders</div>
-                                            <div className="promotion-stat-value">{totalPromotionOrders}</div>
+                                    <div className="promotion-stat5">
+                                        <div className="promotion-stat-info5">
+                                            <div className="promotion-stat-label5">Promotion Orders</div>
+                                            <div className="promotion-stat-value5">{totalPromotionOrders}</div>
                                         </div>
-                                        <div className="promotion-stat-icon">📦</div>
+                                        <div className="promotion-stat-icon5">📦</div>
                                     </div>
-                                    <div className="promotion-stat">
-                                        <div className="promotion-stat-info">
-                                            <div className="promotion-stat-label">Conversion Rate</div>
-                                            <div className="promotion-stat-value">{overallConversionRate.toFixed(1)}%</div>
+                                    <div className="promotion-stat5">
+                                        <div className="promotion-stat-info5">
+                                            <div className="promotion-stat-label5">Conversion Rate</div>
+                                            <div className="promotion-stat-value5">{overallConversionRate.toFixed(1)}%</div>
                                         </div>
-                                        <div className="promotion-stat-icon">📈</div>
+                                        <div className="promotion-stat-icon5">📈</div>
                                     </div>
-                                    <div className="promotion-stat">
-                                        <div className="promotion-stat-info">
-                                            <div className="promotion-stat-label">Total Discounts</div>
-                                            <div className="promotion-stat-value">${totalDiscountGiven.toFixed(2)}</div>
+                                    <div className="promotion-stat5">
+                                        <div className="promotion-stat-info5">
+                                            <div className="promotion-stat-label5">Total Discounts</div>
+                                            <div className="promotion-stat-value5">${totalDiscountGiven.toFixed(2)}</div>
                                         </div>
-                                        <div className="promotion-stat-icon">💰</div>
+                                        <div className="promotion-stat-icon5">💰</div>
                                     </div>
                                 </>
                             );
@@ -244,38 +232,38 @@ function PromotionDashboard() {
                 )}
 
                 {/* Promotions Section */}
-                <div className="promotions-section">
-                    <div className="promotions-header">
-                        <h2 className="promotions-title">Promotions Management</h2>
-                        <div className="promotions-info">
-                            <span className="promotions-count">
+                <div className="promotions-section5">
+                    <div className="promotions-header5">
+                        <h2 className="promotions-title15">Promotions Management</h2>
+                        <div className="promotions-info5">
+                            <span className="promotions-count5">
                                 {filteredPromotions.length} of {promotions.length} promotions
                             </span>
                         </div>
                     </div>
 
                     {loading ? (
-                        <div className="loading-container">
-                            <div className="loading-spinner"></div>
-                            <div className="loading-text">Loading promotions...</div>
+                        <div className="loading-container5">
+                            <div className="loading-spinner5"></div>
+                            <div className="loading-text5">Loading promotions...</div>
                         </div>
                     ) : error ? (
-                        <div className="error-container">
-                            <div className="error-icon">⚠️</div>
-                            <div className="error-title">Error Loading Promotions</div>
-                            <div className="error-message">{error}</div>
+                        <div className="error-container5">
+                            <div className="error-icon5">⚠️</div>
+                            <div className="error-title5">Error Loading Promotions</div>
+                            <div className="error-message5">{error}</div>
                         </div>
                     ) : filteredPromotions.length === 0 ? (
-                        <div className="empty-state-container">
+                        <div className="empty-state-container5">
                             {searchTerm ? (
                                 <>
-                                    <div className="empty-state-icon">🔍</div>
-                                    <div className="empty-state-title">No Promotions Found</div>
-                                    <div className="empty-state-message">
+                                    <div className="empty-state-icon5">🔍</div>
+                                    <div className="empty-state-title5">No Promotions Found</div>
+                                    <div className="empty-state-message5">
                                         No promotions found matching "{searchTerm}"
                                     </div>
                                     <button 
-                                        className="clear-search-btn"
+                                        className="clear-search-btn5"
                                         onClick={() => setSearchTerm('')}
                                     >
                                         Clear Search
@@ -283,97 +271,95 @@ function PromotionDashboard() {
                                 </>
                             ) : (
                                 <>
-                                    <div className="empty-state-icon">📋</div>
-                                    <div className="empty-state-title">No Promotions</div>
-                                    <div className="empty-state-message">No promotions found.</div>
+                                    <div className="empty-state-icon5">📋</div>
+                                    <div className="empty-state-title5">No Promotions</div>
+                                    <div className="empty-state-message5">No promotions found.</div>
                                 </>
                             )}
                         </div>
                     ) : (
-                        <div className="promotions-grid">
+                        <div className="promotions-grid15">
                             {filteredPromotions.map((p) => (
-                                <div key={p._id} className="promotion-card">
+                                <div key={p._id} className="promotion-card15">
                                     {p.bannerImage ? (
                                         <img
                                             src={`http://localhost:5000${p.bannerImage}`}
                                             alt={p.title}
-                                            className="promotion-card-image"
+                                            className="promotion-card-image5"
                                         />
                                     ) : (
-                                        <div className="promotion-card-no-image">No Image</div>
+                                        <div className="promotion-card-no-image5">No Image</div>
                                     )}
                                     
-                                    <div className="promotion-card-content">
-                                        <h3 className="promotion-card-title">{p.title}</h3>
+                                    <div className="promotion-card-content15">
+                                        <h3 className="promotion-card-title5">{p.title}</h3>
                                         
-                                        {/* Product Details */}
                                         {(() => {
                                             const product = getProductByCode(p.productId);
                                             if (product) {
                                                 const originalPrice = product.pamount;
                                                 const discountedPrice = originalPrice - (originalPrice * p.discount / 100);
                                                 return (
-                                                    <div className="promotion-product-info">
-                                                        <div className="promotion-product-name">📦 {product.pname}</div>
-                                                        <div className="promotion-product-details">
+                                                    <div className="promotion-product-info5">
+                                                        <div className="promotion-product-name5">📦 {product.pname}</div>
+                                                        <div className="promotion-product-details5">
                                                             Code: {product.pcode} | Size: {product.psize} | Color: {product.pcolor}
                                                         </div>
-                                                        <div className="promotion-price-section">
-                                                            <span className="original-price">${originalPrice}</span>
-                                                            <span className="discounted-price">${discountedPrice.toFixed(2)}</span>
-                                                            <span className="save-badge">SAVE ${(originalPrice - discountedPrice).toFixed(2)}</span>
+                                                        <div className="promotion-price-section5">
+                                                            <span className="original-price5">${originalPrice}</span>
+                                                            <span className="discounted-price5">${discountedPrice.toFixed(2)}</span>
+                                                            <span className="save-badge5">SAVE ${(originalPrice - discountedPrice).toFixed(2)}</span>
                                                         </div>
                                                     </div>
                                                 );
                                             }
-                                            return <div className="product-not-found">Product ID: {p.productId} (Product not found)</div>;
+                                            return <div className="product-not-found5">Product ID: {p.productId} (Product not found)</div>;
                                         })()}
                                         
-                                        <div className="promotion-details">
-                                            <div className="promotion-detail-item">
-                                                <span className="detail-label">Description:</span>
-                                                <span className="detail-value">{p.description || 'N/A'}</span>
+                                        <div className="promotion-details5">
+                                            <div className="promotion-detail-item5">
+                                                <span className="detail-label5">Description:</span>
+                                                <span className="detail-value5">{p.description || 'N/A'}</span>
                                             </div>
-                                            <div className="promotion-detail-item">
-                                                <span className="detail-label">Discount:</span>
-                                                <span className="detail-value">{p.discount}%</span>
+                                            <div className="promotion-detail-item5">
+                                                <span className="detail-label5">Discount:</span>
+                                                <span className="detail-value5">{p.discount}%</span>
                                             </div>
-                                            <div className="promotion-detail-item">
-                                                <span className="detail-label">Start Date:</span>
-                                                <span className="detail-value">{p.startDate ? new Date(p.startDate).toLocaleDateString() : 'N/A'}</span>
+                                            <div className="promotion-detail-item5">
+                                                <span className="detail-label5">Start Date:</span>
+                                                <span className="detail-value5">{p.startDate ? new Date(p.startDate).toLocaleDateString() : 'N/A'}</span>
                                             </div>
-                                            <div className="promotion-detail-item">
-                                                <span className="detail-label">End Date:</span>
-                                                <span className="detail-value">{p.endDate ? new Date(p.endDate).toLocaleDateString() : 'N/A'}</span>
+                                            <div className="promotion-detail-item5">
+                                                <span className="detail-label5">End Date:</span>
+                                                <span className="detail-value5">{p.endDate ? new Date(p.endDate).toLocaleDateString() : 'N/A'}</span>
                                             </div>
                                         </div>
                                         
-                                        {/* Promotion Performance Tracking */}
                                         {(() => {
                                             const performance = getPromotionPerformance(p);
                                             return (
-                                                <div className="promotion-performance">
-                                                    <div className="promotion-performance-title">📊 Performance Metrics</div>
-                                                    <div className="promotion-performance-grid">
-                                                        <div className="performance-item">
-                                                            <span className="performance-label">Orders:</span>
-                                                            <span className="performance-value">{performance.orderCount}</span>
+                                                <div className="promotion-performance5">
+                                                    <div className="promotion-performance-title5">📊 Performance Metrics</div>
+                                                    <div className="promotion-performance-grid5">
+                                                        <div className="performance-item5">
+                                                            <span className="performance-label5">Orders:</span>
+                                                            <span className="performance-value5">{performance.orderCount}</span>
                                                         </div>
-                                                        <div className="performance-item">
-                                                            <span className="performance-label">Conversion:</span>
-                                                            <span className="performance-value">{performance.conversionRate.toFixed(1)}%</span>
+                                                        <div className="performance-item5">
+                                                            <span className="performance-label5">Conversion:</span>
+                                                            <span className="performance-value5">{performance.conversionRate.toFixed(1)}%</span>
                                                         </div>
-                                                        <div className="performance-item">
-                                                            <span className="performance-label">Revenue:</span>
-                                                            <span className="performance-value">${performance.totalRevenue.toFixed(2)}</span>
+                                                        <div className="performance-item5">
+                                                            <span className="performance-label5">Revenue:</span>
+                                                            <span className="performance-value5">${performance.totalRevenue.toFixed(2)}</span>
                                                         </div>
-                                                        <div className="performance-item">
-                                                            <span className="performance-label">Avg Order:</span>
-                                                            <span className="performance-value">${performance.avgOrderValue.toFixed(2)}</span>
+                                                        <div className="performance-item5">
+                                                            <span className="performance-label5">Avg Order:</span>
+                                                            <span className="performance-value5">${performance.avgOrderValue.toFixed(2)}</span>
                                                         </div>
                                                     </div>
                                                     {performance.totalDiscountGiven > 0 && (
-                                                        <div className="promotion-discount-total">
+                                                        <div className="promotion-discount-total5">
                                                             💰 Total Discount Given: ${performance.totalDiscountGiven.toFixed(2)}
                                                         </div>
                                                     )}
@@ -381,15 +367,15 @@ function PromotionDashboard() {
                                             );
                                         })()}
                                         
-                                        <div className="promotion-actions">
+                                        <div className="promotion-actions5">
                                             <button 
-                                                className="promotion-btn promotion-btn-edit"
+                                                className="promotion-btn5 promotion-btn-edit5"
                                                 onClick={() => handleEdit(p)} 
                                             >
                                                 Edit
                                             </button>
                                             <button 
-                                                className="promotion-btn promotion-btn-delete"
+                                                className="promotion-btn5 promotion-btn-delete5"
                                                 onClick={() => handleDelete(p._id)} 
                                             >
                                                 Delete
