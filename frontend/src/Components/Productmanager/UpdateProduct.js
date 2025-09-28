@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../utils/api";
 import Nav from "../Navbar/nav";
+import "./UpdateProduct.css";
 
 const UpdateProduct = () => {
   const { id } = useParams();
@@ -14,9 +15,13 @@ const UpdateProduct = () => {
     pdescription: "",
   });
   const [variants, setVariants] = useState([]);
-  const [imageFile, setImageFile] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [deletedImages, setDeletedImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   // Available sizes (35-44) and colors
   const availableSizes = Array.from({ length: 10 }, (_, i) => i + 35);
@@ -48,6 +53,13 @@ const UpdateProduct = () => {
           };
           setVariants([legacyVariant]);
         }
+
+        // Load existing images
+        if (p?.images && Array.isArray(p.images)) {
+          setExistingImages(p.images);
+        } else if (p?.image) {
+          setExistingImages([p.image]);
+        }
       } catch (err) {
         console.error(err);
         setError(err.response?.data?.message || "Failed to load product");
@@ -63,8 +75,48 @@ const UpdateProduct = () => {
     setProduct((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handle file changes for new images
   const handleFileChange = (e) => {
-    setImageFile(e.target.files[0] || null);
+    const files = Array.from(e.target.files);
+    setImageFiles(prev => [...prev, ...files]);
+  };
+
+  // Remove image from new files preview
+  const removeNewImage = (index) => {
+    setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Delete existing image
+  const deleteExistingImage = (index) => {
+    const imageToDelete = existingImages[index];
+    setDeletedImages(prev => [...prev, imageToDelete]);
+    setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Restore deleted image
+  const restoreImage = (deletedImage) => {
+    setExistingImages(prev => [...prev, deletedImage]);
+    setDeletedImages(prev => prev.filter(img => img !== deletedImage));
+  };
+
+  // Handle drag and drop
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      setImageFiles(prev => [...prev, ...files]);
+    }
   };
 
   // Add new variant
@@ -94,18 +146,37 @@ const UpdateProduct = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setIsSubmitting(true);
+    
+    // Basic validation
+    for (const key of Object.keys(product)) {
+      if (!product[key]) {
+        setError("All fields are required");
+        setIsSubmitting(false);
+        return;
+      }
+    }
     
     // Validate variants
     if (variants.length === 0) {
       setError("At least one size/color combination is required");
+      setIsSubmitting(false);
       return;
     }
 
     for (const variant of variants) {
       if (variant.quantity < 0) {
         setError("Quantity cannot be negative");
+        setIsSubmitting(false);
         return;
       }
+    }
+
+    // Check if there are any images (existing or new)
+    if (existingImages.length === 0 && imageFiles.length === 0) {
+      setError("At least one product image is required");
+      setIsSubmitting(false);
+      return;
     }
 
     try {
@@ -115,82 +186,177 @@ const UpdateProduct = () => {
       formData.append("pamount", product.pamount);
       formData.append("pdescription", product.pdescription);
       formData.append("variants", JSON.stringify(variants));
-      if (imageFile) formData.append("image", imageFile);
+      
+      // Append new image files
+      imageFiles.forEach((file, index) => {
+        formData.append("images", file);
+      });
 
-      await api.put(`/products/${id}`, formData);
-      alert("Product updated");
-      navigate("/products");
+      // Append deleted images info
+      if (deletedImages.length > 0) {
+        formData.append("deletedImages", JSON.stringify(deletedImages));
+      }
+
+      const res = await api.put(`/products/${id}`, formData);
+      
+      if (res.status === 200 || res.status === 201) {
+        alert("Product updated successfully!");
+        navigate("/products");
+      } else {
+        setError("Failed to update product");
+      }
     } catch (err) {
       console.error(err);
       setError(err.response?.data?.message || "Failed to update product");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) return (
+    <div className="product-manager-container">
+      <Nav />
+      <div className="loading-container">
+        <div className="loading-spinner" />
+        <p>Loading product...</p>
+      </div>
+    </div>
+  );
 
   return (
-    <div style={{ background: "#f5f7fa", minHeight: "100vh" }}>
+    <div className="product-manager-container">
+      {/* Background Decoration */}
+      <div className="background-decoration" />
+      
       <Nav />
-      <div style={{ display: "flex", justifyContent: "center", padding: "40px 20px" }}>
-        <form onSubmit={handleSubmit} style={{ background: "#fff", padding: 24, borderRadius: 12, width: "100%", maxWidth: 600 }}>
-          <h2 style={{ marginTop: 0 }}>Edit Product</h2>
-          
-          {/* Basic Product Fields */}
-          {[{label:"Product Name",name:"pname",type:"text"},
-            {label:"Product Code",name:"pcode",type:"text"},
-            {label:"Price",name:"pamount",type:"number"},
-            {label:"Description",name:"pdescription",type:"text"}].map(f => (
-            <div key={f.name} style={{ marginBottom: 12 }}>
-              <label htmlFor={f.name} style={{ display: "block", marginBottom: 6 }}>{f.label}</label>
-              <input id={f.name} name={f.name} type={f.type} value={product[f.name]} onChange={handleInputChange} style={{ width: "100%", padding: 10, border: "1px solid #ccc", borderRadius: 6 }} />
+      
+      <div className="content-wrapper">
+        {/* Left Container - Form Fields */}
+        <div className="form-container">
+          <div className="form-header">
+            <h1 className="form-title">
+              Update Product
+            </h1>
+            <div className="title-underline" />
+          </div>
+
+          {[
+            { label: "Product Name", name: "pname", type: "text" },
+            { label: "Product Code", name: "pcode", type: "text" },
+            { label: "Price ($)", name: "pamount", type: "number" },
+            { label: "Description", name: "pdescription", type: "text" },
+          ].map((field) => (
+            <div key={field.name} className="field-container">
+              <label htmlFor={field.name} className="field-label">
+                {field.label}:
+              </label>
+              <input
+                type={field.type}
+                id={field.name}
+                name={field.name}
+                value={product[field.name]}
+                onChange={handleInputChange}
+                required
+                placeholder={`Enter ${field.label.toLowerCase()}`}
+                className="field-input"
+              />
             </div>
           ))}
 
+          {error && (
+            <div className="error-message">
+              ⚠️ {error}
+            </div>
+          )}
+        </div>
+
+        {/* Right Container - Images and Variants */}
+        <div className="image-container">
+          {/* Existing Images Section */}
+          {existingImages.length > 0 && (
+            <div className="existing-images-section">
+              <div className="section-header">
+                <h3 className="section-title">Current Images</h3>
+                <span className="image-count">({existingImages.length} images)</span>
+              </div>
+              <div className="existing-images-grid">
+                {existingImages.map((image, index) => (
+                  <div key={index} className="existing-image-item">
+                    <img
+                      src={`http://localhost:5000/${image}`}
+                      alt={`Product ${index + 1}`}
+                      className="existing-image"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => deleteExistingImage(index)}
+                      className="delete-image-btn"
+                    >
+                      ✕
+                    </button>
+                    <div className="image-label">Current #{index + 1}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Deleted Images Section */}
+          {deletedImages.length > 0 && (
+            <div className="deleted-images-section">
+              <div className="section-header">
+                <h3 className="section-title">Deleted Images</h3>
+                <span className="image-count">({deletedImages.length} images)</span>
+              </div>
+              <div className="deleted-images-grid">
+                {deletedImages.map((image, index) => (
+                  <div key={index} className="deleted-image-item">
+                    <img
+                      src={`http://localhost:5000/${image}`}
+                      alt={`Deleted ${index + 1}`}
+                      className="deleted-image"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => restoreImage(image)}
+                      className="restore-image-btn"
+                    >
+                      ↶
+                    </button>
+                    <div className="image-label">Deleted #{index + 1}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Variants Section */}
-          <div style={{ marginTop: 20, padding: 20, background: "#f8fafc", borderRadius: 12, border: "2px solid #e2e8f0" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
-              <h3 style={{ margin: 0, color: "#4a5568" }}>Size & Color Variants</h3>
+          <div className="variants-section">
+            <div className="variants-header">
+              <h3 className="variants-title">Size & Color</h3>
               <button
                 type="button"
                 onClick={addVariant}
-                style={{
-                  background: "#4f46e5",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 16px",
-                  borderRadius: 8,
-                  cursor: "pointer"
-                }}
+                className="add-variant-btn"
               >
-                + Add Variant
+                + Add Colors & Sizes
               </button>
             </div>
 
             {variants.length === 0 && (
-              <div style={{ textAlign: "center", color: "#718096", fontStyle: "italic", padding: 20, background: "#edf2f7", borderRadius: 8, border: "2px dashed #cbd5e0" }}>
-                Click "Add Variant" to add size/color combinations with quantities
+              <div className="no-variants-message">
+                Click "Add Colors & Sizes" to add size/color combinations with quantities
               </div>
             )}
 
             {variants.map((variant, index) => (
-              <div key={index} style={{ 
-                display: "grid", 
-                gridTemplateColumns: "1fr 1fr auto auto", 
-                gap: 12, 
-                alignItems: "end", 
-                padding: 15, 
-                background: "white", 
-                borderRadius: 10, 
-                border: "2px solid #e2e8f0", 
-                marginBottom: 12,
-                position: "relative"
-              }}>
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a5568", marginBottom: 4 }}>Size:</label>
+              <div key={index} className="variant-row">
+                <div className="variant-field">
+                  <label className="variant-label">Size:</label>
                   <select
                     value={variant.size}
                     onChange={(e) => updateVariant(index, "size", parseInt(e.target.value))}
-                    style={{ width: "100%", padding: 8, border: "2px solid #e2e8f0", borderRadius: 8 }}
+                    className="variant-select"
                   >
                     {availableSizes.map(size => (
                       <option key={size} value={size}>{size}</option>
@@ -198,12 +364,12 @@ const UpdateProduct = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a5568", marginBottom: 4 }}>Color:</label>
+                <div className="variant-field">
+                  <label className="variant-label">Color:</label>
                   <select
                     value={variant.color}
                     onChange={(e) => updateVariant(index, "color", e.target.value)}
-                    style={{ width: "100%", padding: 8, border: "2px solid #e2e8f0", borderRadius: 8 }}
+                    className="variant-select"
                   >
                     {availableColors.map(color => (
                       <option key={color} value={color}>{color}</option>
@@ -211,14 +377,14 @@ const UpdateProduct = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "#4a5568", marginBottom: 4 }}>Quantity:</label>
+                <div className="variant-field">
+                  <label className="variant-label">Quantity:</label>
                   <input
                     type="number"
                     value={variant.quantity}
                     onChange={(e) => updateVariant(index, "quantity", parseInt(e.target.value) || 0)}
                     min="0"
-                    style={{ width: "100%", padding: 8, border: "2px solid #e2e8f0", borderRadius: 8 }}
+                    className="variant-input"
                     placeholder="0"
                   />
                 </div>
@@ -226,56 +392,99 @@ const UpdateProduct = () => {
                 <button
                   type="button"
                   onClick={() => removeVariant(index)}
-                  style={{
-                    background: "#fed7d7",
-                    color: "#c53030",
-                    border: "none",
-                    padding: 8,
-                    borderRadius: 8,
-                    cursor: "pointer",
-                    minWidth: 40,
-                    height: 40,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
+                  className="remove-variant-btn"
                 >
                   ✕
                 </button>
 
                 {variantExists(variant.size, variant.color, index) && (
-                  <div style={{
-                    position: "absolute",
-                    top: -8,
-                    left: 15,
-                    background: "#fef5e7",
-                    color: "#c05621",
-                    padding: "4px 8px",
-                    borderRadius: 6,
-                    fontSize: 11,
-                    fontWeight: 500,
-                    border: "1px solid #f6ad55",
-                    whiteSpace: "nowrap"
-                  }}>
+                  <div className="duplicate-warning">
                     ⚠️ This size/color combination already exists
                   </div>
                 )}
               </div>
             ))}
           </div>
-
-          <div style={{ marginBottom: 12 }}>
-            <label htmlFor="image" style={{ display: "block", marginBottom: 6 }}>Replace Image</label>
-            <input id="image" name="image" type="file" accept="image/*" onChange={handleFileChange} />
+          
+          {/* New Images Upload Area */}
+          <div className="image-upload-area">
+            <label htmlFor="images" className="upload-label">
+              Add New Images (Multiple):
+            </label>
+            
+            <div 
+              className={`upload-dropzone ${isDragOver ? 'dragover' : ''}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
+              <input
+                type="file"
+                id="images"
+                name="images"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                className="file-input"
+              />
+              <div className="upload-icon">📁</div>
+              <div className="upload-text">Drop your images here or click to browse</div>
+              <div className="upload-subtext">Supports: JPG, PNG, GIF (Max 3MB each, up to 10 images)</div>
+            </div>
           </div>
 
-          {error && <p style={{ color: "red", marginBottom: 12 }}>{error}</p>}
+          {/* New Images Preview */}
+          {imageFiles.length > 0 && (
+            <div className="image-preview-container">
+              <div className="preview-label">New Images Preview ({imageFiles.length} images):</div>
+              <div className="image-preview-grid">
+                {imageFiles.map((file, index) => (
+                  <div key={index} className="image-preview-item">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index + 1}`}
+                      className="image-preview"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeNewImage(index)}
+                      className="remove-image-btn"
+                    >
+                      ✕
+                    </button>
+                    <div className="image-order">New #{index + 1}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-          <div style={{ display: "flex", gap: 8 }}>
-            <button type="submit" style={{ padding: "10px 14px", background: "#4f46e5", color: "#fff", border: "none", borderRadius: 8, cursor: "pointer" }}>Save</button>
-            <button type="button" onClick={() => navigate("/products")} style={{ padding: "10px 14px", background: "#e5e7eb", color: "#111827", border: "none", borderRadius: 8, cursor: "pointer" }}>Cancel</button>
-          </div>
-        </form>
+          <form onSubmit={handleSubmit} encType="multipart/form-data" style={{ width: "100%" }}>
+            <div className="button-group">
+              <button
+                type="submit"
+                className="submit-button"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="loading-spinner" />
+                    Updating Product...
+                  </>
+                ) : (
+                  "Update Product"
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/products")}
+                className="cancel-button"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

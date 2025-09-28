@@ -130,18 +130,44 @@
 
 /* Headers */
 .form-header {
-  text-align: center;
-  margin-bottom: 30px;
-  position: relative;
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;  /* optional: space for a small action button */
+  margin-bottom: 32px;
+  padding-bottom: 12px;
+  color: #0a0a0a;
+
+  /* Visuals */
+  border-bottom: 2px solid #fcfcfc;        /* soft divider line */
+  background: transparent;                 /* keep it clean */
+}
+.form-header .header-badge {
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.5px;
 }
 
 .form-title {
-  font-size: 28px;
+  font-size: 26px;
   font-weight: 700;
-  background: linear-gradient(135deg, #b8b8c7 0%, #c8c3ce 100%);
-  -webkit-background-clip: text;
+  color: #1f2937;                           /* dark neutral text */
+  letter-spacing: -0.3px;
   margin: 0;
-  letter-spacing: -0.5px;
+
+  /* Optional gradient text for a subtle pop */
+  background: linear-gradient(90deg, #000000 0%, #0b0b0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title-underline,
+.title-underline-small {
+  display: none; /* old underline styles removed */
 }
 
 .image-title {
@@ -398,7 +424,7 @@
 .submit-button {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #080808 0%, #080808 100%);
   color: #ffffff;
   font-weight: 600;
   font-size: 16px;
