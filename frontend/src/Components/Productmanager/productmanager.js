@@ -158,7 +158,7 @@ const AddProducts = () => {
       <div className="content-wrapper">
         {/* Left Container - Form Fields */}
         <div className="form-container">
-          <div className="form-header">
+          <div className="form-headerpd">
             <h1 className="form-title">
               Add New Product
             </h1>
@@ -188,22 +188,33 @@ const AddProducts = () => {
             </div>
           ))}
 
+          
+
+          {error && (
+            <div className="error-message">
+              ⚠️ {error}
+            </div>
+          )}
+        </div>
+
+        {/* Right Container - Image Upload */}
+        <div className="image-container">
           {/* Variants Section */}
           <div className="variants-section">
             <div className="variants-header">
-              <h3 className="variants-title">Size & Color Variants</h3>
+              <h3 className="variants-titlepd">Size & Color</h3>
               <button
                 type="button"
                 onClick={addVariant}
-                className="add-variant-btn"
+                className="add-variant-btnpd"
               >
-                + Add Variant
+                + Add Colors & Sizes
               </button>
             </div>
 
             {variants.length === 0 && (
               <div className="no-variants-message">
-                Click "Add Variant" to add size/color combinations with quantities
+                Click "Add Colors & Sizes" to add size/color combinations with quantities
               </div>
             )}
 
@@ -263,22 +274,7 @@ const AddProducts = () => {
               </div>
             ))}
           </div>
-
-          {error && (
-            <div className="error-message">
-              ⚠️ {error}
-            </div>
-          )}
-        </div>
-
-        {/* Right Container - Image Upload */}
-        <div className="image-container">
-          <div className="form-header">
-            <h2 className="image-title">
-              Product Image
-            </h2>
-            <div className="title-underline-small" />
-          </div>
+          
 
           {/* Image upload area */}
           <div className="image-upload-area">

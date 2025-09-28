@@ -11,6 +11,9 @@ function Home() {
 	const [products, setProducts] = useState([]);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
+	const [showSuggestions, setShowSuggestions] = useState(false);
+	const [searchHistory, setSearchHistory] = useState([]);
+	const [popularSearches] = useState(['shirts', 'jeans', 'shoes', 'accessories', 'dresses', 'jackets']);
 
 	useEffect(() => {
 		const load = async () => {
@@ -32,223 +35,268 @@ function Home() {
 	const handleSearch = (e) => {
 		e.preventDefault();
 		if (!query.trim()) return;
-		navigate(`/items?search=${encodeURIComponent(query.trim())}`);
+		
+		// Add to search history
+		const trimmedQuery = query.trim();
+		if (!searchHistory.includes(trimmedQuery)) {
+			setSearchHistory(prev => [trimmedQuery, ...prev.slice(0, 4)]);
+		}
+		
+		navigate(`/items?search=${encodeURIComponent(trimmedQuery)}`);
+		setShowSuggestions(false);
+	};
+
+	const handleSuggestionClick = (suggestion) => {
+		setQuery(suggestion);
+		setShowSuggestions(false);
+	};
+
+	const handleInputFocus = () => {
+		setShowSuggestions(true);
+	};
+
+	const handleInputBlur = () => {
+		// Delay hiding suggestions to allow clicking on them
+		setTimeout(() => setShowSuggestions(false), 200);
+	};
+
+	const clearSearch = () => {
+		setQuery('');
+		setShowSuggestions(false);
 	};
 
 	return (
 		<div className="home-container">
 			<Nav />
 
-			{/* Modern Hero Section */}
-			<section className="modern-hero">
+			{/* Hero Section with Search */}
+			<section className="hero-section">
 				<div className="hero-background">
-					<div className="hero-pattern"></div>
-					<div className="hero-gradient"></div>
+					<div className="hero-overlay"></div>
+					<div className="hero-particles"></div>
 				</div>
 				
 				<div className="hero-content">
 					<div className="hero-text">
 						<h1 className="hero-title">
-							<span className="title-line">Discover Your</span>
-							<span className="title-line highlight">Perfect Style</span>
+							<span className="title-primary">Discover</span>
+							<span className="title-secondary">Amazing Products</span>
 						</h1>
-						<p className="hero-subtitle">
-							Fresh drops, timeless classics, and daily essentials curated for the modern lifestyle.
-							Experience fashion that moves with you.
+						<p className="hero-description">
+							Find the perfect items for your lifestyle. Quality products, great prices, and exceptional service.
 						</p>
-						
-						<div className="hero-actions">
-							<form className="hero-search" onSubmit={handleSearch} role="search">
-								<div className="search-container">
-									<input
-										type="search"
-										placeholder="Search products, brands, colors..."
-										value={query}
-										onChange={(e) => setQuery(e.target.value)}
-										aria-label="Search products"
-										className="search-input"
-									/>
-									<button type="submit" className="search-btn">
-										<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-											<circle cx="11" cy="11" r="8"></circle>
-											<path d="m21 21-4.35-4.35"></path>
-										</svg>
-									</button>
-								</div>
-							</form>
-							
-							<div className="hero-buttons">
-								<button 
-									className="btn-primary"
-									onClick={() => navigate('/items')}
-								>
-									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-									</svg>
-									Shop Now
-								</button>
-								<button 
-									className="btn-secondary"
-									onClick={() => navigate('/Promotion')}
-								>
-									<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-									</svg>
-									View Promotions
-								</button>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<div className="scroll-indicator">
-					<div className="scroll-arrow">
-						<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-							<path d="M7 13l3 3 3-3M7 6l3 3 3-3"></path>
-						</svg>
-					</div>
-				</div>
-			</section>
-
-			{/* Quick Actions Section */}
-			<section className="quick-actions">
-				<div className="actions-container">
-					<div className="section-header">
-						<h2 className="section-title">
-							<span className="title-icon">⚡</span>
-							Quick Actions
-						</h2>
-						<p className="section-subtitle">Everything you need, right at your fingertips</p>
 					</div>
 					
-					<div className="actions-grid">
-						<div className="action-card primary" onClick={() => navigate('/items')}>
-							<div className="card-background">
-								<div className="card-pattern"></div>
-								<div className="card-gradient"></div>
-							</div>
-							<div className="card-content">
-								<div className="card-icon">
-									<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-									</svg>
+					{/* Search Bar */}
+					<div className="search-section">
+						<div className="enhanced-search-container">
+							<form className="hero-search" onSubmit={handleSearch} role="search">
+								<div className="search-wrapper">
+									<div className="search-container">
+										<div className="search-icon">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+												<circle cx="11" cy="11" r="8"></circle>
+												<path d="m21 21-4.35-4.35"></path>
+											</svg>
+										</div>
+										<input
+											type="search"
+											placeholder="Search products, brands, colors..."
+											value={query}
+											onChange={(e) => setQuery(e.target.value)}
+											onFocus={handleInputFocus}
+											onBlur={handleInputBlur}
+											aria-label="Search products"
+											className="search-input"
+										/>
+										{query && (
+											<button type="button" className="clear-btn" onClick={clearSearch}>
+												<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+													<line x1="18" y1="6" x2="6" y2="18"></line>
+													<line x1="6" y1="6" x2="18" y2="18"></line>
+												</svg>
+											</button>
+										)}
+										<button type="submit" className="search-btn">
+											<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+												<circle cx="11" cy="11" r="8"></circle>
+												<path d="m21 21-4.35-4.35"></path>
+											</svg>
+										</button>
+									</div>
 								</div>
-								<h3 className="card-title">Shop Now</h3>
-								<p className="card-description">Discover our latest collection of premium products</p>
-								<div className="card-action">
-									<span className="action-text">Explore All</span>
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M5 12h14M12 5l7 7-7 7"></path>
-									</svg>
-								</div>
-							</div>
+								
+								{/* Search Suggestions */}
+								{showSuggestions && (
+									<div className="search-suggestions">
+										{searchHistory.length > 0 && (
+											<div className="suggestion-section">
+												<div className="suggestion-header">
+													<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+														<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+														<path d="M3 3v5h5"></path>
+													</svg>
+													<span>Recent Searches</span>
+												</div>
+												{searchHistory.map((term, index) => (
+													<div key={index} className="suggestion-item" onClick={() => handleSuggestionClick(term)}>
+														<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+															<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+															<path d="M3 3v5h5"></path>
+														</svg>
+														<span>{term}</span>
+													</div>
+												))}
+											</div>
+										)}
+										
+										<div className="suggestion-section">
+											<div className="suggestion-header">
+												<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+													<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+												</svg>
+												<span>Popular Searches</span>
+											</div>
+											{popularSearches.map((term, index) => (
+												<div key={index} className="suggestion-item" onClick={() => handleSuggestionClick(term)}>
+													<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+														<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+													</svg>
+													<span>{term}</span>
+												</div>
+											))}
+										</div>
+									</div>
+								)}
+							</form>
 						</div>
-
-						<div className="action-card secondary" onClick={() => navigate('/Promotion')}>
-							<div className="card-background">
-								<div className="card-pattern"></div>
-								<div className="card-gradient"></div>
-							</div>
-							<div className="card-content">
-								<div className="card-icon">
-									<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
-									</svg>
-								</div>
-								<h3 className="card-title">Promotions</h3>
-								<p className="card-description">Exclusive deals and limited-time offers</p>
-								<div className="card-action">
-									<span className="action-text">View Deals</span>
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M5 12h14M12 5l7 7-7 7"></path>
-									</svg>
-								</div>
-							</div>
-						</div>
-
-						<div className="action-card accent" onClick={() => navigate('/userdetails')}>
-							<div className="card-background">
-								<div className="card-pattern"></div>
-								<div className="card-gradient"></div>
-							</div>
-							<div className="card-content">
-								<div className="card-icon">
-									<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-										<circle cx="12" cy="7" r="4"></circle>
-									</svg>
-								</div>
-								<h3 className="card-title">My Profile</h3>
-								<p className="card-description">Manage your account and preferences</p>
-								<div className="card-action">
-									<span className="action-text">View Profile</span>
-									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-										<path d="M5 12h14M12 5l7 7-7 7"></path>
-									</svg>
-								</div>
-							</div>
-						</div>
-
+					</div>
+					
+					<div className="hero-actions">
+						<button 
+							className="btn-primary"
+							onClick={() => navigate('/items')}
+						>
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+								<path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+							</svg>
+							Shop Now
+						</button>
+						<button 
+							className="btn-secondary"
+							onClick={() => navigate('/Promotion')}
+						>
+							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+								<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+							</svg>
+							View Promotions
+						</button>
 					</div>
 				</div>
 			</section>
 
-			<section className="product-rail">
-				<div className="rail-header">
-					<h2>Trending now</h2>
-					<div className="rail-controls">
-						<button className="rail-btn" data-target="#rail2" data-dir="left">‹</button>
-						<button className="rail-btn" data-target="#rail2" data-dir="right">›</button>
+			{/* Features Section */}
+			<section className="features-section">
+				<div className="container">
+					<div className="section-header">
+						<h2 className="section-title">Why Choose Us?</h2>
+						<p className="section-subtitle">Experience the difference with our premium service</p>
+					</div>
+					
+					<div className="features-grid">
+						<div className="feature-card">
+							<div className="feature-icon">
+								<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+									<path d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+								</svg>
+							</div>
+							<h3 className="feature-title">Quality Products</h3>
+							<p className="feature-description">Carefully curated selection of premium products</p>
+						</div>
+						
+						<div className="feature-card">
+							<div className="feature-icon">
+								<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+									<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+								</svg>
+							</div>
+							<h3 className="feature-title">Best Prices</h3>
+							<p className="feature-description">Competitive pricing with regular promotions</p>
+						</div>
+						
+						<div className="feature-card">
+							<div className="feature-icon">
+								<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+									<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+									<circle cx="12" cy="7" r="4"></circle>
+								</svg>
+							</div>
+							<h3 className="feature-title">Expert Support</h3>
+							<p className="feature-description">24/7 customer support for all your needs</p>
+						</div>
 					</div>
 				</div>
-				<div className="rail cards" id="rail2">
-					{loading && <div className="rail-empty">Loading...</div>}
-					{!loading && error && <div className="rail-empty error">{error}</div>}
-					{!loading && !error && featured.length === 0 && (
-						<div className="rail-empty">No products yet</div>
-					)}
-					{featured.map((p) => (
-						<div key={p._id} className="card">
-							<div className="card-media">
-								{(p.images && p.images.length > 0) ? (
-									<img src={`http://localhost:5000${p.images[0]}`} alt={p.pname} />
-								) : p.image ? (
-									<img src={`http://localhost:5000${p.image}`} alt={p.pname} />
-								) : (
-									<div className="placeholder">No Image</div>
-								)}
-							</div>
-							<div className="card-body">
-								<h4 className="card-title">{p.pname}</h4>
-								{(() => {
-									const hasPromo = p.hasActivePromotion || (p.promotion && p.promotion.discount > 0);
-									const original = typeof p.originalPrice !== 'undefined' ? p.originalPrice : p.pamount;
-									const discountPct = p.promotion?.discount;
-									const discounted = typeof p.discountedPrice !== 'undefined'
-										? p.discountedPrice
-										: (hasPromo && discountPct ? Number((Number(original) * (100 - Number(discountPct)) / 100).toFixed(2)) : null);
-									if (hasPromo && discounted !== null) {
-										return (
-											<div className="price-stack">
-												<div className="old-price">${original}</div>
-												<div className="sale-row">
-													<span className="sale-price">${discounted}</span>
-													{discountPct ? <span className="discount-badge">{discountPct}% OFF</span> : null}
+			</section>
+
+			{/* Products Section */}
+			<section className="products-section">
+				<div className="container">
+					<div className="section-header">
+						<h2 className="section-title">Trending Products</h2>
+						<p className="section-subtitle">Discover our most popular items</p>
+					</div>
+					
+					<div className="products-grid">
+						{loading && <div className="loading-state">Loading products...</div>}
+						{!loading && error && <div className="error-state">{error}</div>}
+						{!loading && !error && featured.length === 0 && (
+							<div className="empty-state">No products available</div>
+						)}
+						{featured.map((p) => (
+							<div key={p._id} className="product-card">
+								<div className="product-image">
+									{(p.images && p.images.length > 0) ? (
+										<img src={`http://localhost:5000${p.images[0]}`} alt={p.pname} />
+									) : p.image ? (
+										<img src={`http://localhost:5000${p.image}`} alt={p.pname} />
+									) : (
+										<div className="placeholder">No Image</div>
+									)}
+								</div>
+								<div className="product-info">
+									<h3 className="product-name">{p.pname}</h3>
+									{(() => {
+										const hasPromo = p.hasActivePromotion || (p.promotion && p.promotion.discount > 0);
+										const original = typeof p.originalPrice !== 'undefined' ? p.originalPrice : p.pamount;
+										const discountPct = p.promotion?.discount;
+										const discounted = typeof p.discountedPrice !== 'undefined'
+											? p.discountedPrice
+											: (hasPromo && discountPct ? Number((Number(original) * (100 - Number(discountPct)) / 100).toFixed(2)) : null);
+										if (hasPromo && discounted !== null) {
+											return (
+												<div className="price-container">
+													<div className="original-price">${original}</div>
+													<div className="price-row">
+														<span className="current-price">${discounted}</span>
+														{discountPct ? <span className="discount-tag">{discountPct}% OFF</span> : null}
+													</div>
 												</div>
+											);
+										}
+										return (
+											<div className="price-container">
+												<span className="current-price">${p.pamount}</span>
+												<span className="product-color">{p.pcolor}</span>
 											</div>
 										);
-									}
-									return (
-										<div className="card-meta">
-											<span className="price">${p.pamount}</span>
-											<span className="color">{p.pcolor}</span>
-										</div>
-									);
-								})()}
-								<button className="pill" onClick={() => navigate(`/products/${p._id}`)}>View</button>
+									})()}
+									<button className="view-btn" onClick={() => navigate(`/products/${p._id}`)}>
+										View Details
+									</button>
+								</div>
 							</div>
-						</div>
-					))}
+						))}
+					</div>
 				</div>
 			</section>
 
