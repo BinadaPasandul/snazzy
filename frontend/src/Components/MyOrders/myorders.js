@@ -230,7 +230,7 @@ function MyOrders() {
                         </div>
 
                         <div className="order-actions">
-                          {!getRefundStatus(order._id) && order.payment_id ? (
+                          {!getRefundStatus(order._id) && order.payment_id && order.status !== "Delivered" && order.status !== "Delivering" ? (
                             <button 
                               className="action-btn refund-btn" 
                               onClick={() => handleRefundClick(order._id, order.payment_id)}

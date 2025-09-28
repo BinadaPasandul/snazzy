@@ -592,18 +592,18 @@
   box-shadow: 0 8px 20px rgba(239, 68, 68, 0.3);
 }
 
-.btn-primary { 
+.btn-primary1 { 
   background: linear-gradient(135deg, #1e293b 0%, #334155 100%); 
   color: #ffffff; 
   border-color: #334155;
   box-shadow: 0 4px 12px rgba(30, 41, 59, 0.3);
 }
-.btn-primary:hover {
+.btn-primary1:hover {
   background: linear-gradient(135deg, #334155 0%, #475569 100%);
   box-shadow: 0 8px 20px rgba(30, 41, 59, 0.4);
 }
 
-.btn-secondary { 
+.btn-secondarye { 
   background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); 
   color: #64748b;
   border-color: #e2e8f0;
@@ -632,49 +632,212 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 12px;
+  padding: 20px;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .om-modal {
   background: #ffffff;
-  border-radius: 10px;
-  padding: 16px;
-  width: 420px;
+  border-radius: 20px;
+  padding: 32px;
+  width: 500px;
   max-width: 95vw;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    0 10px 20px rgba(0, 0, 0, 0.15),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  position: relative;
+  animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.om-modal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #3b82f6, #1e40af, #6366f1);
+  border-radius: 20px 20px 0 0;
+}
+
+/* Modal Header */
+.om-modal h3 {
+  margin: 0 0 24px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #1e293b;
+  text-align: center;
+  padding-bottom: 16px;
+  border-bottom: 2px solid #f1f5f9;
+  position: relative;
+}
+
+.om-modal h3::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #3b82f6, #1e40af);
+  border-radius: 1px;
+}
+
+/* Close Button */
+.om-modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.om-modal-close:hover {
+  background: #f1f5f9;
+  color: #1e293b;
+  transform: scale(1.1);
 }
 
 .om-discount-card {
-  background: #fef3c7;
-  border: 1px solid #f59e0b;
-  border-radius: 8px;
-  padding: 10px;
-  margin-bottom: 12px;
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  border: 2px solid #f59e0b;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.om-discount-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #f59e0b, #d97706);
 }
 
 .om-discount-title {
   font-weight: 700;
   color: #92400e;
-  margin-bottom: 6px;
+  margin-bottom: 12px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.om-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
 .om-form input,
 .om-form select {
   width: 100%;
-  margin-bottom: 8px;
-  padding: 8px 10px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  padding: 16px 20px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 16px;
+  background: #ffffff;
+  color: #1e293b;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.om-form input:focus,
+.om-form select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 
+    0 0 0 4px rgba(59, 130, 246, 0.1),
+    0 4px 12px rgba(59, 130, 246, 0.15);
+  transform: translateY(-1px);
+}
+
+.om-form input:hover,
+.om-form select:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.om-form input[readonly] {
+  background: #f8fafc;
+  color: #64748b;
+  cursor: not-allowed;
 }
 
 .om-form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 16px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 2px solid #f1f5f9;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+  color: #ffffff;
+  border: 2px solid #3b82f6;
+  padding: 14px 28px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
 }
 
 @media (max-width: 1200px) {
@@ -768,6 +931,46 @@
     width: 100%; 
     max-width: 100%; 
     padding: 12px 16px;
+  }
+  
+  /* Modal responsive design */
+  .om-modal {
+    width: 95vw;
+    padding: 24px;
+    margin: 10px;
+  }
+  
+  .om-modal h3 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .om-form {
+    gap: 16px;
+  }
+  
+  .om-form input,
+  .om-form select {
+    padding: 14px 16px;
+    font-size: 14px;
+  }
+  
+  .om-form-actions {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+  }
+  
+  .om-modal-close {
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    font-size: 20px;
   }
 }
 

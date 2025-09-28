@@ -184,10 +184,10 @@ function OrderManager() {
       <Nav />
       <div className="om-container">
         <div className="om-header">
-          <h2 className="om-title">Order Manager</h2>
+          <h2 className="om-title">Order Manager Dashboard</h2>
           <div className="om-actions">
-            <button className="btn btn-primary" onClick={generatePDF}>
-              Download PDF
+            <button className="btn btn-primary1" onClick={generatePDF}>
+              Download Order Report
             </button>
           </div>
           <div className="om-search">
@@ -339,8 +339,11 @@ function OrderManager() {
         </div>
 
         {editingOrder && (
-          <div className="om-modal-backdrop">
-            <div className="om-modal">
+          <div className="om-modal-backdrop" onClick={closeModal}>
+            <div className="om-modal" onClick={(e) => e.stopPropagation()}>
+              <button className="om-modal-close" onClick={closeModal}>
+                ×
+              </button>
               <h3>Edit Order</h3>
 
               {(editingOrder.used_loyalty_points || editingOrder.has_promotion) && (
@@ -371,6 +374,7 @@ function OrderManager() {
                   onChange={handleChange}
                   placeholder="Customer Name"
                   required
+                  readOnly
                 />
                 <input
                   type="text"
@@ -387,6 +391,7 @@ function OrderManager() {
                   onChange={handleChange}
                   placeholder="Product ID"
                   required
+                  readOnly
                 />
                 <input
                   type="text"
@@ -403,6 +408,7 @@ function OrderManager() {
                   onChange={handleChange}
                   placeholder="Quantity"
                   required
+                  readOnly
                 />
                 <input
                   type="text"
@@ -411,6 +417,7 @@ function OrderManager() {
                   onChange={handleChange}
                   placeholder="Payment Type"
                   required
+                  readOnly
                 />
                 <select name="status" value={formData.status} onChange={handleChange} className="status-select">
                   <option value="Packing">Processing</option>
@@ -419,7 +426,7 @@ function OrderManager() {
                 </select>
                 <div className="om-form-actions">
                   <button type="submit" className="btn btn-primary">Save</button>
-                  <button type="button" className="btn btn-secondary" onClick={closeModal}>Cancel</button>
+                  <button type="button" className="btn btn-secondarye" onClick={closeModal}>Cancel</button>
                 </div>
               </form>
             </div>
