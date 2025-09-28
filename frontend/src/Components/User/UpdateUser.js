@@ -124,8 +124,8 @@ function UpdateUser() {
       
       <div className="update-user-container">
         <div className="update-header">
-          <h1 className="update-title">Update Profile</h1>
-          <p className="update-subtitle">Update your personal information and settings</p>
+          <h1 className="update-title1">Update Profile</h1>
+          <p className="update-subtitle1">Update your personal information and settings</p>
         </div>
 
         <div className="update-form-container">
@@ -219,14 +219,14 @@ function UpdateUser() {
             <div className="button-group">
               <button 
                 type="button" 
-                className="btn btn-secondary" 
+                className="btn btn-secondaryy" 
                 onClick={() => history(-1)}
               >
                 Cancel
               </button>
               <button 
                 type="submit" 
-                className="btn btn-primary"
+                className="btn btn-primaryyy"
               >
                 Save Changes
               </button>

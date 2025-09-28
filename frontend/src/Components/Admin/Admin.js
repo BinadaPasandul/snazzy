@@ -48,7 +48,7 @@ function Admin() {
         password: "",
         age: "",
         address: "",
-        role: "" // Default role set to staff
+        role: ""
     });
 
     const fetchUsers = async () => {
@@ -61,7 +61,6 @@ function Admin() {
             const usersData = response.data.users || [];
             setUsers(usersData);
             
-            // Calculate user statistics
             const stats = {
                 customers: usersData.filter(u => u.role === 'customer').length,
                 admins: usersData.filter(u => u.role === 'admin').length,
@@ -92,7 +91,6 @@ function Admin() {
         const { name, value } = e.target;
         setUser((prevUser) => ({ ...prevUser, [name]: value }));
         
-        // Validate password in real-time
         if (name === "password") {
             const validationError = validatePassword(value);
             setPasswordError(validationError);
@@ -112,12 +110,10 @@ function Admin() {
     const applyFilters = (role, email) => {
         let filtered = users;
         
-        // Filter by role
         if (role && role !== '') {
             filtered = filtered.filter(user => user.role === role);
         }
         
-        // Filter by email
         if (email && email !== '') {
             filtered = filtered.filter(user => 
                 user.gmail && user.gmail.toLowerCase().includes(email.toLowerCase())
@@ -133,19 +129,18 @@ function Admin() {
         setFilteredUsers(users);
     };
 
-    // PDF Component for download - uses filtered users
     const PDFReport = () => (
-        <div className="pdf-report">
-            <div className="pdf-header">
-                <div className="pdf-logo-section">
-                    <img src={logo} alt="Snazzy Logo" className="pdf-logo" />
-                    <h1 className="pdf-title">SNAZZY</h1>
+        <div className="pdf-report1">
+            <div className="pdf-header1">
+                <div className="pdf-logo-section1">
+                    <img src={logo} alt="Snazzy Logo" className="pdf-logo1" />
+                    <h1 className="pdf-title1">SNAZZY</h1>
                 </div>
-                <div className="pdf-report-info">
-                    <h2 className="pdf-report-title">User Report</h2>
-                    <p className="pdf-date">Generated on: {new Date().toLocaleDateString()}</p>
+                <div className="pdf-report-info1">
+                    <h2 className="pdf-report-title1">User Report</h2>
+                    <p className="pdf-date1">Generated on: {new Date().toLocaleDateString()}</p>
                     {(searchRole || searchEmail) && (
-                        <div className="pdf-filters">
+                        <div className="pdf-filters1">
                             <p><strong>Applied Filters:</strong></p>
                             {searchRole && <p>• Role: {searchRole}</p>}
                             {searchEmail && <p>• Email contains: {searchEmail}</p>}
@@ -155,11 +150,11 @@ function Admin() {
                 </div>
             </div>
             
-            <div className="pdf-content">
-                <h3 className="pdf-section-title">
+            <div className="pdf-content1">
+                <h3 className="pdf-section-title1">
                     {filteredUsers.length === users.length ? 'All Users' : 'Filtered Users'}
                 </h3>
-                <table className="pdf-table">
+                <table className="pdf-table1">
                     <thead>
                         <tr>
                             <th>Name</th>
@@ -190,7 +185,6 @@ function Admin() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validate password before submission
         const passwordValidationError = validatePassword(user.password);
         if (passwordValidationError) {
             setPasswordError(passwordValidationError);
@@ -200,115 +194,111 @@ function Admin() {
         sendRequest().then(() => {
             alert("Staff Member Added Successfully");
             fetchUsers();
-            history("/admin"); // Redirect to admin for consistency
+            history("/admin");
         }).catch((err) => {
             alert("Error: " + err.message);
         });
     };
 
-   const sendRequest = async () => {
-    const token = localStorage.getItem("token"); // Get token from localStorage
-
-    return await axios.post("http://localhost:5000/user", {
-        name: String(user.name),
-        gmail: String(user.gmail),
-        password: String(user.password),
-        age: Number(user.age),
-        address: String(user.address),
-        role: String(user.role)
-    }, {
-        headers: {
-            Authorization: token // Attach token here
-        }
-    }).then((res) => res.data);
-};
-
+    const sendRequest = async () => {
+        const token = localStorage.getItem("token");
+        return await axios.post("http://localhost:5000/user", {
+            name: String(user.name),
+            gmail: String(user.gmail),
+            password: String(user.password),
+            age: Number(user.age),
+            address: String(user.address),
+            role: String(user.role)
+        }, {
+            headers: {
+                Authorization: token
+            }
+        }).then((res) => res.data);
+    };
 
     return (
-        <div className="admin-dashboard">
+        <div className="admin-dashboard1">
             <Nav />
             
-            {/* Hidden PDF Component for download */}
             <div style={{ display: 'none' }}>
                 <PDFReport />
             </div>
             
-            <div className="dashboard-header">
-                <h1 className="dashboard-title">Admin Dashboard</h1>
-                <p className="dashboard-subtitle">Manage users and system settings</p>
+            <div className="dashboard-header1">
+                <h1 className="dashboard-title1">Admin Dashboard</h1>
+                <p className="dashboard-subtitle1">Manage users and system settings</p>
             </div>
             
-            <div className="dashboard-content">
-                {/* Statistics Cards */}
-                <div className="stats-section">
-                    <div className="stats-grid">
-                        <div className="stat-card customers">
-                            <div className="stat-content">
-                                <div className="stat-info">
-                                    <h3 className="stat-title">Customers</h3>
-                                    <p className="stat-value">{loadingStats ? '...' : userStats.customers}</p>
+            <div className="dashboard-content1">
+                <div className="stats-section1">
+                    <div className="stats-grid1">
+                        <div className="stat-card1 customers1">
+                            <div className="stat-content1">
+                                <div className="stat-info1">
+                                    <h3 className="stat-title1">Customers</h3>
+                                    <p className="stat-value1">{loadingStats ? '...' : userStats.customers}</p>
                                 </div>
-                                <div className="stat-icon">
+                                <div className="stat-icon1">
                                     👥
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="stat-card admins">
-                            <div className="stat-content">
-                                <div className="stat-info">
-                                    <h3 className="stat-title">Admins</h3>
-                                    <p className="stat-value">{loadingStats ? '...' : userStats.admins}</p>
+                        <div className="stat-card1 admins1">
+                            <div className="stat-content1">
+                                <div className="stat-info1">
+                                    <h3 className="stat-title1">Admins</h3>
+                                    <p className="stat-value1">{loadingStats ? '...' : userStats.admins}</p>
                                 </div>
-                                <div className="stat-icon">
+                                <div className="stat-icon1">
                                     👑
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="stat-card product-managers">
-                            <div className="stat-content">
-                                <div className="stat-info">
-                                    <h3 className="stat-title">Product Managers</h3>
-                                    <p className="stat-value">{loadingStats ? '...' : userStats.productManagers}</p>
+                        <div className="stat-card1 product-managers1">
+                            <div className="stat-content1">
+                                <div className="stat-info1">
+                                    <h3 className="stat-title1">Product Managers</h3>
+                                    <p className="stat-value1">{loadingStats ? '...' : userStats.productManagers}</p>
                                 </div>
-                                <div className="stat-icon">
+                                <div className="stat-icon1">
                                     📦
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="stat-card order-managers">
-                            <div className="stat-content">
-                                <div className="stat-info">
-                                    <h3 className="stat-title">Order Managers</h3>
-                                    <p className="stat-value">{loadingStats ? '...' : userStats.orderManagers}</p>
+                        <div className="stat-card1 order-managers1">
+                            <div className="stat-content1">
+                                <div className="stat-info1">
+                                    <h3 className="stat-title1">Order Managers</h3>
+                                    <p className="stat-value1">{loadingStats ? '...' : userStats.orderManagers}</p>
                                 </div>
-                                <div className="stat-icon">
+                                <div className="stat-icon1">
                                     📋
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="stat-card promotion-managers">
-                            <div className="stat-content">
-                                <div className="stat-info">
-                                    <h3 className="stat-title">Promotion Managers</h3>
-                                    <p className="stat-value">{loadingStats ? '...' : userStats.promotionManagers}</p>
+                        <div className="stat-card1 promotion-managers1">
+                            <div className="stat-content1">
+                                <div className="stat-info1">
+                                    <h3 className="stat-title1">Promotion Managers</h3>
+                                    <p className="stat-value1">{loadingStats ? '...' : userStats.promotionManagers}</p>
                                 </div>
-                                <div className="stat-icon">
+                                <div className="stat-icon1">
                                     🎯
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="stat-card total-users">
-                            <div className="stat-content">
-                                <div className="stat-info">
-                                    <h3 className="stat-title">Total Users</h3>
-                                    <p className="stat-value">{loadingStats ? '...' : userStats.totalUsers}</p>
+                        <div className="stat-card1 total-users1">
+                            <div className="stat-content1">
+                                <div className="stat-info1">
+                                    <h3 className="stat-title1">Total Users</h3>
+                                    <p className="stat-value1">{loadingStats ? '...' : userStats.totalUsers}</p>
                                 </div>
-                                <div className="stat-icon">
+                                <div className="stat-icon1">
                                     👤
                                 </div>
                             </div>
@@ -316,120 +306,116 @@ function Admin() {
                     </div>
                 </div>
 
-                <div className="form-section">
-                    <h2 className="form-title">Add Staff Member</h2>
-                    <form className="user-form" onSubmit={handleSubmit}>
-
-<div className="form-group">
-                    <label htmlFor="name">Full Name:</label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        onChange={handleInputChange}
-                        value={user.name}
-                        required
-                        placeholder="Enter your full name"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="gmail">Email:</label>
-                    <input
-                        type="email"
-                        id="gmail"
-                        name="gmail"
-                        onChange={handleInputChange}
-                        value={user.gmail}
-                        required
-                        placeholder="Enter your email address"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        onChange={handleInputChange}
-                        value={user.password}
-                        required
-                        placeholder="Enter your password"
-                        style={passwordError ? { borderColor: '#dc3545' } : {}}
-                    />
-                    {passwordError && (
-                        <div className="password-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
-                            {passwordError}
+                <div className="form-section1">
+                    <h2 className="form-title1">Add Staff Member</h2>
+                    <form className="user-form1" onSubmit={handleSubmit}>
+                        <div className="form-group1">
+                            <label htmlFor="name">Full Name:</label>
+                            <input
+                                type="text"
+                                id="name"
+                                name="name"
+                                onChange={handleInputChange}
+                                value={user.name}
+                                required
+                                placeholder="Enter your full name"
+                            />
                         </div>
-                    )}
-                    <div className="password-requirements" style={{ fontSize: '0.8rem', color: '#6c757d', marginTop: '4px' }}>
-                        Password must be at least 5 characters with uppercase, lowercase, and symbol
-                    </div>
-                </div>
 
-                <div className="form-group">
-                    <label htmlFor="age">Age:</label>
-                    <input
-                        type="number"
-                        id="age"
-                        name="age"
-                        onChange={handleInputChange}
-                        value={user.age}
-                        required
-                        placeholder="Enter your age"
-                        min="1"
-                    />
-                </div>
+                        <div className="form-group1">
+                            <label htmlFor="gmail">Email:</label>
+                            <input
+                                type="email"
+                                id="gmail"
+                                name="gmail"
+                                onChange={handleInputChange}
+                                value={user.gmail}
+                                required
+                                placeholder="Enter your email address"
+                            />
+                        </div>
 
-                <div className="form-group">
-                    <label htmlFor="address">Address:</label>
-                    <input
-                        type="text"
-                        id="address"
-                        name="address"
-                        onChange={handleInputChange}
-                        value={user.address}
-                        required
-                        placeholder="Enter your address"
-                    />
-                </div>
+                        <div className="form-group1">
+                            <label htmlFor="password">Password:</label>
+                            <input
+                                type="password"
+                                id="password"
+                                name="password"
+                                onChange={handleInputChange}
+                                value={user.password}
+                                required
+                                placeholder="Enter your password"
+                                style={passwordError ? { borderColor: '#dc3545' } : {}}
+                            />
+                            {passwordError && (
+                                <div className="password-error1" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                                    {passwordError}
+                                </div>
+                            )}
+                            <div className="password-requirements1" style={{ fontSize: '0.8rem', color: '#6c757d', marginTop: '4px' }}>
+                                Password must be at least 5 characters with uppercase, lowercase, and symbol
+                            </div>
+                        </div>
 
-                <div className="form-group">
-                    <label htmlFor="role">Role:</label>
-                    <select
-                        id="role"
-                        name="role"
-                        onChange={handleInputChange}
-                        value={user.role}
-                        required
-                    >
-                       
-                        <option value="product_manager">Product Manager</option>
-                        <option value="order_manager">Order Manager</option>
-                        <option value="promotion_manager">Promotion Manager</option>
-                        
-                    </select>
-                </div>
+                        <div className="form-group1">
+                            <label htmlFor="age">Age:</label>
+                            <input
+                                type="number"
+                                id="age"
+                                name="age"
+                                onChange={handleInputChange}
+                                value={user.age}
+                                required
+                                placeholder="Enter your age"
+                                min="1"
+                            />
+                        </div>
 
-                {/* Role is not shown in the form as it's set by default */}
-                        <button type="submit" className="submit-btn">
+                        <div className="form-group1">
+                            <label htmlFor="address">Address:</label>
+                            <input
+                                type="text"
+                                id="address"
+                                name="address"
+                                onChange={handleInputChange}
+                                value={user.address}
+                                required
+                                placeholder="Enter your address"
+                            />
+                        </div>
+
+                        <div className="form-group1">
+                            <label htmlFor="role">Role:</label>
+                            <select
+                                id="role"
+                                name="role"
+                                onChange={handleInputChange}
+                                value={user.role}
+                                required
+                            >
+                                <option value="product_manager">Product Manager</option>
+                                <option value="order_manager">Order Manager</option>
+                                <option value="promotion_manager">Promotion Manager</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" className="submit-btn1">
                             Add Member
                         </button>
                     </form>
                 </div>
 
-                <div className="users-section">
-                    <div className="users-header">
-                        <h2 className="users-title">All Users</h2>
-                        <div className="search-container">
-                            <div className="role-search-container">
-                                <label htmlFor="roleSearch" className="search-label">Filter by Role:</label>
+                <div className="users-section1">
+                    <div className="users-header1">
+                        <h2 className="users-title1">All Users</h2>
+                        <div className="search-container1">
+                            <div className="role-search-container1">
+                                <label htmlFor="roleSearch" className="search-label1">Filter by Role:</label>
                                 <select 
                                     id="roleSearch"
                                     value={searchRole} 
                                     onChange={(e) => handleRoleSearch(e.target.value)}
-                                    className="role-search-select"
+                                    className="role-search-select1"
                                 >
                                     <option value="">All Roles</option>
                                     <option value="customer">Customer</option>
@@ -437,25 +423,24 @@ function Admin() {
                                     <option value="product_manager">Product Manager</option>
                                     <option value="order_manager">Order Manager</option>
                                     <option value="promotion_manager">Promotion Manager</option>
-                                    
                                 </select>
                             </div>
                             
-                            <div className="email-search-container">
-                                <label htmlFor="emailSearch" className="search-label">Search by Email:</label>
+                            <div className="email-search-container1">
+                                <label htmlFor="emailSearch" className="search-label1">Search by Email:</label>
                                 <input 
                                     id="emailSearch"
                                     type="text"
                                     value={searchEmail} 
                                     onChange={(e) => handleEmailSearch(e.target.value)}
-                                    className="email-search-input"
+                                    className="email-search-input1"
                                     placeholder="Enter email address..."
                                 />
                             </div>
                             
                             {(searchRole || searchEmail) && (
                                 <button 
-                                    className="clear-all-filters-btn"
+                                    className="clear-all-filters-btn1"
                                     onClick={clearAllFilters}
                                 >
                                     Clear All Filters
@@ -463,8 +448,8 @@ function Admin() {
                             )}
                         </div>
                     </div>
-                    <div className="users-table-container">
-                        <table className="users-table">
+                    <div className="users-table-container1">
+                        <table className="users-table1">
                             <thead>
                                 <tr>
                                     <th>Name</th>
@@ -476,10 +461,9 @@ function Admin() {
                                     <th>Actions</th>
                                     <th>
                                         <button 
-                                            className="download-btn"
-                                            onClick={async ()=>{
+                                            className="download-btn1"
+                                            onClick={async () => {
                                                 try {
-                                                    // Create a new window for PDF generation
                                                     const printWindow = window.open('', '_blank');
                                                     printWindow.document.write(`
                                                         <html>
@@ -487,7 +471,7 @@ function Admin() {
                                                                 <title>Snazzy User Report</title>
                                                                 <style>
                                                                     ${document.querySelector('style')?.innerHTML || ''}
-                                                                    .pdf-report {
+                                                                    .pdf-report1 {
                                                                         font-family: Arial, sans-serif;
                                                                         max-width: 800px;
                                                                         margin: 0 auto;
@@ -495,53 +479,53 @@ function Admin() {
                                                                         background: white;
                                                                         color: black;
                                                                     }
-                                                                    .pdf-header {
+                                                                    .pdf-header1 {
                                                                         text-align: center;
                                                                         margin-bottom: 30px;
                                                                         border-bottom: 2px solid #667eea;
                                                                         padding-bottom: 20px;
                                                                     }
-                                                                    .pdf-logo-section {
+                                                                    .pdf-logo-section1 {
                                                                         display: flex;
                                                                         align-items: center;
                                                                         justify-content: center;
                                                                         gap: 15px;
                                                                         margin-bottom: 20px;
                                                                     }
-                                                                    .pdf-logo {
+                                                                    .pdf-logo1 {
                                                                         width: 50px;
                                                                         height: 50px;
                                                                         object-fit: contain;
                                                                     }
-                                                                    .pdf-title {
+                                                                    .pdf-title1 {
                                                                         font-size: 2.5rem;
                                                                         font-weight: bold;
                                                                         color: #667eea;
                                                                         margin: 0;
                                                                     }
-                                                                    .pdf-report-title {
+                                                                    .pdf-report-title1 {
                                                                         font-size: 1.8rem;
                                                                         color: #2d3748;
                                                                         margin: 10px 0;
                                                                     }
-                                                                    .pdf-date {
+                                                                    .pdf-date1 {
                                                                         color: #718096;
                                                                         font-size: 0.9rem;
                                                                         margin: 0;
                                                                     }
-                                                                    .pdf-section-title {
+                                                                    .pdf-section-title1 {
                                                                         font-size: 1.4rem;
                                                                         color: #2d3748;
                                                                         margin: 20px 0 15px 0;
                                                                         border-bottom: 1px solid #e2e8f0;
                                                                         padding-bottom: 10px;
                                                                     }
-                                                                    .pdf-table {
+                                                                    .pdf-table1 {
                                                                         width: 100%;
                                                                         border-collapse: collapse;
                                                                         margin-top: 20px;
                                                                     }
-                                                                    .pdf-table th {
+                                                                    .pdf-table1 th {
                                                                         background: #667eea;
                                                                         color: white;
                                                                         padding: 12px 8px;
@@ -549,32 +533,32 @@ function Admin() {
                                                                         font-weight: bold;
                                                                         font-size: 0.9rem;
                                                                     }
-                                                                    .pdf-table td {
+                                                                    .pdf-table1 td {
                                                                         padding: 10px 8px;
                                                                         border-bottom: 1px solid #e2e8f0;
                                                                         font-size: 0.85rem;
                                                                     }
-                                                                    .pdf-table tr:nth-child(even) {
+                                                                    .pdf-table1 tr:nth-child(even) {
                                                                         background: #f8fafc;
                                                                     }
                                                                     @media print {
                                                                         body { margin: 0; }
-                                                                        .pdf-report { margin: 0; padding: 10px; }
+                                                                        .pdf-report1 { margin: 0; padding: 10px; }
                                                                     }
                                                                 </style>
                                                             </head>
                                                             <body>
-                                                                <div class="pdf-report">
-                                                                    <div class="pdf-header">
-                                                                        <div class="pdf-logo-section">
-                                                                            <img src="${logo}" alt="Snazzy Logo" class="pdf-logo" />
-                                                                            <h1 class="pdf-title">SNAZZY</h1>
+                                                                <div class="pdf-report1">
+                                                                    <div class="pdf-header1">
+                                                                        <div class="pdf-logo-section1">
+                                                                            <img src="${logo}" alt="Snazzy Logo" class="pdf-logo1" />
+                                                                            <h1 class="pdf-title1">SNAZZY</h1>
                                                                         </div>
-                                                                        <div class="pdf-report-info">
-                                                                            <h2 class="pdf-report-title">User Report</h2>
-                                                                            <p class="pdf-date">Generated on: ${new Date().toLocaleDateString()}</p>
+                                                                        <div class="pdf-report-info1">
+                                                                            <h2 class="pdf-report-title1">User Report</h2>
+                                                                            <p class="pdf-date1">Generated on: ${new Date().toLocaleDateString()}</p>
                                                                             ${(searchRole || searchEmail) ? `
-                                                                                <div class="pdf-filters">
+                                                                                <div class="pdf-filters1">
                                                                                     <p><strong>Applied Filters:</strong></p>
                                                                                     ${searchRole ? `<p>• Role: ${searchRole}</p>` : ''}
                                                                                     ${searchEmail ? `<p>• Email contains: ${searchEmail}</p>` : ''}
@@ -584,9 +568,9 @@ function Admin() {
                                                                         </div>
                                                                     </div>
                                                                     
-                                                                    <div class="pdf-content">
-                                                                        <h3 class="pdf-section-title">${filteredUsers.length === users.length ? 'All Users' : 'Filtered Users'}</h3>
-                                                                        <table class="pdf-table">
+                                                                    <div class="pdf-content1">
+                                                                        <h3 class="pdf-section-title1">${filteredUsers.length === users.length ? 'All Users' : 'Filtered Users'}</h3>
+                                                                        <table class="pdf-table1">
                                                                             <thead>
                                                                                 <tr>
                                                                                     <th>Name</th>
@@ -635,15 +619,15 @@ function Admin() {
                                         <td>{u.age}</td>
                                         <td>{u.address}</td>
                                         <td>
-                                            <span className={`role-badge role-${u.role}`}>
+                                            <span className={`role-badge1 role-${u.role}1`}>
                                                 {u.role.replace('_', ' ')}
                                             </span>
                                         </td>
                                         <td>{u.role === 'customer' ? (u.loyaltyPoints ?? 0) : '-'}</td>
                                         <td>
-                                            <div className="action-buttons">
+                                            <div className="action-buttons1">
                                                 <button 
-                                                    className="action-btn edit-btn"
+                                                    className="action-btn1 edit-btn1"
                                                     onClick={() => {
                                                         setEditingUser(u._id);
                                                         setEditForm({ name: u.name || "", gmail: u.gmail || "", age: u.age || "", address: u.address || "", role: u.role || "" });
@@ -652,7 +636,7 @@ function Admin() {
                                                     ✏️ Edit
                                                 </button>
                                                 <button 
-                                                    className="action-btn delete-btn"
+                                                    className="action-btn1 delete-btn1"
                                                     onClick={async () => {
                                                         if (!window.confirm('Delete this user?')) return;
                                                         const token = localStorage.getItem('token');
@@ -669,7 +653,7 @@ function Admin() {
                                 ))}
                                 {filteredUsers.length === 0 && (
                                     <tr>
-                                        <td colSpan={8} className="empty-state">
+                                        <td colSpan={8} className="empty-state1">
                                             {searchRole || searchEmail ? 
                                                 `No users found matching your search criteria.` : 
                                                 'No users found.'
@@ -683,9 +667,9 @@ function Admin() {
                 </div>
 
                 {editingUser && (
-                    <div className="edit-modal">
-                        <h2 className="edit-modal-title">Edit User</h2>
-                        <form className="edit-form" onSubmit={async (e) => {
+                    <div className="edit-modal1">
+                        <h2 className="edit-modal-title1">Edit User</h2>
+                        <form className="edit-form1" onSubmit={async (e) => {
                             e.preventDefault();
                             const token = localStorage.getItem('token');
                             await axios.put(`http://localhost:5000/user/${editingUser}`, {
@@ -698,23 +682,23 @@ function Admin() {
                             setEditingUser(null);
                             await fetchUsers();
                         }}>
-                            <div className="form-group">
+                            <div className="form-group1">
                                 <label>Name</label>
                                 <input value={editForm.name} onChange={(e)=> setEditForm({ ...editForm, name: e.target.value })} />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group1">
                                 <label>Email</label>
                                 <input type="email" value={editForm.gmail} onChange={(e)=> setEditForm({ ...editForm, gmail: e.target.value })} />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group1">
                                 <label>Age</label>
                                 <input type="number" value={editForm.age} onChange={(e)=> setEditForm({ ...editForm, age: e.target.value })} />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group1">
                                 <label>Address</label>
                                 <input value={editForm.address} onChange={(e)=> setEditForm({ ...editForm, address: e.target.value })} />
                             </div>
-                            <div className="form-group">
+                            <div className="form-group1">
                                 <label>Role</label>
                                 <select value={editForm.role} onChange={(e)=> setEditForm({ ...editForm, role: e.target.value })}>
                                     <option value="customer">Customer</option>
@@ -724,9 +708,9 @@ function Admin() {
                                     <option value="promotion_manager">Promotion Manager</option>
                                 </select>
                             </div>
-                            <div className="modal-buttons">
-                                <button type="submit" className="save-btn">Save Changes</button>
-                                <button type="button" className="cancel-btn" onClick={()=> setEditingUser(null)}>Cancel</button>
+                            <div className="modal-buttons1">
+                                <button type="submit" className="save-btn1">Save Changes</button>
+                                <button type="button" className="cancel-btn1" onClick={()=> setEditingUser(null)}>Cancel</button>
                             </div>
                         </form>
                     </div>
