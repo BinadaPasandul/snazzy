@@ -1,7 +1,7 @@
 /* ==============================
-   Modern Insert Promotion - Two Container Layout
+   Modern Edit Promotion - Two Container Layout
    ============================== */
-.insert-promotion-container {
+.edit-promotion-container {
   min-height: 100vh;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
   padding: 0;
@@ -14,7 +14,7 @@
 /* ==============================
    Animated Background Elements
    ============================== */
-.insert-promotion-container::before {
+.edit-promotion-container::before {
   content: '';
   position: absolute;
   top: 0;
@@ -216,6 +216,31 @@
   resize: vertical;
   min-height: 100px;
   line-height: 1.6;
+}
+
+/* ==============================
+   Current Banner Display
+   ============================== */
+.current-banner {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.current-banner-img {
+  width: 200px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.current-banner-label {
+  display: block;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: #6b7280;
+  font-weight: 500;
 }
 
 /* ==============================
@@ -561,6 +586,80 @@
 }
 
 /* ==============================
+   Loading & Error States
+   ============================== */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(102, 126, 234, 0.1);
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-container p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.error-container h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 12px;
+}
+
+.error-container p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 24px;
+  max-width: 400px;
+}
+
+.retry-btn {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+/* ==============================
    Responsive Design
    ============================== */
 @media (max-width: 1024px) {
@@ -613,6 +712,11 @@
     width: 100%;
     max-width: 300px;
   }
+  
+  .current-banner-img {
+    width: 150px;
+    height: 75px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -646,6 +750,11 @@
   
   .preview-banner {
     height: 150px;
+  }
+  
+  .current-banner-img {
+    width: 120px;
+    height: 60px;
   }
 }
 
@@ -700,7 +809,7 @@
    Print Styles
    ============================== */
 @media print {
-  .insert-promotion-container {
+  .edit-promotion-container {
     background: white;
     padding: 0;
   }
