@@ -5,6 +5,8 @@ import Nav from "../Navbar/nav";
 import Footer from "../Footer/Footer";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const DisplayProducts = () => {
   const [products, setProducts] = useState([]);
@@ -92,6 +94,99 @@ const DisplayProducts = () => {
     }
   };
 
+  // Generate PDF
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(20);
+    doc.text("Product Inventory Report", 14, 22);
+    
+    // Add generation date
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    
+    // Calculate summary data first
+    const totalProducts = products.length;
+    const totalVariants = products.reduce((sum, product) => {
+      return sum + (product.variants ? product.variants.length : 1);
+    }, 0);
+    const totalStock = products.reduce((sum, product) => {
+      if (product.variants && product.variants.length > 0) {
+        return sum + product.variants.reduce((variantSum, variant) => variantSum + variant.quantity, 0);
+      } else {
+        return sum + (product.quantity || 0);
+      }
+    }, 0);
+
+    // Add summary above the table
+    doc.setFontSize(12);
+    doc.text("Summary:", 14, 45);
+    
+    doc.setFontSize(10);
+    doc.text(`Total Products: ${totalProducts}`, 14, 55);
+    doc.text(`Total Variants: ${totalVariants}`, 14, 63);
+    doc.text(`Total Stock: ${totalStock}`, 14, 71);
+    
+    // Prepare table data
+    const tableData = products.map(product => {
+      if (product.variants && product.variants.length > 0) {
+        // For products with variants, create a row for each variant
+        return product.variants.map(variant => [
+          product.pname,
+          product.pcode,
+          variant.size,
+          variant.color,
+          variant.quantity,
+          `$${product.pamount}`
+        ]);
+      } else {
+        // For legacy products without variants
+        return [[
+          product.pname,
+          product.pcode,
+          product.psize || "N/A",
+          product.pcolor || "N/A",
+          product.quantity || 0,
+          `$${product.pamount}`
+        ]];
+      }
+    }).flat();
+
+    // Define table columns
+    const columns = ["Product Name", "Code", "Size", "Color", "Quantity", "Price"];
+    
+    // Generate table starting after summary
+    autoTable(doc, {
+      head: [columns],
+      body: tableData,
+      startY: 85, // Start table after summary
+      styles: {
+        fontSize: 8,
+        cellPadding: 3,
+      },
+      headStyles: {
+        fillColor: [79, 70, 229], // Blue color
+        textColor: 255,
+        fontStyle: 'bold',
+      },
+      alternateRowStyles: {
+        fillColor: [248, 249, 250],
+      },
+      columnStyles: {
+        0: { cellWidth: 40 }, // Product Name
+        1: { cellWidth: 25 }, // Code
+        2: { cellWidth: 20 }, // Size
+        3: { cellWidth: 25 }, // Color
+        4: { cellWidth: 20 }, // Quantity
+        5: { cellWidth: 20 }, // Price
+      },
+    });
+
+    // Save the PDF
+    doc.save(`product-inventory-${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   return (
     <div style={{ background: "#f5f7fa", minHeight: "100vh" }}>
       <Nav />
@@ -99,6 +194,35 @@ const DisplayProducts = () => {
         <h1 style={{ textAlign: "center", marginBottom: "30px" }}>
           Product List
         </h1>
+
+        {/* PDF Generation Button */}
+        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+          <button
+            onClick={generatePDF}
+            style={{
+              padding: "12px 24px",
+              background: "#dc3545",
+              color: "#fff",
+              border: "none",
+              borderRadius: "8px",
+              cursor: "pointer",
+              fontSize: "16px",
+              fontWeight: "bold",
+              boxShadow: "0 2px 8px rgba(220, 53, 69, 0.3)",
+              transition: "all 0.3s ease",
+            }}
+            onMouseOver={(e) => {
+              e.target.style.background = "#c82333";
+              e.target.style.transform = "translateY(-2px)";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.background = "#dc3545";
+              e.target.style.transform = "translateY(0)";
+            }}
+          >
+            📄 Download PDF Report
+          </button>
+        </div>
 
         {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
 

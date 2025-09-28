@@ -120,108 +120,146 @@ function MyOrders() {
   );
 
   if (loading) {
-    return <p className="mo-loading">Loading your orders…</p>;
+    return (
+      <div>
+        <Nav />
+        <div className="my-orders-page">
+          <div className="mo-container">
+            <div className="mo-header">
+              <h1 className="mo-title">My Orders</h1>
+              <p className="mo-subtitle">Track and manage your orders</p>
+            </div>
+            <div className="loading-state">
+              <div className="loading-spinner"></div>
+              <p className="loading-text">Loading your orders...</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
     <div>
-       <Nav />
-    <div>
-     
-      
-    <div className="mo-container">
-      <h2 className="mo-title">My Orders</h2>
-      {orders.length === 0 ? (
-        <p className="mo-empty">You have no orders yet.</p>
-      ) : (
-        <>
-          <div className="mo-stats">
-            <div className="mo-stat">
-              <div className="mo-stat-value">{stats.total}</div>
-              <div className="mo-stat-label">Total Orders</div>
-            </div>
-            <div className="mo-stat">
-              <div className="mo-stat-value badge-green">{stats.delivered}</div>
-              <div className="mo-stat-label">Delivered</div>
-            </div>
-            <div className="mo-stat">
-              <div className="mo-stat-value badge-orange">{stats.delivering}</div>
-              <div className="mo-stat-label">Delivering</div>
-            </div>
-            <div className="mo-stat">
-              <div className="mo-stat-value badge-blue">{stats.processing}</div>
-              <div className="mo-stat-label">Processing</div>
-            </div>
-            <div className="mo-stat">
-              <div className="mo-stat-value">${stats.spent.toFixed(2)}</div>
-              <div className="mo-stat-label">Total Spent</div>
-            </div>
+      <Nav />
+      <div className="my-orders-page">
+        <div className="mo-container">
+          <div className="mo-header">
+            <h1 className="mo-title">My Orders</h1>
+            <p className="mo-subtitle">Track and manage your orders</p>
           </div>
-        <table className="mo-table">
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Product Name</th>
-              <th>Product ID</th>
-              <th>Size</th>
-              <th>Quantity</th>
-              <th>Total Price</th>
-              <th>Delivery Address</th>
-              <th>Payment Type</th>
-              <th>Status</th>
-              <th>Action</th> {/* ✅ Refund button column */}
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                 <td className="mo-mono">{order._id}</td>
-                <td>{order.product_name}</td>
-                 <td className="mo-mono">{order.product_id}</td>
-                <td>{order.size}</td>
-                <td>{order.quantity}</td>
-                 <td>${order.total_price?.toFixed ? order.total_price.toFixed(2) : order.total_price}</td>
-                <td>{order.customer_address}</td>
-                <td>{order.payment_type}</td>
-                <td>
-                   <span className={`badge ${
-                     getStatusColor(order.status) === "green" ? "badge-green" :
-                     getStatusColor(order.status) === "orange" ? "badge-orange" : "badge-blue"
-                   }`}>
-                     {order.status || "Processing"}
-                   </span>
-                </td>
-                <td>
-                  {/* Show refund button only if no refund request exists and order has payment_id */}
-                  {!getRefundStatus(order._id) && order.payment_id && (
-                     <button className="btn btn-danger btn-sm" onClick={() => handleRefundClick(order._id, order.payment_id)}>
-                       Refund
-                     </button>
-                  )}
-                  
-                  {/* Show refund status if refund request exists */}
-                  {getRefundStatus(order._id) && (
-                     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                       <span className={`badge ${
-                         getRefundStatusColor(getRefundStatus(order._id)) === "green" ? "badge-green" :
-                         getRefundStatusColor(getRefundStatus(order._id)) === "red" ? "badge-red" : "badge-orange"
-                       }`}>
-                         Refund: {getRefundStatus(order._id)}
-                       </span>
-                      {order.payment_id && (
-                         <button className="btn btn-chat btn-sm" onClick={() => setOpenChatForPayment(order.payment_id)}>
-                           💬 Chat
-                         </button>
-                      )}
+
+          {orders.length === 0 ? (
+            <div className="mo-empty-state">
+              <div className="empty-icon">📦</div>
+              <h3 className="empty-title">No Orders Yet</h3>
+              <p className="empty-message">You haven't placed any orders yet. Start shopping to see your orders here!</p>
+              <button className="shop-now-btn" onClick={() => window.location.href = '/home'}>
+                Start Shopping
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="mo-stats">
+                <div className="mo-stat">
+                  <div className="mo-stat-icon">📋</div>
+                  <div className="mo-stat-info">
+                    <div className="mo-stat-value">{stats.total}</div>
+                    <div className="mo-stat-label">Total Orders</div>
+                  </div>
+                </div>
+                <div className="mo-stat">
+                  <div className="mo-stat-icon">✅</div>
+                  <div className="mo-stat-info">
+                    <div className="mo-stat-value">{stats.delivered}</div>
+                    <div className="mo-stat-label">Delivered</div>
+                  </div>
+                </div>
+                <div className="mo-stat">
+                  <div className="mo-stat-icon">🚚</div>
+                  <div className="mo-stat-info">
+                    <div className="mo-stat-value">{stats.delivering}</div>
+                    <div className="mo-stat-label">Delivering</div>
+                  </div>
+                </div>
+                <div className="mo-stat">
+                  <div className="mo-stat-icon">⏳</div>
+                  <div className="mo-stat-info">
+                    <div className="mo-stat-value">{stats.processing}</div>
+                    <div className="mo-stat-label">Processing</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="orders-section">
+                <h2 className="orders-section-title">Your Orders</h2>
+                <div className="orders-grid">
+                  {orders.map((order) => (
+                    <div key={order._id} className="order-card">
+                      <div className="order-header">
+                        <div className="order-id">#{order._id.slice(-8)}</div>
+                        <div className={`order-status status-${order.status?.toLowerCase() || 'processing'}`}>
+                          {order.status || "Processing"}
+                        </div>
+                      </div>
+
+                      <div className="order-content">
+                        <div className="product-info">
+                          <h3 className="product-name">{order.product_name}</h3>
+                          <div className="product-details">
+                            <span className="product-id">ID: {order.product_id}</span>
+                            <span className="product-size">Size: {order.size}</span>
+                            <span className="product-quantity">Qty: {order.quantity}</span>
+                          </div>
+                        </div>
+
+                        <div className="order-details">
+                          <div className="detail-row">
+                            <span className="detail-label">Total Price:</span>
+                            <span className="detail-value price">${order.total_price?.toFixed ? order.total_price.toFixed(2) : order.total_price}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Payment:</span>
+                            <span className="detail-value">{order.payment_type}</span>
+                          </div>
+                          <div className="detail-row">
+                            <span className="detail-label">Address:</span>
+                            <span className="detail-value address">{order.customer_address}</span>
+                          </div>
+                        </div>
+
+                        <div className="order-actions">
+                          {!getRefundStatus(order._id) && order.payment_id ? (
+                            <button 
+                              className="action-btn refund-btn" 
+                              onClick={() => handleRefundClick(order._id, order.payment_id)}
+                            >
+                              Request Refund
+                            </button>
+                          ) : getRefundStatus(order._id) ? (
+                            <div className="refund-status-container">
+                              <div className={`refund-status refund-${getRefundStatus(order._id)}`}>
+                                Refund: {getRefundStatus(order._id)}
+                              </div>
+                              {order.payment_id && (
+                                <button 
+                                  className="action-btn chat-btn" 
+                                  onClick={() => setOpenChatForPayment(order.payment_id)}
+                                >
+                                  💬 Chat
+                                </button>
+                              )}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        </>
-      )}
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
 
       {/* Chat Popup for refund requests */}
       {openChatForPayment && (
@@ -233,38 +271,14 @@ function MyOrders() {
 
       {/* Refund Reason Selection Dialog */}
       {showReasonDialog && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 2000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "30px",
-              borderRadius: "8px",
-              width: "400px",
-              maxWidth: "90%",
-            }}
-          >
-            <h3 style={{ marginTop: 0, marginBottom: "20px" }}>
-              Select Refund Reason
-            </h3>
+        <div className="refund-dialog-overlay">
+          <div className="refund-dialog">
+            <div className="dialog-header">
+              <h3 className="dialog-title">Select Refund Reason</h3>
+              <p className="dialog-subtitle">Please select a reason for your refund request</p>
+            </div>
             
-            <div style={{ marginBottom: "20px" }}>
-              <p style={{ marginBottom: "15px", fontWeight: "bold" }}>
-                Please select a reason for your refund request:
-              </p>
-              
+            <div className="reasons-list">
               {[
                 "Ordered by mistake",
                 "Found a better price elsewhere", 
@@ -274,15 +288,7 @@ function MyOrders() {
               ].map((reason) => (
                 <label
                   key={reason}
-                  style={{
-                    display: "block",
-                    marginBottom: "10px",
-                    cursor: "pointer",
-                    padding: "8px",
-                    borderRadius: "4px",
-                    backgroundColor: selectedReason === reason ? "#e3f2fd" : "#f5f5f5",
-                    border: selectedReason === reason ? "2px solid #2196f3" : "2px solid transparent",
-                  }}
+                  className={`reason-option ${selectedReason === reason ? 'selected' : ''}`}
                 >
                   <input
                     type="radio"
@@ -290,38 +296,20 @@ function MyOrders() {
                     value={reason}
                     checked={selectedReason === reason}
                     onChange={(e) => setSelectedReason(e.target.value)}
-                    style={{ marginRight: "10px" }}
                   />
-                  {reason}
+                  <span className="reason-text">{reason}</span>
                 </label>
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>
-              <button
-                onClick={handleCancelRefund}
-                style={{
-                  backgroundColor: "#6c757d",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              >
+            <div className="dialog-actions">
+              <button className="dialog-btn cancel-btn" onClick={handleCancelRefund}>
                 Cancel
               </button>
-              <button
+              <button 
+                className={`dialog-btn submit-btn ${!selectedReason ? 'disabled' : ''}`}
                 onClick={handleRefundSubmit}
                 disabled={!selectedReason}
-                style={{
-                  backgroundColor: selectedReason ? "#dc3545" : "#ccc",
-                  color: "white",
-                  border: "none",
-                  padding: "10px 20px",
-                  borderRadius: "4px",
-                  cursor: selectedReason ? "pointer" : "not-allowed",
-                }}
               >
                 Submit Refund Request
               </button>

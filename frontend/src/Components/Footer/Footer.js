@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './Footer.css';
+import { FaFacebookF, FaInstagram, FaXTwitter } from "react-icons/fa6";
 
 function Footer() {
     return (
@@ -12,19 +13,20 @@ function Footer() {
                         <h3 className="footer-title">SNAZZY</h3>
                         <p className="footer-description">
                             Your premier destination for stylish and comfortable footwear. 
-                            Discover the latest trends in shoes with unbeatable quality and service.
+                            Discover the latest trends in shoes witha  great user experience
                         </p>
-                        <div className="social-links">
-                            <a href="#" className="social-link" aria-label="Facebook">
-                                <span className="social-icon">📘</span>
-                            </a>
-                            <a href="#" className="social-link" aria-label="Instagram">
-                                <span className="social-icon">📷</span>
-                            </a>
-                            <a href="#" className="social-link" aria-label="Twitter">
-                                <span className="social-icon">🐦</span>
-                            </a>
-                        </div>
+<div className="social-links">
+  <a href="#" className="social-link" aria-label="Facebook">
+    <FaFacebookF className="social-icon" />
+  </a>
+  <a href="#" className="social-link" aria-label="Instagram">
+    <FaInstagram className="social-icon" />
+  </a>
+  <a href="#" className="social-link" aria-label="X (Twitter)">
+    <FaXTwitter className="social-icon" />
+  </a>
+</div>
+
                     </div>
 
                     {/* Quick Links */}
@@ -71,15 +73,15 @@ function Footer() {
                         <div className="contact-info">
                             <div className="contact-item">
                                 <span className="contact-icon">📍</span>
-                                <span>123 Fashion Street, Style City, SC 12345</span>
+                                <span>Still we dont have a physical shop guys !! we are planing for that</span>
                             </div>
                             <div className="contact-item">
                                 <span className="contact-icon">📞</span>
-                                <span>+1 (555) 123-4567</span>
+                                <span>0762625723</span>
                             </div>
                             <div className="contact-item">
                                 <span className="contact-icon">✉️</span>
-                                <span>info@snazzy.com</span>
+                                <span>snazzy@gmail.com</span>
                             </div>
                         </div>
                     </div>
@@ -89,7 +91,7 @@ function Footer() {
                 <div className="footer-bottom">
                     <div className="footer-bottom-content">
                         <p className="copyright">
-                            © 2024 SNAZZY. All rights reserved.
+                            © 2024 SNAZZY All rights reserved.
                         </p>
                         <div className="footer-bottom-links">
                             <NavLink to="/privacy" className="footer-bottom-link">Privacy Policy</NavLink>
