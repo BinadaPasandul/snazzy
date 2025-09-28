@@ -40,7 +40,7 @@ function PromotionDashboard() {
             } finally {
                 setLoading(false);
             }
-        };
+        }; 
         fetchData();
     }, []);
 
