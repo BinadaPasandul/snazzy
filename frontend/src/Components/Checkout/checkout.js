@@ -9,15 +9,15 @@ function Checkout() {
   const location = useLocation();
 
   // ✅ Get product data from ProductDetail
-  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion } = location.state || {};
+  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion, selectedSize, selectedColor, quantity } = location.state || {};
 
   const [form, setForm] = useState({
     customer_name: "",
     product_name:productname,
     customer_address: "",
     product_id: productCode || "", // auto-fill from navigation
-    size: "",
-    quantity: 1,
+    size: selectedSize || "", // auto-fill from ProductDetail selection
+    quantity: quantity || 1, // auto-fill from ProductDetail selection
     payment_type: "cash",
   });
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -28,9 +28,14 @@ function Checkout() {
 
   useEffect(() => {
     if (productCode) {
-      setForm((prev) => ({ ...prev, product_id: productCode }));
+      setForm((prev) => ({ 
+        ...prev, 
+        product_id: productCode,
+        size: selectedSize || prev.size,
+        quantity: quantity || prev.quantity
+      }));
     }
-  }, [productCode]);
+  }, [productCode, selectedSize, quantity]);
 
   // Fetch user's loyalty points
   useEffect(() => {
@@ -334,19 +339,19 @@ function Checkout() {
                     style={{
                       width: '100%',
                       padding: '0.75rem 1rem',
-                      border: !form.size ? '2px solid #ef4444' : '2px solid #e5e7eb',
+                      border: !form.size ? '2px solid #ef4444' : selectedSize ? '2px solid #10b981' : '2px solid #e5e7eb',
                       borderRadius: '0.5rem',
                       fontSize: '1rem',
                       transition: 'all 0.2s',
-                      backgroundColor: '#fafafa'
+                      backgroundColor: selectedSize ? '#f0fdf4' : '#fafafa'
                     }}
                     onFocus={(e) => {
                       e.target.style.borderColor = '#4f46e5';
                       e.target.style.backgroundColor = 'white';
                     }}
                     onBlur={(e) => {
-                      e.target.style.borderColor = form.size ? '#e5e7eb' : '#ef4444';
-                      e.target.style.backgroundColor = '#fafafa';
+                      e.target.style.borderColor = form.size ? (selectedSize ? '#10b981' : '#e5e7eb') : '#ef4444';
+                      e.target.style.backgroundColor = selectedSize ? '#f0fdf4' : '#fafafa';
                     }}
                   />
                 </div>
