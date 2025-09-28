@@ -294,11 +294,11 @@
 
 .action-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
 }
 
 .action-btn.primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: #000000;
 }
 
 .action-btn.secondary {
