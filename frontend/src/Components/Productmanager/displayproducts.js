@@ -121,7 +121,19 @@ const DisplayProducts = () => {
               }}
             >
               {/* IMAGE */}
-              {p.image ? (
+              {(p.images && p.images.length > 0) ? (
+                <img
+                  src={`http://localhost:5000${p.images[0]}`}
+                  alt={p.pname}
+                  style={{
+                    width: "100%",
+                    height: "200px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "12px",
+                  }}
+                />
+              ) : p.image ? (
                 <img
                   src={`http://localhost:5000${p.image}`}
                   alt={p.pname}

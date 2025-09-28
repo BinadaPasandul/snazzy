@@ -1,4 +1,3 @@
-/* Product Manager Enhanced Styles */
 
 /* Keyframe Animations */
 @keyframes float {
@@ -57,7 +56,7 @@
 
 /* Main Container */
 .product-manager-container {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #ffffff 100%);
   min-height: 100vh;
   position: relative;
   overflow: hidden;
@@ -139,7 +138,7 @@
 .form-title {
   font-size: 28px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #b8b8c7 0%, #c8c3ce 100%);
   -webkit-background-clip: text;
   margin: 0;
   letter-spacing: -0.5px;
@@ -148,7 +147,7 @@
 .image-title {
   font-size: 24px;
   font-weight: 700;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #e9e9ec 0%, #764ba2 100%);
   -webkit-background-clip: text;
   margin: 0;
   letter-spacing: -0.5px;
@@ -332,6 +331,67 @@
   transform: scale(1.05);
   border-color: #667eea;
   box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+}
+
+/* Multiple Image Preview Grid */
+.image-preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.image-preview-item {
+  position: relative;
+  display: inline-block;
+}
+
+.image-preview-item .image-preview {
+  width: 100%;
+  height: 120px;
+  max-width: none;
+  max-height: none;
+  border-radius: 8px;
+  border: 2px solid #e2e8f0;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #ff4757;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(255, 71, 87, 0.3);
+}
+
+.remove-image-btn:hover {
+  background: #ff3742;
+  transform: scale(1.1);
+}
+
+.image-order {
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #667eea;
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
 }
 
 /* Buttons */

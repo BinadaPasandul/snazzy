@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Nav from '../Navbar/nav';
+import Footer from '../Footer/Footer';
 import api from '../../utils/api';
+import './promotionmanager.css';
 
 function PromotionDashboard() {
     const [promotions, setPromotions] = useState([]);
@@ -140,99 +142,59 @@ function PromotionDashboard() {
         <>
             <Nav />
 
-            <div style={{ padding: '20px', maxWidth: '1200px', margin: 'auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                    <h2>Promotion Manager Dashboard</h2>
-                    <button 
-                        onClick={() => navigate('/insertpromotion')} 
-                        style={{ padding: '8px 16px', borderRadius: '8px', backgroundColor: '#6c63ff', color: '#fff', border: 'none', cursor: 'pointer' }}
-                    >
-                        Add Promotion
-                    </button>
+            <div className="promotion-dashboard">
+                <div className="promotion-header">
+                    <div className="promotion-header-content">
+                        <h1 className="promotion-title">Promotion Manager Dashboard</h1>
+                        <p className="promotion-subtitle">Manage your promotional campaigns and track performance</p>
+                    </div>
+                    <div className="promotion-actions">
+                        <button 
+                            className="add-promotion-btn"
+                            onClick={() => navigate('/insertpromotion')} 
+                        >
+                            Add Promotion
+                        </button>
+                    </div>
                 </div>
 
-                {/* Search Bar */}
-                <div style={{ marginBottom: '20px' }}>
-                    <div style={{ position: 'relative', maxWidth: '400px' }}>
-                        <input
-                            type="text"
-                            placeholder="Search promotions by title, description, product ID, discount, or date..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            style={{
-                                width: '100%',
-                                padding: '12px 16px 12px 40px',
-                                border: '2px solid #e2e8f0',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                outline: 'none',
-                                transition: 'border-color 0.2s',
-                                backgroundColor: '#f8fafc'
-                            }}
-                            onFocus={(e) => {
-                                e.target.style.borderColor = '#6c63ff';
-                                e.target.style.backgroundColor = '#fff';
-                            }}
-                            onBlur={(e) => {
-                                e.target.style.borderColor = '#e2e8f0';
-                                e.target.style.backgroundColor = '#f8fafc';
-                            }}
-                        />
-                        <div style={{
-                            position: 'absolute',
-                            left: '12px',
-                            top: '50%',
-                            transform: 'translateY(-50%)',
-                            color: '#6b7280',
-                            fontSize: '16px'
-                        }}>
-                            🔍
+                {/* Search Section */}
+                <div className="promotion-search">
+                    <div className="promotion-search-header">
+                        <h3 className="promotion-search-title">Search Promotions</h3>
+                        <div className="promotion-search-info">
+                            {searchTerm && (
+                                <span className="search-results">
+                                    Showing {filteredPromotions.length} of {promotions.length} promotions
+                                </span>
+                            )}
                         </div>
-                        {searchTerm && (
-                            <button
-                                onClick={() => setSearchTerm('')}
-                                style={{
-                                    position: 'absolute',
-                                    right: '12px',
-                                    top: '50%',
-                                    transform: 'translateY(-50%)',
-                                    background: 'none',
-                                    border: 'none',
-                                    color: '#6b7280',
-                                    cursor: 'pointer',
-                                    fontSize: '16px',
-                                    padding: '4px'
-                                }}
-                            >
-                                ✕
-                            </button>
-                        )}
                     </div>
-                    {searchTerm && (
-                        <div style={{ marginTop: '8px', fontSize: '14px', color: '#6b7280' }}>
-                            Showing {filteredPromotions.length} of {promotions.length} promotions
+                    <div className="promotion-search-container">
+                        <div className="search-input-wrapper">
+                            <input
+                                type="text"
+                                className="promotion-search-input"
+                                placeholder="Search promotions by title, description, product ID, discount, or date..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
+                            <div className="promotion-search-icon">🔍</div>
+                            {searchTerm && (
+                                <button
+                                    className="promotion-search-clear"
+                                    onClick={() => setSearchTerm('')}
+                                >
+                                    ✕
+                                </button>
+                            )}
                         </div>
-                    )}
+                    </div>
                 </div>
 
                 {/* Promotion Performance Summary */}
                 {!loading && promotions.length > 0 && (
-                    <div style={{ 
-                        marginBottom: '20px',
-                        backgroundColor: '#f8fafc',
-                        borderRadius: '12px',
-                        padding: '20px',
-                        border: '1px solid #e2e8f0'
-                    }}>
-                        <h3 style={{ 
-                            margin: '0 0 16px 0', 
-                            color: '#1f2937',
-                            fontSize: '1.25rem',
-                            fontWeight: '600'
-                        }}>
-                            📈 Promotion Performance Summary
-                        </h3>
-                        
+                    <div className="promotion-stats">
                         {(() => {
                             // Calculate overall performance metrics
                             const totalPromotionOrders = orders.filter(order => order.has_promotion).length;
@@ -246,265 +208,201 @@ function PromotionDashboard() {
                                 .reduce((sum, order) => sum + (order.promotion_discount || 0), 0);
                             
                             return (
-                                <div style={{ 
-                                    display: 'grid', 
-                                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-                                    gap: '16px'
-                                }}>
-                                    <div style={{
-                                        backgroundColor: '#fff',
-                                        padding: '16px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #e5e7eb',
-                                        textAlign: 'center'
-                                    }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#3b82f6' }}>
-                                            {totalPromotionOrders}
+                                <>
+                                    <div className="promotion-stat">
+                                        <div className="promotion-stat-info">
+                                            <div className="promotion-stat-label">Total Promotions</div>
+                                            <div className="promotion-stat-value">{promotions.length}</div>
                                         </div>
-                                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                                            Total Promotion Orders
-                                        </div>
+                                        <div className="promotion-stat-icon">🎯</div>
                                     </div>
-                                    <div style={{
-                                        backgroundColor: '#fff',
-                                        padding: '16px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #e5e7eb',
-                                        textAlign: 'center'
-                                    }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>
-                                            {overallConversionRate.toFixed(1)}%
+                                    <div className="promotion-stat">
+                                        <div className="promotion-stat-info">
+                                            <div className="promotion-stat-label">Promotion Orders</div>
+                                            <div className="promotion-stat-value">{totalPromotionOrders}</div>
                                         </div>
-                                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                                            Overall Conversion Rate
-                                        </div>
+                                        <div className="promotion-stat-icon">📦</div>
                                     </div>
-                                    <div style={{
-                                        backgroundColor: '#fff',
-                                        padding: '16px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #e5e7eb',
-                                        textAlign: 'center'
-                                    }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#f59e0b' }}>
-                                            ${totalPromotionRevenue.toFixed(2)}
+                                    <div className="promotion-stat">
+                                        <div className="promotion-stat-info">
+                                            <div className="promotion-stat-label">Conversion Rate</div>
+                                            <div className="promotion-stat-value">{overallConversionRate.toFixed(1)}%</div>
                                         </div>
-                                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                                            Total Promotion Revenue
-                                        </div>
+                                        <div className="promotion-stat-icon">📈</div>
                                     </div>
-                                    <div style={{
-                                        backgroundColor: '#fff',
-                                        padding: '16px',
-                                        borderRadius: '8px',
-                                        border: '1px solid #e5e7eb',
-                                        textAlign: 'center'
-                                    }}>
-                                        <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#ef4444' }}>
-                                            ${totalDiscountGiven.toFixed(2)}
+                                    <div className="promotion-stat">
+                                        <div className="promotion-stat-info">
+                                            <div className="promotion-stat-label">Total Discounts</div>
+                                            <div className="promotion-stat-value">${totalDiscountGiven.toFixed(2)}</div>
                                         </div>
-                                        <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
-                                            Total Discounts Given
-                                        </div>
+                                        <div className="promotion-stat-icon">💰</div>
                                     </div>
-                                </div>
+                                </>
                             );
                         })()}
                     </div>
                 )}
 
-                {loading ? (
-                    <div>Loading promotions...</div>
-                ) : error ? (
-                    <div style={{ color: 'red' }}>Error loading promotions: {error}</div>
-                ) : filteredPromotions.length === 0 ? (
-                    <div style={{ 
-                        textAlign: 'center', 
-                        padding: '40px', 
-                        color: '#6b7280',
-                        backgroundColor: '#f8fafc',
-                        borderRadius: '8px',
-                        border: '1px solid #e2e8f0'
-                    }}>
-                        {searchTerm ? (
-                            <>
-                                <div style={{ fontSize: '24px', marginBottom: '8px' }}>🔍</div>
-                                <div>No promotions found matching "{searchTerm}"</div>
-                                <button 
-                                    onClick={() => setSearchTerm('')}
-                                    style={{
-                                        marginTop: '12px',
-                                        padding: '8px 16px',
-                                        backgroundColor: '#6c63ff',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Clear Search
-                                </button>
-                            </>
-                        ) : (
-                            <>
-                                <div style={{ fontSize: '24px', marginBottom: '8px' }}>📋</div>
-                                <div>No promotions found.</div>
-                            </>
-                        )}
+                {/* Promotions Section */}
+                <div className="promotions-section">
+                    <div className="promotions-header">
+                        <h2 className="promotions-title">Promotions Management</h2>
+                        <div className="promotions-info">
+                            <span className="promotions-count">
+                                {filteredPromotions.length} of {promotions.length} promotions
+                            </span>
+                        </div>
                     </div>
-                ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
-                        {filteredPromotions.map((p) => (
-                            <div key={p._id} style={{ border: '1px solid #ddd', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                                {p.bannerImage ? (
-                                    <img
-                                        src={`http://localhost:5000${p.bannerImage}`} // full URL to display image
-                                        alt={p.title}
-                                        style={{ width: '100%', height: '150px', objectFit: 'cover' }}
-                                    />
-                                ) : (
-                                    <div style={{ width: '100%', height: '150px', backgroundColor: '#f0f0f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No Image</div>
-                                )}
-                                <div style={{ padding: '12px' }}>
-                                    <h3 style={{ margin: '0 0 8px 0' }}>{p.title}</h3>
+
+                    {loading ? (
+                        <div className="loading-container">
+                            <div className="loading-spinner"></div>
+                            <div className="loading-text">Loading promotions...</div>
+                        </div>
+                    ) : error ? (
+                        <div className="error-container">
+                            <div className="error-icon">⚠️</div>
+                            <div className="error-title">Error Loading Promotions</div>
+                            <div className="error-message">{error}</div>
+                        </div>
+                    ) : filteredPromotions.length === 0 ? (
+                        <div className="empty-state-container">
+                            {searchTerm ? (
+                                <>
+                                    <div className="empty-state-icon">🔍</div>
+                                    <div className="empty-state-title">No Promotions Found</div>
+                                    <div className="empty-state-message">
+                                        No promotions found matching "{searchTerm}"
+                                    </div>
+                                    <button 
+                                        className="clear-search-btn"
+                                        onClick={() => setSearchTerm('')}
+                                    >
+                                        Clear Search
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="empty-state-icon">📋</div>
+                                    <div className="empty-state-title">No Promotions</div>
+                                    <div className="empty-state-message">No promotions found.</div>
+                                </>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="promotions-grid">
+                            {filteredPromotions.map((p) => (
+                                <div key={p._id} className="promotion-card">
+                                    {p.bannerImage ? (
+                                        <img
+                                            src={`http://localhost:5000${p.bannerImage}`}
+                                            alt={p.title}
+                                            className="promotion-card-image"
+                                        />
+                                    ) : (
+                                        <div className="promotion-card-no-image">No Image</div>
+                                    )}
                                     
-                                    {/* Product Details */}
-                                    {(() => {
-                                        const product = getProductByCode(p.productId);
-                                        if (product) {
-                                            const originalPrice = product.pamount;
-                                            const discountedPrice = originalPrice - (originalPrice * p.discount / 100);
-                                            return (
-                                                <div style={{ 
-                                                    background: '#f8f9fa', 
-                                                    padding: '8px', 
-                                                    borderRadius: '6px', 
-                                                    marginBottom: '8px',
-                                                    border: '1px solid #e9ecef'
-                                                }}>
-                                                    <p style={{ margin: '0 0 4px 0', fontSize: '14px', fontWeight: 'bold', color: '#495057' }}>
-                                                        📦 {product.pname}
-                                                    </p>
-                                                    <p style={{ margin: '0 0 4px 0', fontSize: '12px', color: '#6c757d' }}>
-                                                        Code: {product.pcode} | Size: {product.psize} | Color: {product.pcolor}
-                                                    </p>
-                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                        <span style={{ 
-                                                            color: '#e53e3e', 
-                                                            textDecoration: 'line-through', 
-                                                            fontSize: '12px' 
-                                                        }}>
-                                                            ${originalPrice}
-                                                        </span>
-                                                        <span style={{ 
-                                                            color: '#38a169', 
-                                                            fontWeight: 'bold', 
-                                                            fontSize: '14px' 
-                                                        }}>
-                                                            ${discountedPrice.toFixed(2)}
-                                                        </span>
-                                                        <span style={{ 
-                                                            background: '#dc3545', 
-                                                            color: 'white', 
-                                                            padding: '2px 6px', 
-                                                            borderRadius: '4px', 
-                                                            fontSize: '10px',
-                                                            fontWeight: 'bold'
-                                                        }}>
-                                                            SAVE ${(originalPrice - discountedPrice).toFixed(2)}
-                                                        </span>
+                                    <div className="promotion-card-content">
+                                        <h3 className="promotion-card-title">{p.title}</h3>
+                                        
+                                        {/* Product Details */}
+                                        {(() => {
+                                            const product = getProductByCode(p.productId);
+                                            if (product) {
+                                                const originalPrice = product.pamount;
+                                                const discountedPrice = originalPrice - (originalPrice * p.discount / 100);
+                                                return (
+                                                    <div className="promotion-product-info">
+                                                        <div className="promotion-product-name">📦 {product.pname}</div>
+                                                        <div className="promotion-product-details">
+                                                            Code: {product.pcode} | Size: {product.psize} | Color: {product.pcolor}
+                                                        </div>
+                                                        <div className="promotion-price-section">
+                                                            <span className="original-price">${originalPrice}</span>
+                                                            <span className="discounted-price">${discountedPrice.toFixed(2)}</span>
+                                                            <span className="save-badge">SAVE ${(originalPrice - discountedPrice).toFixed(2)}</span>
+                                                        </div>
                                                     </div>
+                                                );
+                                            }
+                                            return <div className="product-not-found">Product ID: {p.productId} (Product not found)</div>;
+                                        })()}
+                                        
+                                        <div className="promotion-details">
+                                            <div className="promotion-detail-item">
+                                                <span className="detail-label">Description:</span>
+                                                <span className="detail-value">{p.description || 'N/A'}</span>
+                                            </div>
+                                            <div className="promotion-detail-item">
+                                                <span className="detail-label">Discount:</span>
+                                                <span className="detail-value">{p.discount}%</span>
+                                            </div>
+                                            <div className="promotion-detail-item">
+                                                <span className="detail-label">Start Date:</span>
+                                                <span className="detail-value">{p.startDate ? new Date(p.startDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                            <div className="promotion-detail-item">
+                                                <span className="detail-label">End Date:</span>
+                                                <span className="detail-value">{p.endDate ? new Date(p.endDate).toLocaleDateString() : 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Promotion Performance Tracking */}
+                                        {(() => {
+                                            const performance = getPromotionPerformance(p);
+                                            return (
+                                                <div className="promotion-performance">
+                                                    <div className="promotion-performance-title">📊 Performance Metrics</div>
+                                                    <div className="promotion-performance-grid">
+                                                        <div className="performance-item">
+                                                            <span className="performance-label">Orders:</span>
+                                                            <span className="performance-value">{performance.orderCount}</span>
+                                                        </div>
+                                                        <div className="performance-item">
+                                                            <span className="performance-label">Conversion:</span>
+                                                            <span className="performance-value">{performance.conversionRate.toFixed(1)}%</span>
+                                                        </div>
+                                                        <div className="performance-item">
+                                                            <span className="performance-label">Revenue:</span>
+                                                            <span className="performance-value">${performance.totalRevenue.toFixed(2)}</span>
+                                                        </div>
+                                                        <div className="performance-item">
+                                                            <span className="performance-label">Avg Order:</span>
+                                                            <span className="performance-value">${performance.avgOrderValue.toFixed(2)}</span>
+                                                        </div>
+                                                    </div>
+                                                    {performance.totalDiscountGiven > 0 && (
+                                                        <div className="promotion-discount-total">
+                                                            💰 Total Discount Given: ${performance.totalDiscountGiven.toFixed(2)}
+                                                        </div>
+                                                    )}
                                                 </div>
                                             );
-                                        }
-                                        return <p><strong>Product ID:</strong> {p.productId} (Product not found)</p>;
-                                    })()}
-                                    
-                                    <p><strong>Promotion Description:</strong> {p.description || 'N/A'}</p>
-                                    <p><strong>Discount:</strong> {p.discount}%</p>
-                                    <p><strong>Start:</strong> {p.startDate ? new Date(p.startDate).toLocaleDateString() : 'N/A'}</p>
-                                    <p><strong>End:</strong> {p.endDate ? new Date(p.endDate).toLocaleDateString() : 'N/A'}</p>
-                                    
-                                    {/* Promotion Performance Tracking */}
-                                    {(() => {
-                                        const performance = getPromotionPerformance(p);
-                                        return (
-                                            <div style={{ 
-                                                background: '#f0f9ff', 
-                                                padding: '12px', 
-                                                borderRadius: '8px', 
-                                                marginTop: '12px',
-                                                border: '1px solid #bae6fd'
-                                            }}>
-                                                <h4 style={{ 
-                                                    margin: '0 0 8px 0', 
-                                                    fontSize: '14px', 
-                                                    fontWeight: 'bold', 
-                                                    color: '#0369a1' 
-                                                }}>
-                                                    📊 Performance Metrics
-                                                </h4>
-                                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' }}>
-                                                    <div>
-                                                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>Orders:</span>
-                                                        <span style={{ marginLeft: '4px', color: '#0c4a6e' }}>
-                                                            {performance.orderCount}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>Conversion:</span>
-                                                        <span style={{ marginLeft: '4px', color: '#0c4a6e' }}>
-                                                            {performance.conversionRate.toFixed(1)}%
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>Revenue:</span>
-                                                        <span style={{ marginLeft: '4px', color: '#0c4a6e' }}>
-                                                            ${performance.totalRevenue.toFixed(2)}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <span style={{ fontWeight: 'bold', color: '#0369a1' }}>Avg Order:</span>
-                                                        <span style={{ marginLeft: '4px', color: '#0c4a6e' }}>
-                                                            ${performance.avgOrderValue.toFixed(2)}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                                {performance.totalDiscountGiven > 0 && (
-                                                    <div style={{ 
-                                                        marginTop: '8px', 
-                                                        padding: '6px 8px', 
-                                                        backgroundColor: '#fef3c7', 
-                                                        borderRadius: '4px',
-                                                        fontSize: '11px',
-                                                        color: '#92400e'
-                                                    }}>
-                                                        💰 Total Discount Given: ${performance.totalDiscountGiven.toFixed(2)}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        );
-                                    })()}
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '10px' }}>
-                                        <button 
-                                            onClick={() => handleEdit(p)} 
-                                            style={{ padding: '5px 10px', borderRadius: '5px', backgroundColor: '#00b894', color: '#fff', border: 'none', cursor: 'pointer' }}
-                                        >
-                                            Edit
-                                        </button>
-                                        <button 
-                                            onClick={() => handleDelete(p._id)} 
-                                            style={{ padding: '5px 10px', borderRadius: '5px', backgroundColor: '#ff4d4d', color: '#fff', border: 'none', cursor: 'pointer' }}
-                                        >
-                                            Delete
-                                        </button>
+                                        })()}
+                                        
+                                        <div className="promotion-actions">
+                                            <button 
+                                                className="promotion-btn promotion-btn-edit"
+                                                onClick={() => handleEdit(p)} 
+                                            >
+                                                Edit
+                                            </button>
+                                            <button 
+                                                className="promotion-btn promotion-btn-delete"
+                                                onClick={() => handleDelete(p._id)} 
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
+            <Footer />
         </>
     );
 }
