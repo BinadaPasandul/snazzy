@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 import Nav from "../Navbar/nav";
+import Footer from "../Footer/Footer";
+import "./UpdateUser.css";
 
 function UpdateUser() {
   const { id } = useParams();
@@ -105,58 +107,135 @@ function UpdateUser() {
 
   if (loading) {
     return (
-      <div>
+      <div className="update-user-page">
         <Nav />
-        <p>Loading...</p>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p className="loading-text">Loading user data...</p>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="update-user-page">
       <Nav />
-      <h1>Update User</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={submitUpdate}>
-        <div>
-          <label>Name</label>
-          <input name="name" value={form.name} onChange={onChange} required />
+      
+      <div className="update-user-container">
+        <div className="update-header">
+          <h1 className="update-title">Update Profile</h1>
+          <p className="update-subtitle">Update your personal information and settings</p>
         </div>
-        <div>
-          <label>Email</label>
-          <input type="email" name="gmail" value={form.gmail} onChange={onChange} required />
-        </div>
-        <div>
-          <label>Age</label>
-          <input type="number" name="age" value={form.age} onChange={onChange} min="1" required />
-        </div>
-        <div>
-          <label>Address</label>
-          <input name="address" value={form.address} onChange={onChange} required />
-        </div>
-        <div>
-          <label>New Password (optional)</label>
-          <input 
-            type="password" 
-            name="password" 
-            value={form.password} 
-            onChange={onChange}
-            style={passwordError ? { borderColor: '#dc3545' } : {}}
-          />
-          {passwordError && (
-            <div style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
-              {passwordError}
+
+        <div className="update-form-container">
+          {error && (
+            <div className="error-message">
+              {error}
             </div>
           )}
-          <div style={{ fontSize: '0.8rem', color: '#6c757d', marginTop: '4px' }}>
-            Password must be at least 5 characters with uppercase, lowercase, and symbol
-          </div>
+
+          <form className="update-form" onSubmit={submitUpdate}>
+            <div className="form-group">
+              <label className="form-label">
+                Full Name <span className="required">*</span>
+              </label>
+              <input 
+                className="form-input" 
+                name="name" 
+                value={form.name} 
+                onChange={onChange} 
+                required 
+                placeholder="Enter your full name"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Email Address <span className="required">*</span>
+              </label>
+              <input 
+                type="email" 
+                className="form-input" 
+                name="gmail" 
+                value={form.gmail} 
+                onChange={onChange} 
+                required 
+                placeholder="Enter your email address"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Age <span className="required">*</span>
+              </label>
+              <input 
+                type="number" 
+                className="form-input" 
+                name="age" 
+                value={form.age} 
+                onChange={onChange} 
+                min="1" 
+                max="120"
+                required 
+                placeholder="Enter your age"
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">
+                Address <span className="required">*</span>
+              </label>
+              <input 
+                className="form-input" 
+                name="address" 
+                value={form.address} 
+                onChange={onChange} 
+                required 
+                placeholder="Enter your address"
+              />
+            </div>
+
+            <div className="form-group password-group">
+              <label className="form-label">New Password (optional)</label>
+              <input 
+                type="password" 
+                className={`form-input ${passwordError ? 'error' : ''}`}
+                name="password" 
+                value={form.password} 
+                onChange={onChange}
+                placeholder="Enter new password (leave blank to keep current)"
+              />
+              {passwordError && (
+                <div className="password-error">
+                  {passwordError}
+                </div>
+              )}
+              <div className="password-requirements">
+                Password must be at least 5 characters with uppercase, lowercase, and symbol
+              </div>
+            </div>
+
+            <div className="button-group">
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={() => history(-1)}
+              >
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+              >
+                Save Changes
+              </button>
+            </div>
+          </form>
         </div>
-        <div style={{ marginTop: 8 }}>
-          <button type="submit">Save</button>
-          <button type="button" onClick={() => history(-1)} style={{ marginLeft: 8 }}>Cancel</button>
-        </div>
-      </form>
+      </div>
+      
+      <Footer />
     </div>
   );
 }

@@ -198,7 +198,7 @@ function Nav() {
                                     {user.role === "product_manager" && (
                                         <>
                                         <NavLink 
-                                            to="/productmanager" 
+                                            to="/products" 
                                             className={({ isActive }) => (isActive ? "active" : "")}
                                         >
                                             <button className="sidebar-btn">
@@ -207,7 +207,7 @@ function Nav() {
                                             </button>
                                         </NavLink>
                                         <NavLink 
-                                                to="/products" 
+                                                to="/productmanager" 
                                                 className={({ isActive }) => (isActive ? "active" : "")}
                                             >
                                         
