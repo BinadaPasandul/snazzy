@@ -36,18 +36,29 @@ function InsertPromotion() {
       alert('Title, Product ID, Discount, Start Date, and End Date are required');
       return;
     }
-
+    // Discount validation 
     const discountNumber = Number(discount);
     if (isNaN(discountNumber) || discountNumber <= 0) {
       alert('Discount must be a positive number');
       return;
     }
 
+    // Check if start date is in the past
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    const startDateObj = new Date(startDate);
+    
+    if (startDateObj < today) {
+      alert('Start Date cannot be in the past. Please select today or a future date.');
+      return;
+    }
+    // End date must be after start date
     if (new Date(endDate) < new Date(startDate)) {
       alert('End Date must be after Start Date');
       return;
     }
 
+    // File validation
     if (!bannerFile) {
       alert('Please select a banner image');
       return;
@@ -92,14 +103,16 @@ function InsertPromotion() {
     <>
       <Nav />
       <div className="promotion-form-container6">
+        <div className="background-decoration"></div>
         <div className="promotion-form6">
-          <div className="form-header6">
-            <h2>Create New Promotion</h2>
-            <p>Fill in the details below to create an amazing promotion</p>
-          </div>
-          
-          <div className="form-body6">
-            <form onSubmit={handleSubmit}>
+          <div className="form-container">
+            <div className="form-header6">
+              <h2>Create New Promotion</h2>
+              <p>Fill in the details below to create an amazing promotion</p>
+            </div>
+            
+            <div className="form-body6">
+              <form onSubmit={handleSubmit}>
               <div className="form-group6">
                 <label htmlFor="title">Promotion Title</label>
                 <input 
@@ -162,6 +175,7 @@ function InsertPromotion() {
                   name="startDate" 
                   value={formData.startDate} 
                   onChange={handleChange} 
+                  min={new Date().toISOString().split('T')[0]}
                   required 
                 />
               </div>
@@ -174,6 +188,7 @@ function InsertPromotion() {
                   name="endDate" 
                   value={formData.endDate} 
                   onChange={handleChange} 
+                  min={formData.startDate || new Date().toISOString().split('T')[0]}
                   required 
                 />
               </div>
@@ -197,7 +212,83 @@ function InsertPromotion() {
               >
                 {isSubmitting ? 'Creating Promotion...' : 'Create Promotion'}
               </button>
-            </form>
+              </form>
+            </div>
+          </div>
+
+          {/* Preview Container (Right Side) */}
+          <div className="preview-container">
+            <div className="preview-header">
+              <h3>Live Preview</h3>
+              <p>See how your promotion will look</p>
+            </div>
+            
+            <div className="preview-card">
+              <div className="preview-banner">
+                {bannerFile ? (
+                  <img
+                    src={URL.createObjectURL(bannerFile)}
+                    alt="Banner Preview"
+                    className="banner-preview"
+                  />
+                ) : (
+                  <div className="banner-placeholder">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                      <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                      <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                      <polyline points="21,15 16,10 5,21"></polyline>
+                    </svg>
+                    <span>Banner Preview</span>
+                  </div>
+                )}
+                {formData.discount && (
+                  <div className="discount-badge">
+                    <span className="discount-percent">{formData.discount}%</span>
+                    <span className="discount-text">OFF</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="preview-content">
+                <h4 className="preview-title">
+                  {formData.title || "Promotion Title"}
+                </h4>
+                
+                {formData.description && (
+                  <p className="preview-description">{formData.description}</p>
+                )}
+                
+                <div className="preview-details">
+                  {formData.productId && (
+                    <div className="detail-item">
+                      <span className="detail-label">Product ID:</span>
+                      <span className="detail-value">{formData.productId}</span>
+                    </div>
+                  )}
+                  
+                  {formData.discount && (
+                    <div className="detail-item">
+                      <span className="detail-label">Discount:</span>
+                      <span className="detail-value">{formData.discount}%</span>
+                    </div>
+                  )}
+                  
+                  {formData.startDate && (
+                    <div className="detail-item">
+                      <span className="detail-label">Start Date:</span>
+                      <span className="detail-value">{new Date(formData.startDate).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                  
+                  {formData.endDate && (
+                    <div className="detail-item">
+                      <span className="detail-label">End Date:</span>
+                      <span className="detail-value">{new Date(formData.endDate).toLocaleDateString()}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

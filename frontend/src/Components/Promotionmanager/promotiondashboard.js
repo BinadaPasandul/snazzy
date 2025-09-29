@@ -6,6 +6,7 @@ import api from '../../utils/api';
 import './promotionmanager.css';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import logo from '../../assets/logo.png';
 
 function PromotionDashboard() {
     const [promotions, setPromotions] = useState([]);
@@ -129,17 +130,49 @@ function PromotionDashboard() {
         navigate(`/EditPromotion/${promotion._id}`);
     };
 
+    // generate pdf
     const generatePDF = () => {
         const doc = new jsPDF();
         const currentDate = new Date().toLocaleDateString();
         
-        // Set up the document
-        doc.setFontSize(20);
-        doc.text('Promotion Dashboard Report', 20, 30);
+        // Add logo to PDF header
+        const img = new Image();
+        img.onload = function() {
+            // Add logo (40x40 pixels) in top-left corner
+            doc.addImage(img, 'PNG', 10, 10, 10, 10);
+            
+            // Set up the document header with logo
+            doc.setFontSize(20);
+            doc.text('Promotion Dashboard Report', 70, 30);
+            
+            doc.setFontSize(12);
+            doc.text(`Generated on: ${currentDate}`, 70, 45);
+            doc.text(`Total Promotions: ${promotions.length}`, 70, 55);
+            
+            // Continue with the rest of the PDF generation
+            generatePDFContent(doc, currentDate);
+        };
         
-        doc.setFontSize(12);
-        doc.text(`Generated on: ${currentDate}`, 20, 45);
-        doc.text(`Total Promotions: ${promotions.length}`, 20, 55);
+        // Fallback if logo fails to load
+        img.onerror = function() {
+            console.log('Logo failed to load, generating PDF without logo');
+            // Set up the document header without logo
+            doc.setFontSize(20);
+            doc.text('Promotion Dashboard Report', 20, 30);
+            
+            doc.setFontSize(12);
+            doc.text(`Generated on: ${currentDate}`, 20, 45);
+            doc.text(`Total Promotions: ${promotions.length}`, 20, 55);
+            
+            // Continue with the rest of the PDF generation
+            generatePDFContent(doc, currentDate);
+        };
+        
+        img.src = logo;
+    };
+
+    // Separate function for PDF content generation
+    const generatePDFContent = (doc, currentDate) => {
         
         // Calculate summary statistics
         const totalPromotionOrders = orders.filter(order => order.has_promotion).length;
@@ -152,7 +185,7 @@ function PromotionDashboard() {
             .filter(order => order.has_promotion)
             .reduce((sum, order) => sum + (order.promotion_discount || 0), 0);
         
-        // Add summary section
+        // Add summary section (adjusted position for logo)
         doc.setFontSize(14);
         doc.text('Summary Statistics', 20, 75);
         
@@ -214,13 +247,24 @@ function PromotionDashboard() {
             }
         });
         
-        // Add footer
+        // Add footer with logo
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
             doc.setPage(i);
             doc.setFontSize(8);
             doc.text(`Page ${i} of ${pageCount}`, 20, doc.internal.pageSize.height - 10);
             doc.text('Snazzy Promotion Dashboard Report', doc.internal.pageSize.width - 80, doc.internal.pageSize.height - 10);
+            
+            // Add small logo in footer (20x20 pixels)
+            try {
+                const footerImg = new Image();
+                footerImg.onload = function() {
+                    doc.addImage(footerImg, 'PNG', doc.internal.pageSize.width - 30, doc.internal.pageSize.height - 15, 15, 15);
+                };
+                footerImg.src = logo;
+            } catch (error) {
+                console.log('Footer logo failed to load');
+            }
         }
         
         // Save the PDF
