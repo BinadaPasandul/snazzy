@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../../utils/api"; // your axios instance with JWT
+import api from "../../utils/api"; //  axios instance with JWT
 import ChatPopup from "../Payment/ChatPopup"; // Import chat popup component
 import Nav from "../Navbar/nav";
 import Footer from "../Footer/Footer";
@@ -16,7 +16,7 @@ function MyOrders() {
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get("/orders/user"); // fetch only current user's orders
+      const res = await api.get("/orders/user"); // current user's orders
       setOrders(res.data.orders || []);
     } catch (err) {
       console.error("Failed to fetch orders:", err.response?.data || err.message);
@@ -52,7 +52,7 @@ function MyOrders() {
     }
 
     try {
-      const res = await api.post(`/refund/request/${selectedOrderForRefund.paymentId}`, {
+      await api.post(`/refund/request/${selectedOrderForRefund.paymentId}`, {
         reason: selectedReason
       });
       alert("Refund request submitted successfully!");
@@ -81,29 +81,7 @@ function MyOrders() {
   };
 
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "Delivered":
-        return "green";
-      case "Delivering":
-        return "orange";
-      case "Processing":
-      default:
-        return "blue";
-    }
-  };
 
-  const getRefundStatusColor = (status) => {
-    switch (status) {
-      case "approved":
-        return "green";
-      case "rejected":
-        return "red";
-      case "pending":
-      default:
-        return "orange";
-    }
-  };
 
   const stats = orders.reduce(
     (acc, o) => {

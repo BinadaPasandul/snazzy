@@ -1,12 +1,12 @@
 const Order = require("../Models/OrderModel");
 const Register = require("../Models/UserModel");
 
-// ✅ Get all orders
+
 const getAllOrders = async (req, res) => {
     try {
         const orders = await Order.find()
             .populate("product_id")
-            .populate("userId", "username email"); // optional: show user info
+            .populate("userId", "username email");
 
         if (!orders || orders.length === 0) {
             return res.status(404).json({ message: "No orders found" });
@@ -19,7 +19,7 @@ const getAllOrders = async (req, res) => {
     }
 };
 
-// ✅ Add new order
+
 const addOrders = async (req, res) => {
     const userId = req.user?.id;
 
@@ -32,7 +32,7 @@ const addOrders = async (req, res) => {
     const { customer_name,product_name, customer_address, product_id, size, quantity, payment_type,total_price, payment_id, base_price, loyalty_discount, used_loyalty_points, promotion_discount, has_promotion, promotion_title, promotion_id } = req.body;
 
     try {
-        // optional: validate user exists
+        
         const user = await Register.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -60,12 +60,12 @@ const addOrders = async (req, res) => {
 
         await order.save();
         
-        // Handle loyalty points logic
+        
         if (used_loyalty_points && user.loyaltyPoints >= 5) {
-            // Deduct 5 loyalty points for using the discount
+        
             user.loyaltyPoints = Math.max((user.loyaltyPoints || 0) - 5, 0);
         } else {
-            // Add 5 loyalty points for new order (if not using loyalty points)
+            
             user.loyaltyPoints = (user.loyaltyPoints || 0) + 5;
         }
         
@@ -84,7 +84,7 @@ const addOrders = async (req, res) => {
     }
 };
 
-// ✅ Get order by ID
+
 const getById = async (req, res) => {
     const { id } = req.params;
 
@@ -104,7 +104,7 @@ const getById = async (req, res) => {
     }
 };
 
-// ✅ Update order
+
 const updateOrder = async (req, res) => {
     const { id } = req.params;
     const { customer_name, customer_address, size, quantity, payment_type, payment_id, status } = req.body;
@@ -113,7 +113,7 @@ const updateOrder = async (req, res) => {
         const order = await Order.findByIdAndUpdate(
             id,
             { customer_name, customer_address, size, quantity, payment_type, payment_id, status },
-            { new: true } // return updated doc
+            { new: true } 
         );
 
         if (!order) {
@@ -127,7 +127,7 @@ const updateOrder = async (req, res) => {
     }
 };
 
-// ✅ Delete order
+
 const deleteOrder = async (req, res) => {
     const { id } = req.params;
 
@@ -140,7 +140,7 @@ const deleteOrder = async (req, res) => {
         if (order.userId) {
             const user = await Register.findById(order.userId);
             if (user) {
-                // prevent going below 0
+                
                 user.loyaltyPoints = Math.max((user.loyaltyPoints || 0) - 5, 0);
                 await user.save();
             }
@@ -152,9 +152,9 @@ const deleteOrder = async (req, res) => {
         return res.status(500).json({ message: "Unable to delete order" });
     }
 };
-// ✅ Get all orders for the logged-in user
+//  all orders for the loggedin user
 const getUserOrders = async (req, res) => {
-  const userId = req.user?.id; // set by auth middleware
+  const userId = req.user?.id; 
 
   if (!userId) {
     return res.status(401).json({ message: "User not authenticated" });
@@ -162,7 +162,7 @@ const getUserOrders = async (req, res) => {
 
   try {
     const orders = await Order.find({ userId })
-      .populate("product_id"); // optional: populate product info
+      .populate("product_id"); 
 
     if (!orders || orders.length === 0) {
       return res.status(404).json({ message: "No orders found for this user" });
