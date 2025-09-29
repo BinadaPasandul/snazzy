@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Nav from "../Navbar/nav"; // keep/remove based on project
+import Nav from "../Navbar/nav"; 
 import Footer from "../Footer/Footer";
 import "./ProductDetail.css";
 
 const ProductDetail = () => {
-  const { id } = useParams();               // grabs the :id from URL
+  const { id } = useParams();               
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState(null);
@@ -21,7 +21,7 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const res = await axios.get(`http://localhost:5000/products/${id}`);
-        setProduct(res.data.product);        // make sure backend returns { product: {...} }
+        setProduct(res.data.product);       
       } catch (err) {
         console.error(err);
         setError("Failed to load product details.");
@@ -136,7 +136,7 @@ const ProductDetail = () => {
       return;
     }
     
-    // ✅ Pass product code and price to checkout (use discounted price if available)
+    // pass pcode and price to checkout
     const finalPrice = product.hasActivePromotion ? product.discountedPrice : product.pamount;
     navigate("/checkout", { 
       state: { 
