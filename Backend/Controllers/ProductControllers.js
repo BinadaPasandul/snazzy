@@ -5,21 +5,21 @@ const Promotion = require("../Models/PromotionModel");
 const addProducts = async (req, res) => {
   const { pname, pcode, pamount, pdescription, variants } = req.body;
   
-  // Handle images
+  
   let imagePaths = [];
   let firstImagePath = null;
   
   if (req.files && req.files.length > 0) {
     imagePaths = req.files.map(file => `/uploads/${file.filename}`);
-    firstImagePath = imagePaths[0]; // First image 
+    firstImagePath = imagePaths[0]; 
   } else if (req.file) {
-    // Single file upload
+    
     firstImagePath = `/uploads/${req.file.filename}`;
     imagePaths = [firstImagePath];
   }
 
   try {
-    // Parse variants if strings
+    // variants if strings
     let parsedVariants = variants;
     if (typeof variants === 'string') {
       parsedVariants = JSON.parse(variants);
@@ -91,9 +91,9 @@ const updateProduct = async (req, res) => {
       updateData.image = imagePaths[0]; // First image 
       updateData.images = imagePaths; // images
     } else if (req.file) {
-      // Single file upload 
+      
       updateData.image = `/uploads/${req.file.filename}`;
-      // Keep existing images array or create new one with single image
+      
       const existingProduct = await Product.findById(id);
       if (existingProduct && existingProduct.images && existingProduct.images.length > 0) {
         updateData.images = [...existingProduct.images, `/uploads/${req.file.filename}`];
@@ -134,13 +134,13 @@ const purchaseProduct = async (req, res) => {
 
 
 
-//function to calculate discounted price
+//calculate discounted price
 const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
   const discount = (originalPrice * discountPercentage) / 100;
   return originalPrice - discount;
 };
 
-//function to check if promotion is active
+//check if promotion is active
 const isPromotionActive = (startDate, endDate) => {
   const now = new Date();
   const start = new Date(startDate);
