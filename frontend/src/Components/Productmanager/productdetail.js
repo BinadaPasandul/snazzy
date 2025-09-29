@@ -372,7 +372,7 @@ const ProductDetail = () => {
           {/* Quantity Selection */}
           {selectedVariant && (
             <div className="quantity-section">
-              <h3 className="section-title">
+              <h3 className="section-title1">
                 Quantity
               </h3>
               <div className="quantity-controls">
