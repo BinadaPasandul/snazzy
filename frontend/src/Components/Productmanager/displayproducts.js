@@ -155,7 +155,7 @@ const DisplayProducts = () => {
     doc.text(`Total Variants: ${totalVariants}`, 14, 63);
     doc.text(`Total Stock: ${totalStock}`, 14, 71);
     
-    // \table data
+    // table data
     const tableData = products.map(product => {
       if (product.variants && product.variants.length > 0) {
         
