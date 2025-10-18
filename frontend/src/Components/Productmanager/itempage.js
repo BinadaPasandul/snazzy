@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import Nav from "../Navbar/nav"; // optional depending on your project
+import Nav from "../Navbar/nav"; 
 import Footer from "../Footer/Footer";
 import './itempage8.css';
 
@@ -11,7 +11,7 @@ const DisplayProducts = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch products from backend
+  // Fetch products 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -29,16 +29,16 @@ const DisplayProducts = () => {
     fetchProducts();
   }, []);
 
-  // Navigate to product detail/edit page
+  // Navigate to product detail page
   const handleProductClick = (id) => {
-    navigate(`/products/${id}`); // adjust the route as needed
+    navigate(`/products/${id}`); 
   };
 
   return (
     <div className="itempage-container8">
       <Nav />
 
-      {/* Hero Section */}
+      
       <section className="itempage-hero8">
         <div className="hero-background8">
           <div className="hero-overlay8"></div>
@@ -55,7 +55,7 @@ const DisplayProducts = () => {
         </div>
       </section>
 
-      {/* Products Section */}
+      {/* Products*/}
       <section className="products-section8">
         <div className="container8">
           <div className="section-header8">

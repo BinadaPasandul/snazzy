@@ -19,27 +19,27 @@ const AddProducts = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Available sizes (35-44) and colors
+  // Store the sizes in array
   const availableSizes = Array.from({ length: 10 }, (_, i) => i + 35);
   const availableColors = ["Black", "White", "Red", "Blue", "Green", "Yellow", "Pink", "Purple", "Orange", "Brown", "Gray", "Navy"];
 
-  // handle text fields
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setProduct((prev) => ({ ...prev, [name]: value }));
   };
 
-  // Add new variant
+  // Add,Remove,Update variant
   const addVariant = () => {
     setVariants([...variants, { size: 35, color: "Black", quantity: 0 }]);
   };
 
-  // Remove variant
+
   const removeVariant = (index) => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  // Update variant
+
   const updateVariant = (index, field, value) => {
     const updatedVariants = [...variants];
     updatedVariants[index][field] = value;
@@ -53,13 +53,13 @@ const AddProducts = () => {
     );
   };
 
-  // handle file
+  // handling 
   const handleFileChange = (e) => {
     const files = Array.from(e.target.files);
     setImageFiles(prev => [...prev, ...files]);
   };
 
-  // Remove image from preview
+  // Remove image 
   const removeImage = (index) => {
     setImageFiles(prev => prev.filter((_, i) => i !== index));
   };
@@ -89,7 +89,7 @@ const AddProducts = () => {
     setError(null);
     setIsSubmitting(true);
 
-    // basic validation
+    //validation
     for (const key of Object.keys(product)) {
       if (!product[key]) {
         setError("All fields are required");
@@ -127,7 +127,7 @@ const AddProducts = () => {
       formData.append("pdescription", product.pdescription);
       formData.append("variants", JSON.stringify(variants));
       
-      // Append all image files
+      // Append all images
       imageFiles.forEach((file, index) => {
         formData.append("images", file);
       });

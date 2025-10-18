@@ -23,7 +23,7 @@ const UpdateProduct = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Available sizes (35-44) and colors
+  // store size n colors in arrays
   const availableSizes = Array.from({ length: 10 }, (_, i) => i + 35);
   const availableColors = ["Black", "White", "Red", "Blue", "Green", "Yellow", "Pink", "Purple", "Orange", "Brown", "Gray", "Navy"];
 
@@ -119,17 +119,17 @@ const UpdateProduct = () => {
     }
   };
 
-  // Add new variant
+  // Add new/Remove/Update variant
   const addVariant = () => {
     setVariants([...variants, { size: 35, color: "Black", quantity: 0 }]);
   };
 
-  // Remove variant
+  
   const removeVariant = (index) => {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
-  // Update variant
+  
   const updateVariant = (index, field, value) => {
     const updatedVariants = [...variants];
     updatedVariants[index][field] = value;
@@ -148,7 +148,7 @@ const UpdateProduct = () => {
     setError(null);
     setIsSubmitting(true);
     
-    // Basic validation
+    //validations
     for (const key of Object.keys(product)) {
       if (!product[key]) {
         setError("All fields are required");
@@ -172,7 +172,7 @@ const UpdateProduct = () => {
       }
     }
 
-    // Check if there are any images (existing or new)
+    // Check if there are any images 
     if (existingImages.length === 0 && imageFiles.length === 0) {
       setError("At least one product image is required");
       setIsSubmitting(false);

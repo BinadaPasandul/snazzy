@@ -8,16 +8,16 @@ function Checkout() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ✅ Get product data from ProductDetail
-  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion, selectedSize, selectedColor, quantity } = location.state || {};
+  //  Lakmiths product details
+  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion, selectedSize, quantity } = location.state || {};
 
   const [form, setForm] = useState({
     customer_name: "",
     product_name:productname,
     customer_address: "",
-    product_id: productCode || "", // auto-fill from navigation
-    size: selectedSize || "", // auto-fill from ProductDetail selection
-    quantity: quantity || 1, // auto-fill from ProductDetail selection
+    product_id: productCode || "", 
+    size: selectedSize || "", 
+    quantity: quantity || 1, 
     payment_type: "cash",
   });
   const [paymentSuccess, setPaymentSuccess] = useState(false);
@@ -37,7 +37,7 @@ function Checkout() {
     }
   }, [productCode, selectedSize, quantity]);
 
-  // Fetch user's loyalty points
+  //reshmis promotion
   useEffect(() => {
     const fetchUserLoyaltyPoints = async () => {
       try {
@@ -52,20 +52,27 @@ function Checkout() {
     fetchUserLoyaltyPoints();
   }, []);
 
-  // Listen for payment success messages from iframe
+  
+  const originalBasePrice = originalPrice ? form.quantity * originalPrice : (productPrice ? form.quantity * productPrice : 0);
+  const promotionDiscount = hasPromotion ? originalBasePrice * (promotion?.discount / 100) : 0;
+  const priceAfterPromotion = originalBasePrice - promotionDiscount;
+  const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0; 
+  const totalPrice = priceAfterPromotion - loyaltyDiscount;
+
+  
   useEffect(() => {
     const handleMessage = async (event) => {
       if (event.data.type === 'PAYMENT_SUCCESS') {
         console.log('Payment successful:', event.data);
         setPaymentSuccess(true);
         
-        // Store payment ID from either explicit paymentId or payment._id
+        
         const receivedPaymentId = event.data.paymentId || event.data.payment._id;
         setPaymentId(receivedPaymentId);
         
         console.log('Received payment ID:', receivedPaymentId);
         
-        // Automatically submit order after successful payment
+        //validation part in blanks 
         if (!form.product_id) {
           alert("Product ID is required!");
           return;
@@ -86,7 +93,7 @@ function Checkout() {
           promotion_id: promotion?.id || null,
           loyalty_discount: loyaltyDiscount,
           used_loyalty_points: useLoyaltyPoints,
-          payment_id: receivedPaymentId, // Include payment ID
+          payment_id: receivedPaymentId, 
         };
 
         console.log('Submitting order with data:', orderData);
@@ -95,28 +102,28 @@ function Checkout() {
           const orderResponse = await api.post("/orders", orderData);
           console.log('Order submitted successfully:', orderResponse.data);
           
-          // Update loyalty points in state
+          // Update loyalty points 
           if (orderResponse.data.loyaltyPoints !== undefined) {
             setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
           }
           
-          // Show success message with loyalty points info
+          //loyality points validation 
           const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
-            ? `✅ Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
-            : `✅ Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
+            ? ` Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
+            : ` Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
           
           alert(loyaltyMessage);
           navigate("/myorders");
         } catch (err) {
           console.error("Order failed:", err.response?.data || err.message);
-          alert("⚠️ Error placing order");
+          alert(" Error placing order");
         }
       }
     };
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [form, productPrice, navigate]);
+  }, [form, productPrice, navigate, hasPromotion, loyaltyDiscount, originalBasePrice, promotion?.id, promotion?.title, promotionDiscount, totalPrice, useLoyaltyPoints]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -156,7 +163,7 @@ function Checkout() {
       promotion_id: promotion?.id || null,
       loyalty_discount: loyaltyDiscount,
       used_loyalty_points: useLoyaltyPoints,
-      payment_id: paymentId, // Include payment ID if available
+      payment_id: paymentId, 
     };
 
     try {
@@ -169,25 +176,18 @@ function Checkout() {
       
       // Show success message with loyalty points info
       const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
-        ? `✅ Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
-        : `✅ Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
+        ? ` Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
+        : ` Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
       
       alert(loyaltyMessage);
       navigate("/myorders");
     } catch (err) {
       console.error("Order failed:", err.response?.data || err.message);
-      alert("⚠️ Error placing order");
+      alert(" Error placing order");
     }
   };
 
-  // ✅ derived value for total price with both promotion and loyalty discounts
-  const originalBasePrice = originalPrice ? form.quantity * originalPrice : (productPrice ? form.quantity * productPrice : 0);
-  const promotionDiscount = hasPromotion ? originalBasePrice * (promotion?.discount / 100) : 0;
-  const priceAfterPromotion = originalBasePrice - promotionDiscount;
-  const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0; // 5% discount on price after promotion
-  const totalPrice = priceAfterPromotion - loyaltyDiscount;
-  
-  // ✅ Check if all required fields are completed
+  //  Check if all required fields are completed
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
 
   return (

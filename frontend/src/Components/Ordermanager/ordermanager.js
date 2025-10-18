@@ -17,8 +17,32 @@ function OrderManager() {
     size: "",
     quantity: "",
     payment_type: "",
-    status: "Packing", // ✅ new default
+    status: "Packing", 
   });
+
+  
+  const getOrderDate = (orderId) => {
+    try {
+      
+      const timestamp = parseInt(orderId.substring(0, 8), 16) * 1000;
+      return new Date(timestamp);
+    } catch (error) {
+      console.error("Error parsing order date:", error);
+      return new Date();
+    }
+  };
+
+  
+  const formatOrderDate = (orderId) => {
+    const date = getOrderDate(orderId);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   // Fetch orders
   const fetchOrders = async () => {
@@ -36,7 +60,7 @@ function OrderManager() {
     fetchOrders();
   }, []);
 
-  // Open modal to edit
+  
   const openEditModal = (order) => {
     setEditingOrder(order);
     setFormData({
@@ -102,7 +126,7 @@ function OrderManager() {
     }
   };
 
-  // Discount statistics
+  // Discount statistics and the logic
   const discountStats = orders.reduce((stats, order) => {
     if (order.used_loyalty_points) {
       stats.loyaltyDiscounts += 1;
@@ -127,6 +151,7 @@ function OrderManager() {
     ? orders.filter((order) => {
         const fields = [
           order._id,
+          formatOrderDate(order._id),
           order.customer_name,
           order.customer_address,
           order.product_id,
@@ -142,7 +167,7 @@ function OrderManager() {
       })
     : orders;
 
-  // ✅ PDF generator
+  
   const generatePDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(18);
@@ -150,6 +175,7 @@ function OrderManager() {
 
     const tableColumn = [
       "Order ID",
+      "Order Placed Date",
       "Customer Name",
       "Address",
       "Product ID",
@@ -161,6 +187,7 @@ function OrderManager() {
 
     const tableRows = orders.map(order => [
       order._id,
+      formatOrderDate(order._id),
       order.customer_name,
       order.customer_address,
       order.product_id,
@@ -251,6 +278,7 @@ function OrderManager() {
                 <thead>
                   <tr>
                     <th>Order ID</th>
+                    <th>Order Placed Date</th>
                     <th>Customer Name</th>
                     <th>Address</th>
                     <th>Product ID</th>
@@ -270,6 +298,7 @@ function OrderManager() {
                   {filteredOrders.map((order) => (
                     <tr key={order._id}>
                       <td className="om-mono">{order._id}</td>
+                      <td className="om-date">{formatOrderDate(order._id)}</td>
                       <td>{order.customer_name}</td>
                       <td>{order.customer_address}</td>
                       <td className="om-mono">{order.product_id}</td>
@@ -281,7 +310,7 @@ function OrderManager() {
                       </td>
                       <td>
                         {order.has_promotion && order.promotion_discount > 0 ? (
-                          <div>
+                          <div> 
                             <span className="om-badge om-danger">-{order.promotion_discount.toFixed(2)}</span>
                             <div className="om-subtext">{order.promotion_title || "Promotion"}</div>
                           </div>
@@ -348,7 +377,7 @@ function OrderManager() {
 
               {(editingOrder.used_loyalty_points || editingOrder.has_promotion) && (
                 <div className="om-discount-card">
-                  <div className="om-discount-title">🎉 Discounts Applied</div>
+                  <div className="om-discount-title"> Discounts Applied</div>
                   <div className="om-subtext">
                     Base Price: ${editingOrder.base_price?.toFixed(2) || editingOrder.total_price.toFixed(2)}<br />
                     {editingOrder.has_promotion && (
