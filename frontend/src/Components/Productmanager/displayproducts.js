@@ -15,7 +15,7 @@ const DisplayProducts = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
-  const [editingId, setEditingId] = useState(null); // id of product being edited
+  const [editingId, setEditingId] = useState(null); 
   const [editedProduct, setEditedProduct] = useState({
     pname: "",
     pcode: "",
@@ -46,7 +46,7 @@ const DisplayProducts = () => {
     fetchProducts();
   }, []);
 
-  // Filter products based on search query
+  // Filter products based on search 
   const handleSearch = (searchValue) => {
     setSearchQuery(searchValue);
     if (searchValue.trim() === "") {
@@ -61,24 +61,24 @@ const DisplayProducts = () => {
     }
   };
 
-  // Update filtered products when query changes
+  // Update filtered products 
   useEffect(() => {
     handleSearch(searchQuery);
   }, [products]);
 
-  // Handle delete
+  // delete
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     try {
       await api.delete(`/products/${id}`);
-      fetchProducts(); // refresh list
+      fetchProducts(); // refresh 
     } catch (err) {
       console.error(err);
       setError("Failed to delete product.");
     }
   };
 
-  // Start editing
+  //Editing
   const handleEdit = (product) => {
     navigate(`/products/${product._id}/edit`);
   };
@@ -125,15 +125,15 @@ const DisplayProducts = () => {
   const generatePDF = () => {
     const doc = new jsPDF();
     
-    // Add title
+    
     doc.setFontSize(20);
     doc.text("Product Inventory Report", 14, 22);
     
-    // Add generation date
+    
     doc.setFontSize(10);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
     
-    // Calculate summary data first
+    
     const totalProducts = products.length;
     const totalVariants = products.reduce((sum, product) => {
       return sum + (product.variants ? product.variants.length : 1);
@@ -155,10 +155,10 @@ const DisplayProducts = () => {
     doc.text(`Total Variants: ${totalVariants}`, 14, 63);
     doc.text(`Total Stock: ${totalStock}`, 14, 71);
     
-    // Prepare table data
+    // table data
     const tableData = products.map(product => {
       if (product.variants && product.variants.length > 0) {
-        // For products with variants, create a row for each variant
+        
         return product.variants.map(variant => [
           product.pname,
           product.pcode,
@@ -168,7 +168,7 @@ const DisplayProducts = () => {
           `$${product.pamount}`
         ]);
       } else {
-        // For legacy products without variants
+        
         return [[
           product.pname,
           product.pcode,
@@ -180,20 +180,20 @@ const DisplayProducts = () => {
       }
     }).flat();
 
-    // Define table columns
+    
     const columns = ["Product Name", "Code", "Size", "Color", "Quantity", "Price"];
     
-    // Generate table starting after summary
+    // Generate table 
     autoTable(doc, {
       head: [columns],
       body: tableData,
-      startY: 85, // Start table after summary
+      startY: 85, 
       styles: {
         fontSize: 8,
         cellPadding: 3,
       },
       headStyles: {
-        fillColor: [79, 70, 229], // Blue color
+        fillColor: [79, 70, 229], 
         textColor: 255,
         fontStyle: 'bold',
       },
@@ -201,12 +201,12 @@ const DisplayProducts = () => {
         fillColor: [248, 249, 250],
       },
       columnStyles: {
-        0: { cellWidth: 40 }, // Product Name
-        1: { cellWidth: 25 }, // Code
-        2: { cellWidth: 20 }, // Size
-        3: { cellWidth: 25 }, // Color
-        4: { cellWidth: 20 }, // Quantity
-        5: { cellWidth: 20 }, // Price
+        0: { cellWidth: 40 }, 
+        1: { cellWidth: 25 }, 
+        2: { cellWidth: 20 }, 
+        3: { cellWidth: 25 }, 
+        4: { cellWidth: 20 }, 
+        5: { cellWidth: 20 }, 
       },
     });
 
@@ -214,7 +214,7 @@ const DisplayProducts = () => {
     doc.save(`product-inventory-${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
-  // Calculate product statistics
+  // Calculate statistics
   const productStats = {
     total: products.length,
     withVariants: products.filter(p => p.variants && p.variants.length > 0).length,
