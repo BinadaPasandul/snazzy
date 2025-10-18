@@ -21,13 +21,13 @@ const PublicOnlyRoute = ({ children }) => {
   const user = userString ? JSON.parse(userString) : null;
 
   if (token && user && !isTokenExpired(token)) {
-    // redirect to a sensible default (role-based)
+    
     const role = user.role;
     if (role === "admin") return <Navigate to="/admin" replace />;
     if (role === "product_manager") return <Navigate to="/productmanager" replace />;
     if (role === "order_manager") return <Navigate to="/ordermanager" replace />;
     if (role === "promotion_manager") return <Navigate to="/promotionmanager" replace />;
-    if (role === "financial_manager") return <Navigate to="/financialmanager" replace />;
+    
     return <Navigate to="/userdetails" replace />;
   }
 

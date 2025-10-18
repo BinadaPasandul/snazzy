@@ -176,10 +176,29 @@ function Userdetails() {
               
               <button 
                 className="action-btn danger"
-                onClick={() => {
+                onClick={async () => {
                   const confirmed = window.confirm("Are you sure you want to delete your account? This action cannot be undone.");
-                  if (confirmed) {
-                    console.log("Delete account");
+                  if (!confirmed) return;
+                  
+                  const token = localStorage.getItem('token');
+                  const userId = users && users[0]?._id;
+                  
+                  if (!userId) {
+                    alert('User ID not found');
+                    return;
+                  }
+                  
+                  try {
+                    await axios.delete(`http://localhost:5000/user/${userId}`, {
+                      headers: { Authorization: token }
+                    });
+                    // On successful self-delete, log out and go to login
+                    localStorage.removeItem('token');
+                    localStorage.removeItem('user');
+                    window.location.href = "/login";
+                  } catch (e) {
+                    const msg = e?.response?.data?.message || 'Delete failed';
+                    alert(msg);
                   }
                 }}
               >

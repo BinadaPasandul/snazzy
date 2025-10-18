@@ -26,7 +26,7 @@ const regiSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['customer', 'admin', 'staff', 'product_manager', 'order_manager', 'promotion_manager', 'financial_manager'],
+    enum: ['customer', 'admin', 'product_manager', 'order_manager', 'promotion_manager'],
     default: 'customer',
   },
   loyaltyPoints: {
@@ -41,7 +41,7 @@ const regiSchema = new Schema({
 regiSchema.methods.createPasswordResetToken = function() {
   const resetToken = crypto.randomBytes(32).toString('hex');
   this.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+  this.resetPasswordExpires = Date.now() + 10 * 60 * 1000; 
   return resetToken;
 };
 

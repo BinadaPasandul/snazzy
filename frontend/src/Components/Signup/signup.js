@@ -14,12 +14,13 @@ const Signup = () => {
         password: "",
         age: "",
         address: "",
-        role: "customer" // Default role
+        role: "customer" 
     });
     const [error, setError] = useState(null);
     const [passwordError, setPasswordError] = useState("");
+    const [ageError, setAgeError] = useState("");
 
-    // Password validation function
+    
     const validatePassword = (password) => {
         if (password.length < 5) {
             return "Password must be at least 5 characters long";
@@ -40,10 +41,17 @@ const Signup = () => {
         const { name, value } = e.target;
         setUser((prevUser) => ({ ...prevUser, [name]: value }));
         
-        // Validate password in real-time
+        
         if (name === "password") {
             const validationError = validatePassword(value);
             setPasswordError(validationError);
+        }
+        if (name === "age") {
+            if (value < 1) {
+                setAgeError("Age must be greater than 0");
+            } else {
+                setAgeError("");
+            }
         }
     };
 
@@ -51,16 +59,20 @@ const Signup = () => {
         e.preventDefault();
         setError(null);
 
-        // Validate inputs
+        
         if (!user.name || !user.gmail || !user.password || !user.age || !user.address) {
             setError("All fields are required");
             return;
         }
 
-        // Validate password
+        
         const passwordValidationError = validatePassword(user.password);
         if (passwordValidationError) {
             setPasswordError(passwordValidationError);
+            return;
+        }
+        if (user.age < 1) {
+            setAgeError("Age must be greater than 0");
             return;
         }
 
@@ -93,7 +105,7 @@ const Signup = () => {
             <Nav />
             <div className="signup-container">
                 <div className="signup-wrapper">
-                    {/* Left Panel - Image Section */}
+                
                     <div className="signup-left-panel">
                         <div className="signup-image-container">
                             <img src={signImage} alt="Signup Background" className="signup-background-image" />
@@ -106,7 +118,7 @@ const Signup = () => {
                         </div>
                     </div>
 
-                    {/* Right Panel - Signup Form */}
+                    
                     <div className="signup-right-panel">
                         <div className="signup-form-container">
                             <div className="signup-form-header">
@@ -182,7 +194,11 @@ const Signup = () => {
                                         className="signup-input"
                                         placeholder="Enter your age"
                                         min="1"
-                                    />
+                                   style={ageError ? { borderColor: '#dc3545' } : {}}
+                            />
+                            {ageError && (
+                                <div style={{ color: '#dc3545', fontSize: '0.875rem' }}>{ageError}</div>
+                            )}
                                 </div>
 
                                 <div className="signup-form-group">

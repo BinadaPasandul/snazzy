@@ -11,8 +11,10 @@ function Admin() {
     const [users, setUsers] = useState([]);
     const [editingUser, setEditingUser] = useState(null);
     const [passwordError, setPasswordError] = useState("");
+     const [ageError, setAgeError] = useState("");
+    
 
-    // Password validation function
+    
     const validatePassword = (password) => {
         if (password.length < 5) {
             return "Password must be at least 5 characters long";
@@ -94,6 +96,13 @@ function Admin() {
         if (name === "password") {
             const validationError = validatePassword(value);
             setPasswordError(validationError);
+        }
+        if (name === "age") {
+            if (value < 1) {
+                setAgeError("Age must be greater than 0");
+            } else {
+                setAgeError("");
+            }
         }
     };
 
@@ -190,6 +199,11 @@ function Admin() {
             setPasswordError(passwordValidationError);
             return;
         }
+        if (user.age < 1) {
+            setAgeError("Age must be greater than 0");
+            return;
+        }
+
 
         sendRequest().then(() => {
             alert("Staff Member Added Successfully");
@@ -368,7 +382,11 @@ function Admin() {
                                 required
                                 placeholder="Enter your age"
                                 min="1"
+                                style={ageError ? { borderColor: '#dc3545' } : {}}
                             />
+                            {ageError && (
+                                <div style={{ color: '#dc3545', fontSize: '0.875rem' }}>{ageError}</div>
+                            )}
                         </div>
 
                         <div className="form-group1">
