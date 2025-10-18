@@ -4,7 +4,7 @@ import api from '../../utils/api';
 
 const PaymentForm = () => {
   const [cards, setCards] = useState([]);
-  const [amount, setAmount] = useState(null); // ✅ amount comes from query param
+  const [amount, setAmount] = useState(null); 
   const [selectedCard, setSelectedCard] = useState('');
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -12,7 +12,7 @@ const PaymentForm = () => {
 
   const navigate = useNavigate();
 
-  // ✅ Get amount and form completion status from query string (passed from Checkout)
+  
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     const amt = queryParams.get('amount');
@@ -22,17 +22,17 @@ const PaymentForm = () => {
       setAmount(parseFloat(amt));
     }
     
-    // If formComplete is not true, show error
+    
     if (formComplete !== 'true') {
       setError('Please complete all required fields in the checkout form before proceeding with payment.');
     }
   }, []);
 
-  // ✅ Fetch cards for user
+  //  Fetch cards for user
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const res = await api.get('/payment/cards'); // JWT token auto-attached
+        const res = await api.get('/payment/cards'); 
         setCards(res.data.paymentMethods);
       } catch (err) {
         console.error('Fetch cards error:', err);
@@ -51,6 +51,7 @@ const PaymentForm = () => {
     // Check if form is complete
     const queryParams = new URLSearchParams(window.location.search);
     const formComplete = queryParams.get('formComplete');
+    const orderData = queryParams.get('orderData'); // Get order data from URL
     
     if (formComplete !== 'true') {
       setError('Please complete all required fields in the checkout form before proceeding with payment.');
@@ -60,6 +61,7 @@ const PaymentForm = () => {
 
     if (!selectedCard) {
       setError('Please select a card');
+      alert(error);
       setIsLoading(false);
       return;
     }
@@ -71,20 +73,31 @@ const PaymentForm = () => {
     }
 
     try {
+      // Parse order data if available
+      let parsedOrderData = null;
+      if (orderData) {
+        try {
+          parsedOrderData = JSON.parse(decodeURIComponent(orderData));
+        } catch (parseError) {
+          console.error('Error parsing order data:', parseError);
+        }
+      }
+
       const res = await api.post('/payment/pay', {
-        amount, // ✅ already set from query param
+        amount, 
         paymentMethodId: selectedCard,
+        orderData: parsedOrderData // Include order data for invoice
       });
 
       setSuccess(`Payment of $${res.data.payment.amount} successful!`);
       setSelectedCard('');
 
-      // Send success message to parent window (checkout) without navigating
+      // Send success message
       if (window.parent !== window) {
         window.parent.postMessage({
           type: 'PAYMENT_SUCCESS',
           payment: res.data.payment,
-          paymentId: res.data.payment._id, // Explicitly include payment ID
+          paymentId: res.data.payment._id, 
           amount: res.data.payment.amount
         }, '*');
         console.log('Payment success message sent to parent:', {
@@ -93,12 +106,7 @@ const PaymentForm = () => {
           paymentId: res.data.payment._id,
           amount: res.data.payment.amount
         });
-      } else {
-        // Only redirect if not in iframe
-        setTimeout(() => {
-          navigate('/CardList');
-        }, 2000);
-      }
+      } 
     } catch (err) {
       setError(err.response?.data?.message || 'Payment failed');
     } finally {

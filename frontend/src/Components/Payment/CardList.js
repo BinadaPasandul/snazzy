@@ -67,20 +67,6 @@ const CardList = () => {
     }
   };
 
-  const getCardBrandColor = (brand) => {
-    switch (brand?.toLowerCase()) {
-      case 'visa':
-        return 'from-blue-600 to-blue-800';
-      case 'mastercard':
-        return 'from-red-500 to-yellow-500';
-      case 'amex':
-        return 'from-green-600 to-blue-600';
-      case 'discover':
-        return 'from-orange-500 to-red-500';
-      default:
-        return 'from-gray-600 to-gray-800';
-    }
-  };
 
   const getCardBrandGradient = (brand) => {
     switch (brand?.toLowerCase()) {
@@ -100,7 +86,7 @@ const CardList = () => {
   const formatExpirationDate = (expMonth, expYear) => {
     if (!expMonth || !expYear) return 'N/A';
     const month = expMonth.toString().padStart(2, '0');
-    const year = expYear.toString().slice(-2); // Show only last 2 digits of year
+    const year = expYear.toString().slice(-2); // Show only last 2 digits
     return `${month}/${year}`;
   };
 

@@ -716,9 +716,20 @@ function Checkout() {
                   border: '1px solid #e5e7eb',
                   overflow: 'hidden'
                 }}>
-                  <iframe
-                    src={`/pay?amount=${totalPrice}&formComplete=true`}
-                    title="Card Payment"
+                    <iframe
+                      src={`/pay?amount=${totalPrice}&formComplete=true&orderData=${encodeURIComponent(JSON.stringify({
+                        product_name: form.product_name,
+                        size: form.size,
+                        quantity: form.quantity,
+                        total_price: totalPrice,
+                        base_price: originalBasePrice,
+                        promotion_discount: promotionDiscount,
+                        promotion_title: promotion?.title || null,
+                        loyalty_discount: loyaltyDiscount,
+                        customer_address: form.customer_address,
+                        customer_name: form.customer_name
+                      }))}`}
+                      title="Card Payment"
                     style={{
                       width: '100%',
                       height: '900px',

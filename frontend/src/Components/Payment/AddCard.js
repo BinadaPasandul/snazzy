@@ -36,14 +36,14 @@ const AddCard = () => {
 
     try {
       await api.post('/payment/add', { paymentMethodId: paymentMethod.id });
-      setSuccess('✅ Card added successfully!');
+      setSuccess(' Card added successfully!');
       setError(null);
 
       setTimeout(() => {
         navigate('/CardList');
       }, 2000);
     } catch (err) {
-      setError(err.response?.data?.message || '⚠️ Error adding card');
+      setError(err.response?.data?.message || ' Error adding card');
     } finally {
       setIsLoading(false);
     }

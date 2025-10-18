@@ -39,11 +39,13 @@
 
 .om-search {
   margin-top: 8px;
+  
 }
 
 .om-search input {
   width: 400px;
   max-width: 90vw;
+  margin-bottom: 20px;
   padding: 14px 20px;
   border: 2px solid #e2e8f0;
   border-radius: 12px;

@@ -16,6 +16,7 @@ const chatRouter = require('./Routes/chatRoute');
 const orderRoute = require('./Routes/OrderRoute');
 const promotionRouter = require('./Routes/PromotionRoute');
 const contactRouter = require('./Routes/contactRoute');
+const reportRouter = require('./Routes/reportRoute');
 const bodyParser = require('body-parser');
 const ProductRouter = require("./Routes/ProductRoutes");
 
@@ -37,6 +38,7 @@ app.use("/orders",orderRoute);
 app.use("/Promotions", promotionRouter);
 app.use("/products", ProductRouter);
 app.use("/contact", contactRouter);
+app.use('/reports', reportRouter);
 
 
 //database connection link

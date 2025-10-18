@@ -2,7 +2,12 @@ const Stripe = require('stripe');
 const PaymentMethod = require('../Models/PaymentMethod');
 const Payment = require('../Models/Payment');
 const Register = require('../Models/UserModel');
+const sendEmail = require('../utils/sendEmail');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+
+// PDF generation imports
+const { jsPDF } = require('jspdf');
+require('jspdf-autotable');
 
 // Add a card
 exports.addCard = async (req, res) => {
@@ -159,7 +164,7 @@ exports.deleteCard = async (req, res) => {
 // Create payment
 exports.createPayment = async (req, res) => {
   const userId = req.user?.id;
-  const { amount, paymentMethodId } = req.body;
+  const { amount, paymentMethodId, orderData } = req.body;
 
   if (!userId) return res.status(401).json({ message: 'User not authenticated' });
   if (!amount || !paymentMethodId) return res.status(400).json({ message: 'amount & paymentMethodId required' });
@@ -189,6 +194,16 @@ exports.createPayment = async (req, res) => {
     });
     await payment.save();
 
+    // Send PDF invoice email after successful payment
+    if (paymentIntent.status === 'succeeded' && orderData) {
+      try {
+        await sendPDFInvoiceEmail(user, payment, orderData, pm);
+      } catch (emailError) {
+        console.error('PDF Invoice email failed:', emailError);
+        // Don't fail the payment if email fails
+      }
+    }
+
     res.status(200).json({
       message: 'Payment successful',
       payment,
@@ -217,5 +232,172 @@ exports.getPayments = async (req, res) => {
     console.error('Fetch payments error:', err);
     res.status(500).json({ message: 'Server error' });
   }
+};
+
+// Function to generate and send PDF invoice email
+const sendPDFInvoiceEmail = async (user, payment, orderData, paymentMethod) => {
+  const { 
+    product_name, 
+    size, 
+    quantity, 
+    total_price, 
+    base_price, 
+    promotion_discount, 
+    promotion_title,
+    loyalty_discount,
+    customer_address,
+    customer_name
+  } = orderData;
+
+  const invoiceNumber = `INV-${payment._id.toString().slice(-8).toUpperCase()}`;
+  const paymentDate = new Date(payment.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+
+  // Generate PDF
+  const pdfBuffer = await generateInvoicePDF({
+    invoiceNumber,
+    paymentDate,
+    customerName: customer_name || user.name,
+    customerEmail: user.gmail,
+    customerAddress: customer_address,
+    productName: product_name,
+    size: size,
+    quantity: quantity,
+    basePrice: base_price,
+    promotionDiscount: promotion_discount,
+    promotionTitle: promotion_title,
+    loyaltyDiscount: loyalty_discount,
+    totalPrice: total_price,
+    paymentId: payment.stripePaymentId,
+    paymentAmount: payment.amount
+  });
+
+  // Send email with PDF attachment
+  await sendEmailWithPDF({
+    email: user.gmail,
+    subject: `Invoice #${invoiceNumber} - Payment Confirmation`,
+    message: `
+Dear ${customer_name || user.name},
+
+Thank you for your purchase! Your payment has been successfully processed.
+
+Please find your invoice attached as a PDF document.
+
+Invoice Details:
+- Invoice Number: ${invoiceNumber}
+- Payment Date: ${paymentDate}
+- Amount Paid: $${payment.amount.toFixed(2)}
+- Payment Method: Card ending in ${paymentMethod.last4}
+
+Your order is being processed and will be shipped to:
+${customer_address}
+
+Best regards,
+SNAZZY Team
+    `,
+    pdfBuffer: pdfBuffer,
+    filename: `Invoice_${invoiceNumber}.pdf`
+  });
+};
+
+// Function to generate PDF invoice
+const generateInvoicePDF = async (data) => {
+  const doc = new jsPDF();
+  
+  // Header
+  doc.setFontSize(20);
+  doc.setFont(undefined, 'bold');
+  doc.text('SNAZZY', 20, 30);
+  doc.text('INVOICE', 20, 40);
+  
+  // Invoice details
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  doc.text(`Invoice #: ${data.invoiceNumber}`, 20, 55);
+  doc.text(`Date: ${data.paymentDate}`, 20, 60);
+  doc.text(`Payment ID: ${data.paymentId}`, 20, 65);
+  
+  // Customer details
+  doc.text('Bill To:', 20, 80);
+  doc.text(data.customerName, 20, 85);
+  doc.text(data.customerEmail, 20, 90);
+  doc.text(data.customerAddress, 20, 95);
+  
+  // Product details section
+  doc.setFontSize(12);
+  doc.setFont(undefined, 'bold');
+  doc.text('Product Details:', 20, 115);
+  
+  doc.setFontSize(10);
+  doc.setFont(undefined, 'normal');
+  doc.text(`Product: ${data.productName}`, 20, 125);
+  doc.text(`Size: ${data.size}`, 20, 130);
+  doc.text(`Quantity: ${data.quantity}`, 20, 135);
+  doc.text(`Unit Price: $${data.basePrice.toFixed(2)}`, 20, 140);
+  
+  // Draw a simple line
+  doc.line(20, 145, 190, 145);
+  
+  // Calculate totals
+  const subtotal = data.basePrice * data.quantity;
+  let currentY = 155;
+  
+  doc.text(`Subtotal: $${subtotal.toFixed(2)}`, 150, currentY);
+  
+  if (data.promotionDiscount > 0) {
+    currentY += 5;
+    doc.text(`Promotion Discount (${data.promotionTitle}): -$${data.promotionDiscount.toFixed(2)}`, 150, currentY);
+  }
+  
+  if (data.loyaltyDiscount > 0) {
+    currentY += 5;
+    doc.text(`Loyalty Discount: -$${data.loyaltyDiscount.toFixed(2)}`, 150, currentY);
+  }
+  
+  currentY += 10;
+  doc.setFont(undefined, 'bold');
+  doc.text(`Total: $${data.totalPrice.toFixed(2)}`, 150, currentY);
+  
+  // Footer
+  doc.setFont(undefined, 'normal');
+  doc.setFontSize(8);
+  doc.text('Thank you for your business!', 20, currentY + 20);
+  doc.text('For support, contact us at support@snazzy.com', 20, currentY + 25);
+  
+  return doc.output('arraybuffer');
+};
+
+// Function to send email with PDF attachment
+const sendEmailWithPDF = async (options) => {
+  const nodemailer = require("nodemailer");
+  
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  const mailOptions = {
+    from: "Snazzy App <no-reply@snazzy.com>",
+    to: options.email,
+    subject: options.subject,
+    text: options.message,
+    attachments: [
+      {
+        filename: options.filename,
+        content: Buffer.from(options.pdfBuffer),
+        contentType: 'application/pdf'
+      }
+    ]
+  };
+
+  await transporter.sendMail(mailOptions);
 };
 

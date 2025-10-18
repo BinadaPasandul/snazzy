@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Chat = require("../Models/Chat");
-const { askAI } = require("../Utils/aiServices");
+const Payment = require("../Models/Payment");
+const { askAI } = require("../utils/aiServices");
 
 // Helper: Cast paymentId safely
 const castPaymentId = (paymentId) => {
@@ -61,8 +62,21 @@ const adminReply = async (req, res) => {
 
   try {
     const paymentObjectId = castPaymentId(paymentId);
-    const chat = await Chat.findOne({ paymentId: paymentObjectId });
-    if (!chat) return res.status(404).json({ error: "Chat not found" });
+
+    // Find existing chat or create a new one
+    let chat = await Chat.findOne({ paymentId: paymentObjectId });
+    if (!chat) {
+      // Fetch userId from Payment so admin can initiate chat
+      const paymentDoc = await Payment.findById(paymentObjectId);
+      if (!paymentDoc) {
+        return res.status(404).json({ error: "Payment not found" });
+      }
+      chat = new Chat({
+        paymentId: paymentObjectId,
+        userId: paymentDoc.userId, // stored as String in Payment; Chat expects ObjectId ref but allows String cast
+        messages: [],
+      });
+    }
 
     chat.messages.push({
       from: "order_manager",
@@ -78,6 +92,7 @@ const adminReply = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // Get chat history by payment
 const getChatHistory = async (req, res) => {

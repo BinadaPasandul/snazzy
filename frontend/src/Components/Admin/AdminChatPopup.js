@@ -1,6 +1,7 @@
 // AdminChatPopup.js
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import api from "../../utils/api";
+import "./AdminChatPopup.css";
 
 const AdminChatPopup = ({ paymentId, onClose }) => {
   const [messages, setMessages] = useState([]);
@@ -52,74 +53,42 @@ const AdminChatPopup = ({ paymentId, onClose }) => {
   };
 
   return (
-    <div
-      style={{
-        position: "fixed",
-        bottom: 20,
-        right: 20,
-        width: 360,
-        height: 480,
-        backgroundColor: "#fff",
-        border: "1px solid #ccc",
-        borderRadius: 8,
-        display: "flex",
-        flexDirection: "column",
-        zIndex: 1000,
-      }}
-    >
+    <div className="admin-chat-popup">
       {/* Header */}
-      <div
-        style={{
-          padding: 10,
-          borderBottom: "1px solid #ccc",
-          fontWeight: "bold",
-        }}
-      >
+      <div className="admin-chat-header">
         Admin Chat (Payment #{paymentId})
-        <button onClick={onClose} style={{ float: "right" }}>
+        <button onClick={onClose} className="admin-chat-close">
           X
         </button>
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, padding: 10, overflowY: "auto" }}>
+      <div className="admin-chat-messages">
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            style={{
-              marginBottom: 10,
-              display: "flex",
-              justifyContent:
-                msg.from === "user" ? "flex-start" : "flex-end", // user left, admin/AI right
-            }}
+            className={`admin-msg-row ${
+              msg.from === "user" ? "user-msg" : msg.from === "admin" ? "admin-msg" : "ai-msg"
+            }`}
           >
             <div
-              style={{
-                maxWidth: "70%",
-                padding: "6px 12px",
-                borderRadius: 12,
-                backgroundColor:
-                  msg.from === "user"
-                    ? "#d1e7dd" // green for user
-                    : msg.from === "admin"
-                    ? "#f8d7da" // red for admin
-                    : "#cfe2ff", // blue for AI
-                textAlign: "left",
-                wordBreak: "break-word",
-              }}
+              className={`admin-msg ${
+                msg.from === "user"
+                  ? "admin-msg-user"
+                  : msg.from === "admin"
+                  ? "admin-msg-admin"
+                  : "admin-msg-ai"
+              }`}
             >
               {msg.message}
               {msg.fileUrl && msg.fileType?.startsWith("image/") && (
-                <div style={{ marginTop: 5 }}>
-                  <img
-                    src={`${api.defaults.baseURL}${msg.fileUrl}`}
-                    alt="uploaded"
-                    style={{ maxWidth: "150px", borderRadius: 6 }}
-                  />
-                </div>
+                <img
+                  src={`${api.defaults.baseURL}${msg.fileUrl}`}
+                  alt="uploaded"
+                />
               )}
               {msg.from === "ai" && (
-                <div style={{ fontSize: 10, color: "#555" }}>AI</div>
+                <div className="admin-msg-meta">AI</div>
               )}
             </div>
           </div>
@@ -128,13 +97,12 @@ const AdminChatPopup = ({ paymentId, onClose }) => {
       </div>
 
       {/* Input */}
-      <div style={{ padding: 10, borderTop: "1px solid #ccc" }}>
+      <div className="admin-chat-input">
         <input
           type="text"
           placeholder="Type a message..."
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
-          style={{ width: "100%", marginBottom: 5 }}
         />
         <input
           ref={fileInputRef}
@@ -142,10 +110,7 @@ const AdminChatPopup = ({ paymentId, onClose }) => {
           accept="image/*"
           onChange={(e) => setImage(e.target.files[0])}
         />
-        <button
-          onClick={handleSend}
-          style={{ marginTop: 5, width: "100%" }}
-        >
+        <button onClick={handleSend} className="admin-chat-send">
           Send
         </button>
       </div>
