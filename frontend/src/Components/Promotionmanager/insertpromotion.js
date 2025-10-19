@@ -45,7 +45,7 @@ function InsertPromotion() {
 
     // Check if start date is in the past
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    today.setHours(0, 0, 0, 0); 
     const startDateObj = new Date(startDate);
     
     if (startDateObj < today) {

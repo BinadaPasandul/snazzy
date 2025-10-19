@@ -138,10 +138,10 @@ function PromotionDashboard() {
         // Add logo to PDF header
         const img = new Image();
         img.onload = function() {
-            // Add logo (40x40 pixels) in top-left corner
+            
             doc.addImage(img, 'PNG', 10, 10, 10, 10);
             
-            // Set up the document header with logo
+            
             doc.setFontSize(20);
             doc.text('Promotion Dashboard Report', 70, 30);
             
@@ -149,14 +149,14 @@ function PromotionDashboard() {
             doc.text(`Generated on: ${currentDate}`, 70, 45);
             doc.text(`Total Promotions: ${promotions.length}`, 70, 55);
             
-            // Continue with the rest of the PDF generation
+            
             generatePDFContent(doc, currentDate);
         };
         
-        // Fallback if logo fails to load
+        
         img.onerror = function() {
             console.log('Logo failed to load, generating PDF without logo');
-            // Set up the document header without logo
+            
             doc.setFontSize(20);
             doc.text('Promotion Dashboard Report', 20, 30);
             
@@ -164,17 +164,17 @@ function PromotionDashboard() {
             doc.text(`Generated on: ${currentDate}`, 20, 45);
             doc.text(`Total Promotions: ${promotions.length}`, 20, 55);
             
-            // Continue with the rest of the PDF generation
+            
             generatePDFContent(doc, currentDate);
         };
         
         img.src = logo;
     };
 
-    // Separate function for PDF content generation
+    
     const generatePDFContent = (doc, currentDate) => {
         
-        // Calculate summary statistics
+        // Calculate summary statistics to pdf
         const totalPromotionOrders = orders.filter(order => order.has_promotion).length;
         const totalOrders = orders.length;
         const overallConversionRate = totalOrders > 0 ? (totalPromotionOrders / totalOrders) * 100 : 0;
@@ -185,7 +185,7 @@ function PromotionDashboard() {
             .filter(order => order.has_promotion)
             .reduce((sum, order) => sum + (order.promotion_discount || 0), 0);
         
-        // Add summary section (adjusted position for logo)
+        
         doc.setFontSize(14);
         doc.text('Summary Statistics', 20, 75);
         
@@ -255,7 +255,7 @@ function PromotionDashboard() {
             doc.text(`Page ${i} of ${pageCount}`, 20, doc.internal.pageSize.height - 10);
             doc.text('Snazzy Promotion Dashboard Report', doc.internal.pageSize.width - 80, doc.internal.pageSize.height - 10);
             
-            // Add small logo in footer (20x20 pixels)
+            
             try {
                 const footerImg = new Image();
                 footerImg.onload = function() {
