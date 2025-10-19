@@ -2,6 +2,7 @@ const Stripe = require('stripe');
 const Payment = require('../Models/Payment');
 const RefundRequest = require('../Models/RefundRequest');
 const Register = require('../Models/UserModel');
+const Order = require('../Models/OrderModel');
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const { jsPDF } = require('jspdf');
 
@@ -61,6 +62,31 @@ exports.handleRefund = async (req, res) => {
       refundRequest.status = 'approved';
       refundRequest.adminResponse = response || 'Approved';
       await refundRequest.save();
+
+      // Delete the associated order when refund is approved
+      try {
+        // Find order by payment_id since that's how they're linked
+        const orderToDelete = await Order.findOne({ payment_id: refundRequest.paymentId._id });
+        if (orderToDelete) {
+          await Order.findByIdAndDelete(orderToDelete._id);
+          console.log(`Order ${orderToDelete._id} deleted due to refund approval`);
+          
+          // Update user loyalty points when order is deleted
+          if (orderToDelete.userId) {
+            const user = await Register.findById(orderToDelete.userId);
+            if (user) {
+              user.loyaltyPoints = Math.max((user.loyaltyPoints || 0) - 5, 0);
+              await user.save();
+              console.log(`Updated loyalty points for user ${orderToDelete.userId}`);
+            }
+          }
+        } else {
+          console.log(`No order found with payment_id: ${refundRequest.paymentId._id}`);
+        }
+      } catch (orderDeletionError) {
+        console.error('Error deleting order after refund approval:', orderDeletionError);
+        // Don't fail the refund approval if order deletion fails
+      }
 
       // Send approval email with PDF
       try {
