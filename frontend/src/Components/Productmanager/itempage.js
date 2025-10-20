@@ -12,7 +12,7 @@ const DisplayProducts = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   
-  // Filter states
+  // Filter 
   const [filters, setFilters] = useState({
     color: '',
     size: '',
@@ -20,25 +20,25 @@ const DisplayProducts = () => {
     priceRange: [0, 1000]
   });
   
-  // Available filter options
+  // Available filters
   const [filterOptions, setFilterOptions] = useState({
     colors: [],
     sizes: [],
     brands: []
   });
 
-  // Extract filter options from products
+  // Extract filter options
   const extractFilterOptions = (products) => {
     const colors = new Set();
     const sizes = new Set();
     const brands = new Set();
     
     products.forEach(product => {
-      // Extract brand from product name (first word)
+      // Extract brand 
       const brand = product.pname.split(' ')[0];
       brands.add(brand);
       
-      // Extract colors and sizes from variants
+      // Extract colors and sizes
       if (product.variants && product.variants.length > 0) {
         product.variants.forEach(variant => {
           if (variant.color) colors.add(variant.color);
@@ -54,10 +54,10 @@ const DisplayProducts = () => {
     };
   };
 
-  // Filter products based on current filters
+  // Filter products 
   const applyFilters = (products, filters) => {
     return products.filter(product => {
-      // Color filter
+      // Color 
       if (filters.color && product.variants) {
         const hasColor = product.variants.some(variant => 
           variant.color.toLowerCase().includes(filters.color.toLowerCase())
@@ -65,7 +65,7 @@ const DisplayProducts = () => {
         if (!hasColor) return false;
       }
       
-      // Size filter
+      // Size 
       if (filters.size && product.variants) {
         const hasSize = product.variants.some(variant => 
           variant.size === parseInt(filters.size)
@@ -73,13 +73,13 @@ const DisplayProducts = () => {
         if (!hasSize) return false;
       }
       
-      // Brand filter
+      // Brand 
       if (filters.brand) {
         const productBrand = product.pname.split(' ')[0].toLowerCase();
         if (!productBrand.includes(filters.brand.toLowerCase())) return false;
       }
       
-      // Price range filter
+      // Price range
       const price = product.hasActivePromotion ? product.discountedPrice : product.pamount;
       if (price < filters.priceRange[0] || price > filters.priceRange[1]) return false;
       
@@ -123,7 +123,7 @@ const DisplayProducts = () => {
     navigate(`/products/${id}`); 
   };
 
-  // Handle filter changes
+  // filter changes
   const handleFilterChange = (filterType, value) => {
     setFilters(prev => ({
       ...prev,
@@ -142,7 +142,7 @@ const DisplayProducts = () => {
     }));
   };
 
-  // Clear all filters
+  // Clear filters
   const clearFilters = () => {
     setFilters({
       color: '',
