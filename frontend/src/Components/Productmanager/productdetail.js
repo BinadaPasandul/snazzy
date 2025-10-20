@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import api from "../../utils/api";
 import Nav from "../Navbar/nav"; 
 import Footer from "../Footer/Footer";
 import "./ProductDetail.css";
@@ -154,14 +155,49 @@ const ProductDetail = () => {
     });
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!selectedVariant) {
       alert("Please select a size and color first!");
       return;
     }
     
-    // Replace with cart API or global state
-    alert(`${product.pname} (Size ${selectedSize}, ${selectedColor}, Qty: ${quantity}) added to cart!`);
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user) {
+      alert("Please log in to add items to cart!");
+      return;
+    }
+    
+    // Create cart item object
+    const cartItem = {
+      product_id: product._id,
+      pcode: product.pcode,
+      pname: product.pname,
+      pamount: product.pamount,
+      hasActivePromotion: product.hasActivePromotion,
+      discountedPrice: product.discountedPrice,
+      promotion: product.hasActivePromotion ? product.promotion : null,
+      selectedSize: selectedSize,
+      selectedColor: selectedColor,
+      quantity: quantity,
+      variant: selectedVariant,
+      image: product.images && product.images.length > 0 ? product.images[0] : product.image
+    };
+
+    try {
+      const response = await api.post('/cart/add', cartItem);
+      
+      if (response.data) {
+        // Dispatch custom event to update cart count in navbar
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
+        
+        // Show success message
+        alert(`${product.pname} (Size ${selectedSize}, ${selectedColor}, Qty: ${quantity}) added to cart!`);
+      }
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('Failed to add item to cart. Please try again.');
+    }
   };
 
   if (loading) return <p className="loading-state">Loading...</p>;

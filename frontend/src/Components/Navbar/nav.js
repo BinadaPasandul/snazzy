@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import './nav.css';
 import logo from '../../assets/logo.png';
 import profileIcon from '../../assets/profile.jpg';
+import api from '../../utils/api';
 
 function Nav() {
     const navigate = useNavigate();
     const user = JSON.parse(localStorage.getItem('user'));
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [cartItemCount, setCartItemCount] = useState(0);
 
     const handleLogout = () => {
         localStorage.removeItem('user');
@@ -18,6 +20,30 @@ function Nav() {
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
+    // Update cart item count when component mounts or cart changes
+    useEffect(() => {
+        const updateCartCount = async () => {
+            try {
+                const response = await api.get('/cart/count');
+                if (response.data && response.data.itemCount !== undefined) {
+                    setCartItemCount(response.data.itemCount);
+                }
+            } catch (error) {
+                console.error('Error fetching cart count:', error);
+                setCartItemCount(0);
+            }
+        };
+
+        updateCartCount();
+
+        // Listen for custom cart update events
+        window.addEventListener('cartUpdated', updateCartCount);
+
+        return () => {
+            window.removeEventListener('cartUpdated', updateCartCount);
+        };
+    }, []);
 
     return (
         <nav className="navbar">
@@ -79,12 +105,30 @@ function Nav() {
                 <div className="user-section">
                     {user ? (
                         <>
-                            {/* For customers, show greeting, profile icon and logout */}
+                            {/* For customers, show greeting, cart, profile icon and logout */}
                             {user.role === "customer" && (
                                 <>
                                     <div className="customer-greeting">
                                         Hi {user.name}
                                     </div>
+                                    
+                                    {/* Cart Icon */}
+                                    <NavLink 
+                                        to="/cart" 
+                                        className={({ isActive }) => (isActive ? "active" : "")}
+                                    >
+                                        <div className="cart-icon-container">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                <circle cx="9" cy="21" r="1"></circle>
+                                                <circle cx="20" cy="21" r="1"></circle>
+                                                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                            </svg>
+                                            {cartItemCount > 0 && (
+                                                <span className="cart-badge">{cartItemCount}</span>
+                                            )}
+                                        </div>
+                                    </NavLink>
+                                    
                                     <NavLink 
                                         to="/userdetails" 
                                         className={({ isActive }) => (isActive ? "active" : "")}
@@ -109,6 +153,21 @@ function Nav() {
                     ) : (
                         <>
                             {/* Public links */}
+                            <NavLink 
+                                to="/cart" 
+                                className={({ isActive }) => (isActive ? "active" : "")}
+                            >
+                                <div className="cart-icon-container">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <circle cx="9" cy="21" r="1"></circle>
+                                        <circle cx="20" cy="21" r="1"></circle>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                    </svg>
+                                    {cartItemCount > 0 && (
+                                        <span className="cart-badge">{cartItemCount}</span>
+                                    )}
+                                </div>
+                            </NavLink>
                             <NavLink 
                                 to="/login" 
                                 className={({ isActive }) => (isActive ? "active" : "")}
