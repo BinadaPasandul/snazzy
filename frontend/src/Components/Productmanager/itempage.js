@@ -177,7 +177,7 @@ const DisplayProducts = () => {
       <section className="filter-section8">
         <div className="container8">
           <div className="filter-container8">
-            <h3 className="filter-title8">Filter Products</h3>
+            <h3 className="filter-title8">Filter Shoes</h3>
             
             <div className="filter-grid8">
               {/* Brand Filter */}
@@ -271,8 +271,8 @@ const DisplayProducts = () => {
       <section className="products-section8">
         <div className="container8">
           <div className="section-header8">
-            <h2 className="section-title8">Shop All Products</h2>
-            <p className="section-subtitle8">Find the perfect items for your lifestyle</p>
+            <h2 className="section-title8">All from SNAZZY</h2>
+            <p className="section-subtitle8">Find the perfect fit for your lifestyle</p>
           </div>
           
           <div className="products-grid8">
