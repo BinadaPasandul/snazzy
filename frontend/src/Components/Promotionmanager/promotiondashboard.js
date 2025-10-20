@@ -17,6 +17,12 @@ function PromotionDashboard() {
     const [filteredPromotions, setFilteredPromotions] = useState([]);
     const navigate = useNavigate();
 
+    // Report generation state
+    const now = new Date();
+    const [reportType, setReportType] = useState("month");
+    const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
+    const [selYear, setSelYear] = useState(now.getFullYear());
+
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
@@ -129,19 +135,129 @@ function PromotionDashboard() {
         navigate(`/EditPromotion/${promotion._id}`);
     };
 
+    // Filter promotions by selected month/year
+    const filterPromotionsByPeriod = (promotions, reportType, year, month) => {
+        return promotions.filter(promotion => {
+            const startDate = new Date(promotion.startDate);
+            const endDate = new Date(promotion.endDate);
+            const startYear = startDate.getFullYear();
+            const startMonth = startDate.getMonth() + 1;
+            const endYear = endDate.getFullYear();
+            const endMonth = endDate.getMonth() + 1;
+
+            if (reportType === "year") {
+                // Check if promotion was active during the selected year
+                return (startYear <= year && endYear >= year);
+            } else {
+                // Check if promotion was active during the selected month/year
+                return (startYear < year || (startYear === year && startMonth <= month)) &&
+                       (endYear > year || (endYear === year && endMonth >= month));
+            }
+        });
+    };
+
     const generatePDF = () => {
-        const doc = new jsPDF();
-        const currentDate = new Date().toLocaleDateString();
+        try {
+            console.log("Starting PDF generation...");
+            console.log("Report type:", reportType, "Year:", selYear, "Month:", selMonth);
+            console.log("Total promotions:", promotions.length);
+            
+            const isYear = reportType === "year";
+            
+            // Validate inputs
+            if (!promotions || !Array.isArray(promotions)) {
+                console.error("Promotions data is not available or invalid");
+                alert("No promotions data available. Please refresh the page and try again.");
+                return;
+            }
+
+            if (!selYear || selYear < 1900 || selYear > 3000) {
+                console.error("Invalid year:", selYear);
+                alert("Please select a valid year.");
+                return;
+            }
+
+            if (!isYear && (!selMonth || selMonth < 1 || selMonth > 12)) {
+                console.error("Invalid month:", selMonth);
+                alert("Please select a valid month.");
+                return;
+            }
+            
+            // Filter promotions by selected period
+            const filteredPromotions = filterPromotionsByPeriod(promotions, reportType, selYear, selMonth);
+            console.log("Filtered promotions count:", filteredPromotions.length);
+
+            if (filteredPromotions.length === 0) {
+                const periodText = isYear ? `year ${selYear}` : `month ${new Date(selYear, selMonth - 1).toLocaleString("default", { month: "long" })} ${selYear}`;
+                alert(`No promotions found for ${periodText}`);
+                return;
+            }
+
+            // Create professional PDF
+            console.log("Creating PDF document...");
+            const doc = new jsPDF('landscape', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.width;
+            
+            // Professional Header
+            doc.setFillColor(31, 41, 55);
+            doc.rect(0, 0, pageWidth, 35, "F");
+            
+            // Company title
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(20);
+            doc.setFont('helvetica', 'bold');
+            doc.text("SNAZZY", 20, 15);
+            
+            // Report title
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'normal');
+            doc.text("Promotion Management Report", 20, 22);
+            
+            // Generation timestamp
+            doc.setFontSize(10);
+            const generatedDate = new Date();
+            doc.text(`Generated: ${generatedDate.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit' 
+            })}`, pageWidth - 80, 15);
+            
+            // Period indicator badge
+            const monthName = new Date(selYear, selMonth - 1).toLocaleString("default", { month: "long" });
+            doc.setFillColor(59, 130, 246);
+            doc.setDrawColor(59, 130, 246);
+            doc.roundedRect(pageWidth - 60, 20, 45, 12, 3, 3, "FD");
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            
+            if (isYear) {
+                doc.text(`${selYear}`, pageWidth - 37, 28, { align: "center" });
+            } else {
+                doc.text(
+                    `${monthName.slice(0, 3)} ${selYear}`,
+                    pageWidth - 37,
+                    28,
+                    { align: "center" }
+                );
+            }
+
+            // Continue with the rest of the PDF generation
+            generatePDFContent(doc, new Date().toLocaleDateString(), filteredPromotions, isYear, selYear, selMonth, monthName);
+
+        } catch (err) {
+            console.error("Promotion report generation failed", err);
+            console.error("Error stack:", err.stack);
+            alert(`Failed to generate promotion report: ${err.message}`);
+        }
+    };
+
+    // Separate function for PDF content generation
+    const generatePDFContent = (doc, currentDate, filteredPromotions, isYear, selYear, selMonth, monthName) => {
         
-        // Set up the document
-        doc.setFontSize(20);
-        doc.text('Promotion Dashboard Report', 20, 30);
-        
-        doc.setFontSize(12);
-        doc.text(`Generated on: ${currentDate}`, 20, 45);
-        doc.text(`Total Promotions: ${promotions.length}`, 20, 55);
-        
-        // Calculate summary statistics
+        // Calculate summary statistics for filtered promotions
         const totalPromotionOrders = orders.filter(order => order.has_promotion).length;
         const totalOrders = orders.length;
         const overallConversionRate = totalOrders > 0 ? (totalPromotionOrders / totalOrders) * 100 : 0;
@@ -151,17 +267,73 @@ function PromotionDashboard() {
         const totalDiscountGiven = orders
             .filter(order => order.has_promotion)
             .reduce((sum, order) => sum + (order.promotion_discount || 0), 0);
+
+        // Calculate promotion-specific metrics
+        const activePromotions = filteredPromotions.filter(p => {
+            const now = new Date();
+            const startDate = new Date(p.startDate);
+            const endDate = new Date(p.endDate);
+            return now >= startDate && now <= endDate;
+        }).length;
+
+        const upcomingPromotions = filteredPromotions.filter(p => {
+            const now = new Date();
+            const startDate = new Date(p.startDate);
+            return startDate > now;
+        }).length;
+
+        const expiredPromotions = filteredPromotions.filter(p => {
+            const now = new Date();
+            const endDate = new Date(p.endDate);
+            return endDate < now;
+        }).length;
+
+        // Report Overview Section
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        let y = 50;
         
-        // Add summary section
+        // Report period and title
+        doc.text(`Report Period: ${isYear ? `${selYear} (Full Year)` : `${monthName} ${selYear}`}`, 20, y);
+        y += 15;
+        
+        // Summary Statistics Section
         doc.setFontSize(14);
-        doc.text('Summary Statistics', 20, 75);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(0, 0, 0);
+        doc.text('Summary Statistics', 20, y);
+        y += 20;
         
-        doc.setFontSize(10);
-        doc.text(`Total Promotion Orders: ${totalPromotionOrders}`, 20, 85);
-        doc.text(`Overall Conversion Rate: ${overallConversionRate.toFixed(1)}%`, 20, 95);
-        doc.text(`Total Promotion Revenue: $${totalPromotionRevenue.toFixed(2)}`, 20, 105);
-        doc.text(`Total Discounts Given: $${totalDiscountGiven.toFixed(2)}`, 20, 115);
+        // Display metrics in simple black and white format
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(0, 0, 0);
         
+        doc.text(`Total Promotions: ${filteredPromotions.length}`, 20, y);
+        y += 15;
+        
+        doc.text(`Active Promotions: ${activePromotions}`, 20, y);
+        y += 15;
+        
+        doc.text(`Upcoming Promotions: ${upcomingPromotions}`, 20, y);
+        y += 15;
+        
+        doc.text(`Expired Promotions: ${expiredPromotions}`, 20, y);
+        y += 15;
+        
+        doc.text(`Total Promotion Orders: ${totalPromotionOrders}`, 20, y);
+        y += 15;
+        
+        doc.text(`Overall Conversion Rate: ${overallConversionRate.toFixed(1)}%`, 20, y);
+        y += 15;
+        
+        doc.text(`Total Promotion Revenue: $${totalPromotionRevenue.toFixed(2)}`, 20, y);
+        y += 15;
+        
+        doc.text(`Total Discounts Given: $${totalDiscountGiven.toFixed(2)}`, 20, y);
+        y += 25;
+
         // Prepare data for the table
         const tableData = filteredPromotions.map(promotion => {
             const product = getProductByCode(promotion.productId);
@@ -187,17 +359,40 @@ function PromotionDashboard() {
         
         // Add promotions table
         doc.setFontSize(14);
-        doc.text('Promotions Details', 20, 135);
-        
+        doc.text('Promotions Details', 20, y);
+        y += 15;
+
+        // Generate the table with professional styling
         autoTable(doc, {
-            startY: 145,
             head: [['Title', 'Product', 'Code', 'Discount', 'Original Price', 'Discounted Price', 'Start Date', 'End Date', 'Orders', 'Conversion', 'Revenue', 'Avg Order']],
             body: tableData,
-            styles: { fontSize: 8 },
-            headStyles: { fillColor: [41, 128, 185] },
-            alternateRowStyles: { fillColor: [245, 245, 245] },
-            margin: { left: 20, right: 20 },
-            tableWidth: 'auto',
+            startY: y,
+            theme: 'grid',
+            styles: {
+                fontSize: 9,
+                cellPadding: { top: 4, right: 4, bottom: 4, left: 4 },
+                lineColor: [215, 215, 215],
+                lineWidth: 0.5,
+                textColor: [45, 55, 72],
+                valign: 'middle',
+                halign: 'left',
+                font: 'helvetica'
+            },
+            headStyles: {
+                fillColor: [31, 41, 55],
+                textColor: [255, 255, 255],
+                fontStyle: 'bold',
+                fontSize: 10,
+                valign: 'middle'
+            },
+            bodyStyles: {
+                fontSize: 8,
+                lineColor: [229, 229, 229],
+                lineWidth: 0.3
+            },
+            alternateRowStyles: {
+                fillColor: [249, 250, 251]
+            },
             columnStyles: {
                 0: { cellWidth: 25 },
                 1: { cellWidth: 20 },
@@ -211,9 +406,23 @@ function PromotionDashboard() {
                 9: { cellWidth: 12 },
                 10: { cellWidth: 15 },
                 11: { cellWidth: 15 }
+            },
+            margin: { left: 20, right: 20 },
+            pageBreak: 'auto',
+            showHead: 'everyPage',
+            didDrawPage: (data) => {
+                try {
+                    // Add page numbers with better styling
+                    doc.setFontSize(8);
+                    doc.setTextColor(128, 128, 128);
+                    const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
+                    doc.text(`Page ${pageNum}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 15);
+                } catch (pageError) {
+                    console.error("Error adding page number:", pageError);
+                }
             }
         });
-        
+
         // Add footer
         const pageCount = doc.internal.getNumberOfPages();
         for (let i = 1; i <= pageCount; i++) {
@@ -224,7 +433,9 @@ function PromotionDashboard() {
         }
         
         // Save the PDF
-        doc.save(`promotion-dashboard-report-${currentDate.replace(/\//g, '-')}.pdf`);
+        const periodStr = isYear ? selYear.toString() : `${selYear}_${selMonth.toString().padStart(2, '0')}`;
+        const filename = `Promotion_Report_${periodStr}.pdf`;
+        doc.save(filename);
     };
 
     return (
@@ -243,13 +454,6 @@ function PromotionDashboard() {
                             onClick={() => navigate('/insertpromotion')} 
                         >
                             Add Promotion
-                        </button>
-                        <button 
-                            className="pdf-export-btn5"
-                            onClick={generatePDF}
-                            disabled={loading || promotions.length === 0}
-                        >
-                            📄 Export PDF
                         </button>
                     </div>
                 </div>
@@ -285,6 +489,86 @@ function PromotionDashboard() {
                                 </button>
                             )}
                         </div>
+                    </div>
+                </div>
+
+                {/* Report Filters */}
+                <div className="promotion-report-filters5">
+                    <div className="promotion-report-header5">
+                        <h3 className="promotion-report-title5">Generate Report</h3>
+                        <div className="promotion-report-info5">
+                            <span className="report-info5">
+                                Select period for detailed promotion analysis
+                            </span>
+                        </div>
+                    </div>
+                    <div className="promotion-report-controls5">
+                        <div className="report-filter-group5">
+                            <label className="report-filter-label5">Report Type:</label>
+                            <select
+                                className="report-filter-select5"
+                                value={reportType}
+                                onChange={(e) => setReportType(e.target.value)}
+                            >
+                                <option value="month">Monthly</option>
+                                <option value="year">Yearly</option>
+                            </select>
+                        </div>
+
+                        {reportType === "month" && (
+                            <>
+                                <div className="report-filter-group5">
+                                    <label className="report-filter-label5">Month:</label>
+                                    <select
+                                        className="report-filter-select5"
+                                        value={selMonth}
+                                        onChange={(e) => setSelMonth(Number(e.target.value))}
+                                    >
+                                        {Array.from({ length: 12 }).map((_, idx) => (
+                                            <option key={idx + 1} value={idx + 1}>
+                                                {new Date(2000, idx).toLocaleString("default", {
+                                                    month: "long",
+                                                })}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="report-filter-group5">
+                                    <label className="report-filter-label5">Year:</label>
+                                    <input
+                                        className="report-filter-input5"
+                                        type="number"
+                                        value={selYear}
+                                        onChange={(e) => setSelYear(Number(e.target.value))}
+                                        min="2020"
+                                        max="2030"
+                                    />
+                                </div>
+                            </>
+                        )}
+
+                        {reportType === "year" && (
+                            <div className="report-filter-group5">
+                                <label className="report-filter-label5">Year:</label>
+                                <input
+                                    className="report-filter-input5"
+                                    type="number"
+                                    value={selYear}
+                                    onChange={(e) => setSelYear(Number(e.target.value))}
+                                    min="2020"
+                                    max="2030"
+                                />
+                            </div>
+                        )}
+
+                        <button
+                            className="promotion-pdf-export-btn5"
+                            onClick={generatePDF}
+                            disabled={loading || promotions.length === 0}
+                        >
+                            📄 Export PDF Report
+                        </button>
                     </div>
                 </div>
 

@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Nav from '../Navbar/nav';
 import Footer from '../Footer/Footer';
+import PromotionBanner from '../PromotionBanner/PromotionBanner';
 import './Home.css';
 import api from '../../utils/api';
 
@@ -68,6 +69,7 @@ function Home() {
 	return (
 		<div className="home-container">
 			<Nav />
+			<PromotionBanner />
 
 			{/* Hero Section with Search */}
 			<section className="hero-section">

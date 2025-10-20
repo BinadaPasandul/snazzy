@@ -20,10 +20,10 @@ function OrderManager() {
     status: "Packing", 
   });
 
-  // Report generation state
+  // Report filter management
   const now = new Date();
   const [reportType, setReportType] = useState("month");
-  const [selMonth, setSelMonth] = useState(now.getMonth() + 1);
+  const [selMonth, setSelMonth] = useState(now.getMonth() + 1);//get the filters as year and monthly wise
   const [selYear, setSelYear] = useState(now.getFullYear());
 
   
@@ -98,7 +98,7 @@ function OrderManager() {
   useEffect(() => {
     fetchOrders();
     
-    // Set up periodic refresh to detect order deletions from refund approvals
+    // Set up refresh to detect order deletions from refund approvals
     const refreshInterval = setInterval(() => {
       fetchOrders();
     }, 30000); // Refresh every 30 seconds
@@ -227,7 +227,7 @@ function OrderManager() {
       }
     });
   };
-
+  //pdf generating part 
   const generatePDF = () => {
     try {
       console.log("Starting PDF generation...");
@@ -270,11 +270,11 @@ function OrderManager() {
       const doc = new jsPDF('landscape', 'mm', 'a4');
       const pageWidth = doc.internal.pageSize.width;
       
-      // Professional Header
+      
       doc.setFillColor(31, 41, 55);
       doc.rect(0, 0, pageWidth, 35, "F");
       
-      // Company title
+      
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
@@ -283,7 +283,7 @@ function OrderManager() {
       // Report title
       doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
-      doc.text("Orders Management Report", 20, 22);
+      doc.text("Orders Report", 20, 22);
       
       // Generation timestamp
       doc.setFontSize(10);
@@ -337,7 +337,7 @@ function OrderManager() {
       const promotionOrders = filteredOrders.filter(order => order?.has_promotion).length;
       const loyaltyOrders = filteredOrders.filter(order => order?.used_loyalty_points).length;
 
-      // Beautiful Report Overview Section
+    
       doc.setTextColor(31, 41, 55);
       doc.setFontSize(12);
       doc.setFont('helvetica', 'bold');
@@ -347,75 +347,35 @@ function OrderManager() {
       doc.text(`Report Period: ${isYear ? `${selYear} (Full Year)` : `${monthName} ${selYear}`}`, 20, y);
       y += 12;
       
-      // Create a beautiful highlights section with cards
-      const highlightCards = [
+      
+      const highlightItems = [
         { 
           title: "Total Orders", 
           value: filteredOrders.length.toString(), 
-          color: [59, 130, 246], 
-          bgColor: [239, 246, 255] 
+          color: [59, 130, 246]
         },
         { 
           title: "Total Revenue", 
           value: `$${totalRevenue.toFixed(2)}`, 
-          color: [34, 197, 94], 
-          bgColor: [240, 253, 244] 
+          color: [34, 197, 94]
         },
         { 
           title: "Total Discounts", 
           value: `$${totalDiscounts.toFixed(2)}`, 
-          color: [251, 146, 60], 
-          bgColor: [255, 247, 237] 
+          color: [251, 146, 60]
         },
         { 
           title: "Promotion Orders", 
           value: promotionOrders.toString(), 
-          color: [168, 85, 247], 
-          bgColor: [250, 245, 255] 
+          color: [168, 85, 247]
         },
         { 
           title: "Loyalty Orders", 
           value: loyaltyOrders.toString(), 
-          color: [251, 191, 36], 
-          bgColor: [255, 251, 235] 
+          color: [251, 191, 36]
         }
       ];
 
-      // Function to create a highlight card
-      const createHighlightCard = (card, x, yPos) => {
-        const cardWidth = 90;
-        const cardHeight = 40;
-        
-        // Card background with rounded corners effect
-        doc.setFillColor(card.bgColor[0], card.bgColor[1], card.bgColor[2]);
-        doc.setDrawColor(229, 231, 235);
-        doc.roundedRect(x, yPos, cardWidth, cardHeight, 4, 4, "FD");
-        
-        // Card border
-        doc.setDrawColor(229, 231, 235);
-        doc.setLineWidth(0.8);
-        doc.roundedRect(x, yPos, cardWidth, cardHeight, 4, 4, "S");
-        
-        // Title (centered)
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(100, 116, 139);
-        
-        // Center the title text
-        const titleWidth = doc.getTextWidth(card.title);
-        const titleX = x + (cardWidth - titleWidth) / 2;
-        doc.text(card.title, titleX, yPos + 15);
-        
-        // Value (centered and larger)
-        doc.setFontSize(16);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(card.color[0], card.color[1], card.color[2]);
-        
-        // Center the value text
-        const valueWidth = doc.getTextWidth(card.value);
-        const valueX = x + (cardWidth - valueWidth) / 2;
-        doc.text(card.value, valueX, yPos + 32);
-      };
 
       // Title for highlights section
       doc.setFontSize(14);
@@ -424,25 +384,48 @@ function OrderManager() {
       doc.text("Report Highlights", 20, y);
       y += 20;
 
-      // Create highlight cards in a grid
-      const startX = 20;
-      const cardSpacing = 100;
-      const cardsPerRow = 2;
+      // Create a subtle background for highlights section
+      const highlightsBoxHeight = (highlightItems.length * 25) + 20;
+      doc.setFillColor(248, 250, 252);
+      doc.rect(20, y - 10, pageWidth - 40, highlightsBoxHeight, "F");
       
-      highlightCards.forEach((card, index) => {
-        const row = Math.floor(index / cardsPerRow);
-        const col = index % cardsPerRow;
-        const x = startX + (col * cardSpacing);
-        const yCard = y + (row * 45);
+     
+      doc.setDrawColor(59, 130, 246);
+      doc.setLineWidth(3);
+      doc.line(20, y - 10, 20, y + highlightsBoxHeight - 10);
+
+      
+      highlightItems.forEach((item, index) => {
+        const itemY = y + (index * 25);
         
-        createHighlightCard(card, x, yCard);
+       
+        if (index > 0) {
+          doc.setDrawColor(229, 231, 235);
+          doc.setLineWidth(0.5);
+          doc.line(30, itemY - 8, pageWidth - 30, itemY - 8);
+        }
+        
+        
+        doc.setFontSize(11);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(71, 85, 105);
+        doc.text(item.title, 35, itemY);
+        
+        
+        doc.setFontSize(13);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+        
+        
+        const valueWidth = doc.getTextWidth(item.value);
+        const valueX = (pageWidth - 30) - valueWidth;
+        doc.text(item.value, valueX, itemY);
       });
 
-      // Update y position after cards
-      const totalRows = Math.ceil(highlightCards.length / cardsPerRow);
-      y = y + (totalRows * 45) + 25;
+      
+      y = y + (highlightItems.length * 25) + 30;
 
-      // Status breakdown section with beautiful styling
+      
       doc.setFillColor(249, 250, 251);
       doc.roundedRect(20, y, pageWidth - 40, 45, 5, 5, "F");
       doc.setDrawColor(229, 231, 235);
