@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import logo from "../../assets/logo.png";
 
 const DisplayProducts = () => {
   const [products, setProducts] = useState([]);
@@ -124,14 +125,39 @@ const DisplayProducts = () => {
   // Generate PDF
   const generatePDF = () => {
     const doc = new jsPDF();
-    
-    
-    doc.setFontSize(20);
-    doc.text("Product Inventory Report", 14, 22);
-    
-    
+    // Colors aligned with Admin header style
+    const brandColor = [102, 126, 234]; // #667eea
+    const textGray = [45, 55, 72]; // #2d3748
+
+    // Header with logo + title (similar to Admin.js)
+    try {
+      // logo at left
+      doc.addImage(logo, 'PNG', 14, 10, 16, 16);
+    } catch (e) {
+      // ignore if logo load fails
+    }
+
+    // SNAZZY brand title
+    doc.setTextColor(...brandColor);
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('SNAZZY', 34, 22);
+
+    // Report title
+    doc.setTextColor(...textGray);
+    doc.setFontSize(16);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Product Inventory Report', 14, 36);
+
+    // Date line
     doc.setFontSize(10);
-    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+    doc.setTextColor(113, 128, 150); // #718096
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 42);
+
+    // Divider line under header
+    doc.setDrawColor(...brandColor);
+    doc.setLineWidth(0.75);
+    doc.line(14, 46, 196, 46);
     
     
     const totalProducts = products.length;
@@ -147,13 +173,17 @@ const DisplayProducts = () => {
     }, 0);
 
     // summary 
+    doc.setTextColor(...textGray);
     doc.setFontSize(12);
-    doc.text("Summary:", 14, 45);
+    doc.setFont('helvetica', 'bold');
+    doc.text("Summary:", 14, 56);
     
+    doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.text(`Total Products: ${totalProducts}`, 14, 55);
-    doc.text(`Total Variants: ${totalVariants}`, 14, 63);
-    doc.text(`Total Stock: ${totalStock}`, 14, 71);
+    doc.setTextColor(55, 65, 81); // #374151
+    doc.text(`Total Products: ${totalProducts}`, 14, 64);
+    doc.text(`Total Variants: ${totalVariants}`, 14, 70);
+    doc.text(`Total Stock: ${totalStock}`, 14, 76);
     
     // table data
     const tableData = products.map(product => {
@@ -187,13 +217,13 @@ const DisplayProducts = () => {
     autoTable(doc, {
       head: [columns],
       body: tableData,
-      startY: 85, 
+      startY: 88, 
       styles: {
         fontSize: 8,
         cellPadding: 3,
       },
       headStyles: {
-        fillColor: [79, 70, 229], 
+        fillColor: brandColor, 
         textColor: 255,
         fontStyle: 'bold',
       },
