@@ -19,11 +19,85 @@ const Signup = () => {
     const [error, setError] = useState(null);
     const [passwordError, setPasswordError] = useState("");
     const [ageError, setAgeError] = useState("");
+    const [nameError, setNameError] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [addressError, setAddressError] = useState("");
 
     
+    // Name validation - only letters and spaces
+    const validateName = (name) => {
+        if (!name || !name.trim()) {
+            return "Name is required";
+        }
+        if (!/^[a-zA-Z\s]+$/.test(name)) {
+            return "Name can only contain letters and spaces";
+        }
+        if (name.trim().length < 2) {
+            return "Name must be at least 2 characters long";
+        }
+        if (name.trim().length > 50) {
+            return "Name must be less than 50 characters";
+        }
+        return "";
+    };
+
+    // Email validation
+    const validateEmail = (email) => {
+        if (!email || !email.trim()) {
+            return "Email is required";
+        }
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return "Please enter a valid email address";
+        }
+        if (email.length > 100) {
+            return "Email must be less than 100 characters";
+        }
+        return "";
+    };
+
+    // Address validation
+    const validateAddress = (address) => {
+        if (!address || !address.trim()) {
+            return "Address is required";
+        }
+        if (address.trim().length < 5) {
+            return "Address must be at least 5 characters long";
+        }
+        if (address.trim().length > 200) {
+            return "Address must be less than 200 characters";
+        }
+        return "";
+    };
+
+    // Age validation
+    const validateAge = (age) => {
+        if (!age || age === "") {
+            return "Age is required";
+        }
+        const ageNum = parseInt(age);
+        if (isNaN(ageNum)) {
+            return "Age must be a valid number";
+        }
+        if (ageNum < 1) {
+            return "Age must be greater than 0";
+        }
+        if (ageNum > 120) {
+            return "Age must be less than 120";
+        }
+        return "";
+    };
+
+    // Password validation
     const validatePassword = (password) => {
+        if (!password) {
+            return "Password is required";
+        }
         if (password.length < 5) {
             return "Password must be at least 5 characters long";
+        }
+        if (password.length > 50) {
+            return "Password must be less than 50 characters";
         }
         if (!/[A-Z]/.test(password)) {
             return "Password must contain at least one uppercase letter";
@@ -41,17 +115,29 @@ const Signup = () => {
         const { name, value } = e.target;
         setUser((prevUser) => ({ ...prevUser, [name]: value }));
         
+        // Clear general error when user starts typing
+        setError(null);
         
+        // Real-time validation for each field
+        if (name === "name") {
+            const validationError = validateName(value);
+            setNameError(validationError);
+        }
+        if (name === "gmail") {
+            const validationError = validateEmail(value);
+            setEmailError(validationError);
+        }
         if (name === "password") {
             const validationError = validatePassword(value);
             setPasswordError(validationError);
         }
         if (name === "age") {
-            if (value < 1) {
-                setAgeError("Age must be greater than 0");
-            } else {
-                setAgeError("");
-            }
+            const validationError = validateAge(value);
+            setAgeError(validationError);
+        }
+        if (name === "address") {
+            const validationError = validateAddress(value);
+            setAddressError(validationError);
         }
     };
 
@@ -59,20 +145,24 @@ const Signup = () => {
         e.preventDefault();
         setError(null);
 
-        
-        if (!user.name || !user.gmail || !user.password || !user.age || !user.address) {
-            setError("All fields are required");
-            return;
-        }
-
-        
+        // Validate all fields
+        const nameValidationError = validateName(user.name);
+        const emailValidationError = validateEmail(user.gmail);
         const passwordValidationError = validatePassword(user.password);
-        if (passwordValidationError) {
-            setPasswordError(passwordValidationError);
-            return;
-        }
-        if (user.age < 1) {
-            setAgeError("Age must be greater than 0");
+        const ageValidationError = validateAge(user.age);
+        const addressValidationError = validateAddress(user.address);
+
+        // Set all validation errors
+        setNameError(nameValidationError);
+        setEmailError(emailValidationError);
+        setPasswordError(passwordValidationError);
+        setAgeError(ageValidationError);
+        setAddressError(addressValidationError);
+
+        // Check if any validation failed
+        if (nameValidationError || emailValidationError || passwordValidationError || 
+            ageValidationError || addressValidationError) {
+            setError("Please fix all validation errors before submitting");
             return;
         }
 
@@ -142,7 +232,13 @@ const Signup = () => {
                                         required
                                         className="signup-input"
                                         placeholder="Enter your full name"
+                                        style={nameError ? { borderColor: '#dc3545' } : {}}
                                     />
+                                    {nameError && (
+                                        <div className="name-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                                            {nameError}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="signup-form-group">
@@ -156,7 +252,13 @@ const Signup = () => {
                                         required
                                         className="signup-input"
                                         placeholder="Enter your email address"
+                                        style={emailError ? { borderColor: '#dc3545' } : {}}
                                     />
+                                    {emailError && (
+                                        <div className="email-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                                            {emailError}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="signup-form-group">
@@ -194,11 +296,14 @@ const Signup = () => {
                                         className="signup-input"
                                         placeholder="Enter your age"
                                         min="1"
-                                   style={ageError ? { borderColor: '#dc3545' } : {}}
-                            />
-                            {ageError && (
-                                <div style={{ color: '#dc3545', fontSize: '0.875rem' }}>{ageError}</div>
-                            )}
+                                        max="120"
+                                        style={ageError ? { borderColor: '#dc3545' } : {}}
+                                    />
+                                    {ageError && (
+                                        <div className="age-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                                            {ageError}
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div className="signup-form-group">
@@ -212,7 +317,13 @@ const Signup = () => {
                                         required
                                         className="signup-input"
                                         placeholder="Enter your address"
+                                        style={addressError ? { borderColor: '#dc3545' } : {}}
                                     />
+                                    {addressError && (
+                                        <div className="address-error" style={{ color: '#dc3545', fontSize: '0.875rem', marginTop: '4px' }}>
+                                            {addressError}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {error && <p className="signup-error">{error}</p>}
