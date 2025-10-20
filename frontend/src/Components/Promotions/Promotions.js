@@ -11,7 +11,7 @@ function Promotions() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  const BACKEND_URL = 'http://localhost:5000'; // Your backend host
+  const BACKEND_URL = 'http://localhost:5000'; 
 
   const fetchPromotions = async () => {
     setLoading(true);
@@ -29,7 +29,7 @@ function Promotions() {
   // Handle navigation to ProductDetail page based on product code
   const handleViewDetails = async (promotion) => {
     try {
-      // If promotion has productId (which is actually pcode), find the real product _id
+      
       if (promotion.productId) {
         const response = await axios.get(`${BACKEND_URL}/products`);
         const products = response.data.products || [];

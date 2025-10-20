@@ -69,7 +69,6 @@ const addUsers = async (req, res, next) => {
   }
 };
 
-
 const getAllUsers = async (req, res, next) => {
     try {
         const users = await Register.find().select("-password");
@@ -83,6 +82,7 @@ const getAllUsers = async (req, res, next) => {
     }
 };
 
+// Get user by ID - includes loyalty points
 const getById = async (req, res, next) => {
     const id = req.params.id;
 
@@ -331,7 +331,7 @@ const exportUsersPdf = async (req, res, next) => {
 
 const Order = require("../Models/OrderModel");
 
-// ...existing code...
+
 
 // Utility: Update loyalty points for a user
 const updateLoyaltyPoints = async (userId) => {

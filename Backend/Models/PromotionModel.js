@@ -9,14 +9,14 @@ const PromotionSchema = new Schema({
     },
     productId: {
         type: String,
-        required:true
+        required:true //validate
     },
     description: { 
         type: String  
     },
     discount: { 
         type: Number, 
-        required: true 
+        required: true   //validate
     },
     startDate: { 
         type: Date, 

@@ -187,7 +187,14 @@ function Checkout() {
     }
   };
 
-  //  Check if all required fields are completed
+  // ✅ derived value for total price with both promotion and loyalty discounts
+  const originalBasePrice = originalPrice ? form.quantity * originalPrice : (productPrice ? form.quantity * productPrice : 0);
+  const promotionDiscount = hasPromotion ? originalBasePrice * (promotion?.discount / 100) : 0;
+  const priceAfterPromotion = originalBasePrice - promotionDiscount;
+  const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0; // 5% discount on price after promotion
+  const totalPrice = priceAfterPromotion - loyaltyDiscount;
+  
+  // ✅ Check if all required fields are completed
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
 
   return (
