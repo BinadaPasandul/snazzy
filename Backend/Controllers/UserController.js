@@ -62,6 +62,19 @@ const addUsers = async (req, res, next) => {
     });
 
     await user.save();
+
+    // Send welcome email (fire-and-forget; does not block response)
+    try {
+      await sendEmail({
+        email: gmail,
+        subject: "Welcome to Snazzy!",
+        message: `Hi ${name},\n\nWelcome to Snazzy! Your account has been created successfully.\n\nHere are a few tips to get started:\n- Browse products and add items to your cart\n- Track your orders in your account\n- Reach out via Contact Us if you need help\n\nThanks for joining us!\n\n— The Snazzy Team`
+      });
+    } catch (emailErr) {
+      // Log email failure but do not fail signup
+      console.error("Failed to send welcome email:", emailErr);
+    }
+
     return res.status(201).json({ message: "ok", user });
   } catch (err) {
     console.error(err);

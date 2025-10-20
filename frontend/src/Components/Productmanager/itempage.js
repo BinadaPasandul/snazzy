@@ -8,8 +8,84 @@ import './itempage8.css';
 const DisplayProducts = () => {
   const navigate = useNavigate();
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
+  
+  // Filter states
+  const [filters, setFilters] = useState({
+    color: '',
+    size: '',
+    brand: '',
+    priceRange: [0, 1000]
+  });
+  
+  // Available filter options
+  const [filterOptions, setFilterOptions] = useState({
+    colors: [],
+    sizes: [],
+    brands: []
+  });
+
+  // Extract filter options from products
+  const extractFilterOptions = (products) => {
+    const colors = new Set();
+    const sizes = new Set();
+    const brands = new Set();
+    
+    products.forEach(product => {
+      // Extract brand from product name (first word)
+      const brand = product.pname.split(' ')[0];
+      brands.add(brand);
+      
+      // Extract colors and sizes from variants
+      if (product.variants && product.variants.length > 0) {
+        product.variants.forEach(variant => {
+          if (variant.color) colors.add(variant.color);
+          if (variant.size) sizes.add(variant.size);
+        });
+      }
+    });
+    
+    return {
+      colors: Array.from(colors).sort(),
+      sizes: Array.from(sizes).sort((a, b) => a - b),
+      brands: Array.from(brands).sort()
+    };
+  };
+
+  // Filter products based on current filters
+  const applyFilters = (products, filters) => {
+    return products.filter(product => {
+      // Color filter
+      if (filters.color && product.variants) {
+        const hasColor = product.variants.some(variant => 
+          variant.color.toLowerCase().includes(filters.color.toLowerCase())
+        );
+        if (!hasColor) return false;
+      }
+      
+      // Size filter
+      if (filters.size && product.variants) {
+        const hasSize = product.variants.some(variant => 
+          variant.size === parseInt(filters.size)
+        );
+        if (!hasSize) return false;
+      }
+      
+      // Brand filter
+      if (filters.brand) {
+        const productBrand = product.pname.split(' ')[0].toLowerCase();
+        if (!productBrand.includes(filters.brand.toLowerCase())) return false;
+      }
+      
+      // Price range filter
+      const price = product.hasActivePromotion ? product.discountedPrice : product.pamount;
+      if (price < filters.priceRange[0] || price > filters.priceRange[1]) return false;
+      
+      return true;
+    });
+  };
 
   // Fetch products 
   useEffect(() => {
@@ -17,7 +93,14 @@ const DisplayProducts = () => {
       try {
         setLoading(true);
         const res = await axios.get("http://localhost:5000/products");
-        setProducts(res.data.products || []);
+        const productsData = res.data.products || [];
+        setProducts(productsData);
+        setFilteredProducts(productsData);
+        
+        // Extract filter options
+        const options = extractFilterOptions(productsData);
+        setFilterOptions(options);
+        
         setError(null);
       } catch (err) {
         console.error(err);
@@ -29,9 +112,44 @@ const DisplayProducts = () => {
     fetchProducts();
   }, []);
 
+  // Apply filters when filters change
+  useEffect(() => {
+    const filtered = applyFilters(products, filters);
+    setFilteredProducts(filtered);
+  }, [filters, products]);
+
   // Navigate to product detail page
   const handleProductClick = (id) => {
     navigate(`/products/${id}`); 
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (filterType, value) => {
+    setFilters(prev => ({
+      ...prev,
+      [filterType]: value
+    }));
+  };
+
+  // Handle price range change
+  const handlePriceRangeChange = (index, value) => {
+    setFilters(prev => ({
+      ...prev,
+      priceRange: [
+        index === 0 ? parseInt(value) : prev.priceRange[0],
+        index === 1 ? parseInt(value) : prev.priceRange[1]
+      ]
+    }));
+  };
+
+  // Clear all filters
+  const clearFilters = () => {
+    setFilters({
+      color: '',
+      size: '',
+      brand: '',
+      priceRange: [0, 1000]
+    });
   };
 
   return (
@@ -55,6 +173,100 @@ const DisplayProducts = () => {
         </div>
       </section>
 
+      {/* Filter Section */}
+      <section className="filter-section8">
+        <div className="container8">
+          <div className="filter-container8">
+            <h3 className="filter-title8">Filter Products</h3>
+            
+            <div className="filter-grid8">
+              {/* Brand Filter */}
+              <div className="filter-group8">
+                <label className="filter-label8">Brand</label>
+                <select 
+                  className="filter-select8"
+                  value={filters.brand}
+                  onChange={(e) => handleFilterChange('brand', e.target.value)}
+                >
+                  <option value="">All Brands</option>
+                  {filterOptions.brands.map(brand => (
+                    <option key={brand} value={brand}>{brand}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Color Filter */}
+              <div className="filter-group8">
+                <label className="filter-label8">Color</label>
+                <select 
+                  className="filter-select8"
+                  value={filters.color}
+                  onChange={(e) => handleFilterChange('color', e.target.value)}
+                >
+                  <option value="">All Colors</option>
+                  {filterOptions.colors.map(color => (
+                    <option key={color} value={color}>{color}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Size Filter */}
+              <div className="filter-group8">
+                <label className="filter-label8">Size</label>
+                <select 
+                  className="filter-select8"
+                  value={filters.size}
+                  onChange={(e) => handleFilterChange('size', e.target.value)}
+                >
+                  <option value="">All Sizes</option>
+                  {filterOptions.sizes.map(size => (
+                    <option key={size} value={size}>Size {size}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price Range Filter */}
+              <div className="filter-group8 price-range-group8">
+                <label className="filter-label8">Price Range</label>
+                <div className="price-range-container8">
+                  <input
+                    type="number"
+                    className="price-input8"
+                    placeholder="Min"
+                    value={filters.priceRange[0]}
+                    onChange={(e) => handlePriceRangeChange(0, e.target.value)}
+                    min="0"
+                  />
+                  <span className="price-separator8">to</span>
+                  <input
+                    type="number"
+                    className="price-input8"
+                    placeholder="Max"
+                    value={filters.priceRange[1]}
+                    onChange={(e) => handlePriceRangeChange(1, e.target.value)}
+                    min="0"
+                  />
+                </div>
+              </div>
+
+              {/* Clear Filters Button */}
+              <div className="filter-group8">
+                <button className="clear-filters-btn8" onClick={clearFilters}>
+                  Clear All Filters
+                </button>
+              </div>
+            </div>
+
+            {/* Results Count */}
+            <div className="results-info8">
+              <p className="results-text8">
+                Showing {filteredProducts.length} of {products.length} products
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Products*/}
       <section className="products-section8">
         <div className="container8">
@@ -75,11 +287,15 @@ const DisplayProducts = () => {
               <div className="error-state8">{error}</div>
             )}
             
+            {!loading && !error && filteredProducts.length === 0 && products.length > 0 && (
+              <div className="empty-state8">No products match your current filters. Try adjusting your search criteria.</div>
+            )}
+            
             {!loading && !error && products.length === 0 && (
               <div className="empty-state8">No products available.</div>
             )}
             
-            {!loading && !error && products.map((p, index) => (
+            {!loading && !error && filteredProducts.map((p, index) => (
               <div 
                 key={p._id} 
                 className="product-card8" 

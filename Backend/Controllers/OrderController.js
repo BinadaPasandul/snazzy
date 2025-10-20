@@ -1,5 +1,6 @@
 const Order = require("../Models/OrderModel");
 const Register = require("../Models/UserModel");
+const Cart = require("../Models/CartModel");
 
 
 const getAllOrders = async (req, res) => {
@@ -70,6 +71,18 @@ const addOrders = async (req, res) => {
         }
         
         await user.save();
+
+        // Clear user's cart after successful order
+        try {
+            const userCart = await Cart.findOne({ userId });
+            if (userCart) {
+                userCart.items = [];
+                await userCart.save();
+            }
+        } catch (cartError) {
+            console.error("Error clearing cart after order:", cartError);
+            // Don't fail the order if cart clearing fails
+        }
 
         return res.status(201).json({ 
             order, 
