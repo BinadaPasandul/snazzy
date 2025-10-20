@@ -380,11 +380,7 @@ function Checkout() {
     }
   };
 
-<<<<<<< Updated upstream
-  //  Check if all required fields are completed
-=======
   // ✅ Check if all required fields are completed
->>>>>>> Stashed changes
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
 
   return (
