@@ -37,13 +37,29 @@ function InsertPromotion() {
       return;
     }
 
+    // Date validation - no past dates allowed
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+
+    if (startDateObj < today) {
+      alert('Start Date cannot be in the past. Please select today or a future date.');
+      return;
+    }
+
+    if (endDateObj < today) {
+      alert('End Date cannot be in the past. Please select today or a future date.');
+      return;
+    }
+
     const discountNumber = Number(discount);
     if (isNaN(discountNumber) || discountNumber <= 0) {
       alert('Discount must be a positive number');
       return;
     }
 
-    if (new Date(endDate) < new Date(startDate)) {
+    if (endDateObj < startDateObj) {
       alert('End Date must be after Start Date');
       return;
     }
@@ -162,6 +178,7 @@ function InsertPromotion() {
                   name="startDate" 
                   value={formData.startDate} 
                   onChange={handleChange} 
+                  min={new Date().toISOString().split('T')[0]}
                   required 
                 />
               </div>
@@ -174,6 +191,7 @@ function InsertPromotion() {
                   name="endDate" 
                   value={formData.endDate} 
                   onChange={handleChange} 
+                  min={formData.startDate || new Date().toISOString().split('T')[0]}
                   required 
                 />
               </div>

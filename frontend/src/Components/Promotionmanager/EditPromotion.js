@@ -73,7 +73,23 @@ function EditPromotion() {
             return;
         }
 
-        if (new Date(endDate) < new Date(startDate)) {
+        // Date validation - no past dates allowed
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Reset time to start of day
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+
+        if (startDateObj < today) {
+            alert('Start Date cannot be in the past. Please select today or a future date.');
+            return;
+        }
+
+        if (endDateObj < today) {
+            alert('End Date cannot be in the past. Please select today or a future date.');
+            return;
+        }
+
+        if (endDateObj < startDateObj) {
             alert('End Date must be after Start Date');
             return;
         }
@@ -258,6 +274,7 @@ function EditPromotion() {
                                             className="form-input"
                                             value={formData.startDate}
                                             onChange={handleChange}
+                                            min={new Date().toISOString().split('T')[0]}
                                             required
                                         />
                                     </div>
@@ -279,6 +296,7 @@ function EditPromotion() {
                                             className="form-input"
                                             value={formData.endDate}
                                             onChange={handleChange}
+                                            min={formData.startDate || new Date().toISOString().split('T')[0]}
                                             required
                                         />
                                     </div>
