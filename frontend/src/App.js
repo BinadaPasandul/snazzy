@@ -41,6 +41,7 @@ import Checkout from "./Components/Checkout/checkout";
 import MyOrders from "./Components/MyOrders/myorders";
 import Home from "./Components/Home/home";
 import ContactUs from "./Components/ContactUs/ContactUs";
+import Cart from "./Components/Cart/Cart";
 
 // Initialize Stripe
 const stripePromise = process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY
@@ -121,6 +122,10 @@ function App() {
             }
           />
 
+          <Route
+            path="/cart"
+            element={<Cart />}
+          />
           <Route
             path="/checkout"
             element={

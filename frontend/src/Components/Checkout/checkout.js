@@ -9,13 +9,13 @@ function Checkout() {
   const location = useLocation();
 
   //  Lakmiths product details
-  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion, selectedSize, quantity } = location.state || {};
+  const { productCode, productPrice, productname, originalPrice, hasPromotion, promotion, selectedSize, quantity, cartItems, isFromCart } = location.state || {};
 
   const [form, setForm] = useState({
     customer_name: "",
-    product_name:productname,
+    product_name: isFromCart ? "Multiple Items" : productname,
     customer_address: "",
-    product_id: productCode || "", 
+    product_id: isFromCart ? "CART_ORDER" : (productCode || ""), 
     size: selectedSize || "", 
     quantity: quantity || 1, 
     payment_type: "cash",
@@ -53,11 +53,69 @@ function Checkout() {
   }, []);
 
   
-  const originalBasePrice = originalPrice ? form.quantity * originalPrice : (productPrice ? form.quantity * productPrice : 0);
-  const promotionDiscount = hasPromotion ? originalBasePrice * (promotion?.discount / 100) : 0;
-  const priceAfterPromotion = originalBasePrice - promotionDiscount;
-  const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0; 
-  const totalPrice = priceAfterPromotion - loyaltyDiscount;
+  // Calculate prices based on whether it's from cart or single item
+  const calculatePrices = () => {
+    if (isFromCart && cartItems && cartItems.length > 0) {
+      // Calculate totals from cart items
+      let totalBasePrice = 0;
+      let totalPromotionDiscount = 0;
+      
+      cartItems.forEach(item => {
+        const itemBasePrice = item.pamount * item.quantity;
+        const itemPromotionDiscount = item.hasActivePromotion ? itemBasePrice * (item.promotion?.discount / 100) : 0;
+        totalBasePrice += itemBasePrice;
+        totalPromotionDiscount += itemPromotionDiscount;
+      });
+      
+      const priceAfterPromotion = totalBasePrice - totalPromotionDiscount;
+      const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0;
+      const totalPrice = priceAfterPromotion - loyaltyDiscount;
+      
+      return {
+        originalBasePrice: totalBasePrice,
+        promotionDiscount: totalPromotionDiscount,
+        priceAfterPromotion: priceAfterPromotion,
+        loyaltyDiscount: loyaltyDiscount,
+        totalPrice: totalPrice
+      };
+    } else {
+      // Single item calculation
+      const originalBasePrice = originalPrice ? form.quantity * originalPrice : (productPrice ? form.quantity * productPrice : 0);
+      const promotionDiscount = hasPromotion ? originalBasePrice * (promotion?.discount / 100) : 0;
+      const priceAfterPromotion = originalBasePrice - promotionDiscount;
+      const loyaltyDiscount = useLoyaltyPoints ? priceAfterPromotion * 0.05 : 0; 
+      const totalPrice = priceAfterPromotion - loyaltyDiscount;
+      
+      return {
+        originalBasePrice: originalBasePrice,
+        promotionDiscount: promotionDiscount,
+        priceAfterPromotion: priceAfterPromotion,
+        loyaltyDiscount: loyaltyDiscount,
+        totalPrice: totalPrice
+      };
+    }
+  };
+
+  // State for calculated prices to make them reactive
+  const [calculatedPrices, setCalculatedPrices] = useState({
+    originalBasePrice: 0,
+    promotionDiscount: 0,
+    priceAfterPromotion: 0,
+    loyaltyDiscount: 0,
+    totalPrice: 0
+  });
+
+  // Recalculate prices when dependencies change
+  useEffect(() => {
+    const newPrices = calculatePrices();
+    setCalculatedPrices(newPrices);
+  }, [isFromCart, cartItems, useLoyaltyPoints, form.quantity, productPrice, originalPrice, hasPromotion, promotion]);
+
+  const originalBasePrice = calculatedPrices.originalBasePrice;
+  const promotionDiscount = calculatedPrices.promotionDiscount;
+  const priceAfterPromotion = calculatedPrices.priceAfterPromotion;
+  const loyaltyDiscount = calculatedPrices.loyaltyDiscount;
+  const totalPrice = calculatedPrices.totalPrice;
 
   
   useEffect(() => {
@@ -83,40 +141,121 @@ function Checkout() {
           return;
         }
 
-        const orderData = {
-          ...form,
-          total_price: totalPrice,
-          base_price: originalBasePrice,
-          promotion_discount: promotionDiscount,
-          has_promotion: hasPromotion,
-          promotion_title: promotion?.title || null,
-          promotion_id: promotion?.id || null,
-          loyalty_discount: loyaltyDiscount,
-          used_loyalty_points: useLoyaltyPoints,
-          payment_id: receivedPaymentId, 
-        };
+        if (isFromCart && cartItems && cartItems.length > 0) {
+          // Handle multiple items from cart
+          try {
+            let totalOrderPrice = 0;
+            let totalBasePrice = 0;
+            let totalPromotionDiscount = 0;
+            let totalLoyaltyDiscount = 0;
+            let hasAnyPromotion = false;
+            let promotionTitles = [];
 
-        console.log('Submitting order with data:', orderData);
+            // Calculate totals for all items
+            cartItems.forEach(item => {
+              const itemBasePrice = item.pamount * item.quantity;
+              const itemPromotionDiscount = item.hasActivePromotion ? itemBasePrice * (item.promotion?.discount / 100) : 0;
+              const itemPriceAfterPromotion = itemBasePrice - itemPromotionDiscount;
+              const itemLoyaltyDiscount = useLoyaltyPoints ? itemPriceAfterPromotion * 0.05 : 0;
+              const itemTotalPrice = itemPriceAfterPromotion - itemLoyaltyDiscount;
 
-        try {
-          const orderResponse = await api.post("/orders", orderData);
-          console.log('Order submitted successfully:', orderResponse.data);
-          
-          // Update loyalty points 
-          if (orderResponse.data.loyaltyPoints !== undefined) {
-            setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
+              totalBasePrice += itemBasePrice;
+              totalPromotionDiscount += itemPromotionDiscount;
+              totalLoyaltyDiscount += itemLoyaltyDiscount;
+              totalOrderPrice += itemTotalPrice;
+
+              if (item.hasActivePromotion) {
+                hasAnyPromotion = true;
+                promotionTitles.push(item.promotion?.title);
+              }
+            });
+
+            // Create order for each item
+            const orderPromises = cartItems.map(async (item) => {
+              const itemBasePrice = item.pamount * item.quantity;
+              const itemPromotionDiscount = item.hasActivePromotion ? itemBasePrice * (item.promotion?.discount / 100) : 0;
+              const itemPriceAfterPromotion = itemBasePrice - itemPromotionDiscount;
+              const itemLoyaltyDiscount = useLoyaltyPoints ? itemPriceAfterPromotion * 0.05 : 0;
+              const itemTotalPrice = itemPriceAfterPromotion - itemLoyaltyDiscount;
+
+              const orderData = {
+                customer_name: form.customer_name,
+                product_name: item.pname,
+                customer_address: form.customer_address,
+                product_id: item.product_id,
+                size: item.selectedSize,
+                quantity: item.quantity,
+                payment_type: form.payment_type,
+                total_price: itemTotalPrice,
+                base_price: itemBasePrice,
+                promotion_discount: itemPromotionDiscount,
+                has_promotion: item.hasActivePromotion,
+                promotion_title: item.promotion?.title || null,
+                promotion_id: item.promotion?.id || null,
+                loyalty_discount: itemLoyaltyDiscount,
+                used_loyalty_points: useLoyaltyPoints,
+                payment_id: receivedPaymentId,
+              };
+
+              return api.post("/orders", orderData);
+            });
+
+            const orderResponses = await Promise.all(orderPromises);
+            console.log('All orders submitted successfully:', orderResponses);
+
+            // Update loyalty points from the first response
+            if (orderResponses[0]?.data?.loyaltyPoints !== undefined) {
+              setUserLoyaltyPoints(orderResponses[0].data.loyaltyPoints);
+            }
+
+            // Show success message
+            const loyaltyMessage = orderResponses[0]?.data?.loyaltyPointsUsed 
+              ? ` Orders placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponses[0].data.loyaltyPoints}`
+              : ` Orders placed successfully! 5 loyalty points earned. Total points: ${orderResponses[0].data.loyaltyPoints}`;
+            
+            alert(loyaltyMessage);
+            navigate("/myorders");
+          } catch (err) {
+            console.error("Order failed:", err.response?.data || err.message);
+            alert("Error placing orders");
           }
-          
-          //loyality points validation 
-          const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
-            ? ` Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
-            : ` Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
-          
-          alert(loyaltyMessage);
-          navigate("/myorders");
-        } catch (err) {
-          console.error("Order failed:", err.response?.data || err.message);
-          alert(" Error placing order");
+        } else {
+          // Handle single item order (existing logic)
+          const orderData = {
+            ...form,
+            total_price: totalPrice,
+            base_price: originalBasePrice,
+            promotion_discount: promotionDiscount,
+            has_promotion: hasPromotion,
+            promotion_title: promotion?.title || null,
+            promotion_id: promotion?.id || null,
+            loyalty_discount: loyaltyDiscount,
+            used_loyalty_points: useLoyaltyPoints,
+            payment_id: receivedPaymentId, 
+          };
+
+          console.log('Submitting order with data:', orderData);
+
+          try {
+            const orderResponse = await api.post("/orders", orderData);
+            console.log('Order submitted successfully:', orderResponse.data);
+            
+            // Update loyalty points 
+            if (orderResponse.data.loyaltyPoints !== undefined) {
+              setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
+            }
+            
+            //loyality points validation 
+            const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
+              ? ` Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
+              : ` Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
+            
+            alert(loyaltyMessage);
+            navigate("/myorders");
+          } catch (err) {
+            console.error("Order failed:", err.response?.data || err.message);
+            alert(" Error placing order");
+          }
         }
       }
     };
@@ -153,41 +292,99 @@ function Checkout() {
       return;
     }
 
-    const orderData = {
-      ...form,
-      total_price: totalPrice,
-      base_price: originalBasePrice,
-      promotion_discount: promotionDiscount,
-      has_promotion: hasPromotion,
-      promotion_title: promotion?.title || null,
-      promotion_id: promotion?.id || null,
-      loyalty_discount: loyaltyDiscount,
-      used_loyalty_points: useLoyaltyPoints,
-      payment_id: paymentId, 
-    };
+    if (isFromCart && cartItems && cartItems.length > 0) {
+      // Handle multiple items from cart for cash payment
+      try {
+        const orderPromises = cartItems.map(async (item) => {
+          const itemBasePrice = item.pamount * item.quantity;
+          const itemPromotionDiscount = item.hasActivePromotion ? itemBasePrice * (item.promotion?.discount / 100) : 0;
+          const itemPriceAfterPromotion = itemBasePrice - itemPromotionDiscount;
+          const itemLoyaltyDiscount = useLoyaltyPoints ? itemPriceAfterPromotion * 0.05 : 0;
+          const itemTotalPrice = itemPriceAfterPromotion - itemLoyaltyDiscount;
 
-    try {
-      const orderResponse = await api.post("/orders", orderData);
-      
-      // Update loyalty points in state
-      if (orderResponse.data.loyaltyPoints !== undefined) {
-        setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
+          const orderData = {
+            customer_name: form.customer_name,
+            product_name: item.pname,
+            customer_address: form.customer_address,
+            product_id: item.product_id,
+            size: item.selectedSize,
+            quantity: item.quantity,
+            payment_type: form.payment_type,
+            total_price: itemTotalPrice,
+            base_price: itemBasePrice,
+            promotion_discount: itemPromotionDiscount,
+            has_promotion: item.hasActivePromotion,
+            promotion_title: item.promotion?.title || null,
+            promotion_id: item.promotion?.id || null,
+            loyalty_discount: itemLoyaltyDiscount,
+            used_loyalty_points: useLoyaltyPoints,
+            payment_id: paymentId,
+          };
+
+          return api.post("/orders", orderData);
+        });
+
+        const orderResponses = await Promise.all(orderPromises);
+        console.log('All orders submitted successfully:', orderResponses);
+
+        // Update loyalty points from the first response
+        if (orderResponses[0]?.data?.loyaltyPoints !== undefined) {
+          setUserLoyaltyPoints(orderResponses[0].data.loyaltyPoints);
+        }
+
+        // Show success message
+        const loyaltyMessage = orderResponses[0]?.data?.loyaltyPointsUsed 
+          ? ` Orders placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponses[0].data.loyaltyPoints}`
+          : ` Orders placed successfully! 5 loyalty points earned. Total points: ${orderResponses[0].data.loyaltyPoints}`;
+        
+        alert(loyaltyMessage);
+        navigate("/myorders");
+      } catch (err) {
+        console.error("Order failed:", err.response?.data || err.message);
+        alert("Error placing orders");
       }
-      
-      // Show success message with loyalty points info
-      const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
-        ? ` Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
-        : ` Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
-      
-      alert(loyaltyMessage);
-      navigate("/myorders");
-    } catch (err) {
-      console.error("Order failed:", err.response?.data || err.message);
-      alert(" Error placing order");
+    } else {
+      // Handle single item order (existing logic)
+      const orderData = {
+        ...form,
+        total_price: totalPrice,
+        base_price: originalBasePrice,
+        promotion_discount: promotionDiscount,
+        has_promotion: hasPromotion,
+        promotion_title: promotion?.title || null,
+        promotion_id: promotion?.id || null,
+        loyalty_discount: loyaltyDiscount,
+        used_loyalty_points: useLoyaltyPoints,
+        payment_id: paymentId, 
+      };
+
+      try {
+        const orderResponse = await api.post("/orders", orderData);
+        
+        // Update loyalty points in state
+        if (orderResponse.data.loyaltyPoints !== undefined) {
+          setUserLoyaltyPoints(orderResponse.data.loyaltyPoints);
+        }
+        
+        // Show success message with loyalty points info
+        const loyaltyMessage = orderResponse.data.loyaltyPointsUsed 
+          ? ` Order placed successfully! 5 loyalty points deducted. Remaining points: ${orderResponse.data.loyaltyPoints}`
+          : ` Order placed successfully! 5 loyalty points earned. Total points: ${orderResponse.data.loyaltyPoints}`;
+        
+        alert(loyaltyMessage);
+        navigate("/myorders");
+      } catch (err) {
+        console.error("Order failed:", err.response?.data || err.message);
+        alert(" Error placing order");
+      }
     }
   };
 
+<<<<<<< Updated upstream
   //  Check if all required fields are completed
+=======
+  // ✅ Check if all required fields are completed
+>>>>>>> Stashed changes
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
 
   return (
@@ -369,7 +566,7 @@ function Checkout() {
                     color: '#111827',
                     marginBottom: '1rem'
                   }}>
-                    Product Details
+                    {isFromCart ? 'Cart Items' : 'Product Details'}
                   </h3>
                   
                   {/* Product Code */}
@@ -439,7 +636,7 @@ function Checkout() {
                   </div>
 
                   {/* Price Information */}
-                  {productPrice && (
+                  {!isFromCart && productPrice && (
                     <div style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -460,12 +657,14 @@ function Checkout() {
                       padding: '0.75rem 0',
                       borderTop: '1px solid #e2e8f0'
                     }}>
-                      <span style={{ color: '#6b7280' }}>Subtotal ({form.quantity} items):</span>
+                      <span style={{ color: '#6b7280' }}>
+                        {isFromCart ? `Subtotal (${cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0} items):` : `Subtotal (${form.quantity} items):`}
+                      </span>
                       <span style={{ fontWeight: '500', color: '#111827' }}>${originalBasePrice.toFixed(2)}</span>
                     </div>
                   )}
 
-                  {hasPromotion && promotionDiscount > 0 && (
+                  {promotionDiscount > 0 && (
                     <div style={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -473,7 +672,9 @@ function Checkout() {
                       padding: '0.75rem 0',
                       borderTop: '1px solid #e2e8f0'
                     }}>
-                      <span style={{ color: '#dc2626', fontWeight: '500' }}>Promotion Discount ({promotion?.discount}%):</span>
+                      <span style={{ color: '#dc2626', fontWeight: '500' }}>
+                        {isFromCart ? 'Promotion Discounts:' : `Promotion Discount (${promotion?.discount}%):`}
+                      </span>
                       <span style={{ fontWeight: '500', color: '#dc2626' }}>-${promotionDiscount.toFixed(2)}</span>
                     </div>
                   )}
@@ -497,7 +698,7 @@ function Checkout() {
                     alignItems: 'center',
                     padding: '0.75rem 0',
                     borderTop: '2px solid #e2e8f0',
-                    backgroundColor: (useLoyaltyPoints || hasPromotion) ? '#fef3c7' : 'transparent',
+                    backgroundColor: (useLoyaltyPoints || promotionDiscount > 0) ? '#fef3c7' : 'transparent',
                     borderRadius: '0.5rem',
                     marginTop: '0.5rem'
                   }}>
@@ -505,7 +706,7 @@ function Checkout() {
                     <span style={{ 
                       fontWeight: 'bold', 
                       fontSize: '1.125rem',
-                      color: (useLoyaltyPoints || hasPromotion) ? '#f59e0b' : '#4f46e5'
+                      color: (useLoyaltyPoints || promotionDiscount > 0) ? '#f59e0b' : '#4f46e5'
                     }}>
                       ${totalPrice.toFixed(2)}
                     </span>
@@ -614,7 +815,7 @@ function Checkout() {
                         fontSize: '0.875rem', 
                         color: '#6b7280' 
                       }}>
-                        Save ${loyaltyDiscount.toFixed(2)} on this order
+                        Save ${loyaltyDiscount.toFixed(2)} on this {isFromCart ? 'order' : 'order'}
                       </div>
                     </div>
                   </label>
@@ -638,6 +839,101 @@ function Checkout() {
                     </div>
                   )}
                 </div>
+
+                {/* Cart Items Display */}
+                {isFromCart && cartItems && cartItems.length > 0 && (
+                  <div style={{
+                    backgroundColor: '#f8fafc',
+                    borderRadius: '0.75rem',
+                    padding: '1.5rem',
+                    border: '1px solid #e2e8f0',
+                    marginTop: '1rem'
+                  }}>
+                    <h3 style={{
+                      fontSize: '1rem',
+                      fontWeight: '600',
+                      color: '#111827',
+                      marginBottom: '1rem'
+                    }}>
+                      Items in Cart ({cartItems.length})
+                    </h3>
+                    
+                    <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+                      {cartItems.map((item, index) => (
+                        <div key={index} style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '0.75rem 0',
+                          borderBottom: index < cartItems.length - 1 ? '1px solid #e2e8f0' : 'none'
+                        }}>
+                          <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: '500', color: '#111827' }}>
+                              {item.pname}
+                            </div>
+                            <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                              Size: {item.selectedSize} | Color: {item.selectedColor} | Qty: {item.quantity}
+                            </div>
+                          </div>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontWeight: '600', color: '#111827' }}>
+                              ${((item.hasActivePromotion ? item.discountedPrice : item.pamount) * item.quantity).toFixed(2)}
+                            </div>
+                            {item.hasActivePromotion && (
+                              <div style={{ fontSize: '0.75rem', color: '#dc2626' }}>
+                                {item.promotion?.discount}% OFF
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Order Summary for Cart */}
+                    <div style={{
+                      marginTop: '1rem',
+                      padding: '1rem',
+                      backgroundColor: '#f0f9ff',
+                      borderRadius: '0.5rem',
+                      border: '1px solid #bae6fd'
+                    }}>
+                      <h4 style={{
+                        fontSize: '0.875rem',
+                        fontWeight: '600',
+                        color: '#0369a1',
+                        marginBottom: '0.5rem'
+                      }}>
+                        Order Summary
+                      </h4>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                        <span style={{ fontSize: '0.875rem', color: '#6b7280' }}>Subtotal:</span>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '500' }}>${originalBasePrice.toFixed(2)}</span>
+                      </div>
+                      {promotionDiscount > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                          <span style={{ fontSize: '0.875rem', color: '#dc2626' }}>Promotion Discount:</span>
+                          <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#dc2626' }}>-${promotionDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      {useLoyaltyPoints && loyaltyDiscount > 0 && (
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                          <span style={{ fontSize: '0.875rem', color: '#f59e0b' }}>Loyalty Discount:</span>
+                          <span style={{ fontSize: '0.875rem', fontWeight: '500', color: '#f59e0b' }}>-${loyaltyDiscount.toFixed(2)}</span>
+                        </div>
+                      )}
+                      <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'space-between', 
+                        paddingTop: '0.5rem',
+                        borderTop: '1px solid #bae6fd',
+                        marginTop: '0.5rem'
+                      }}>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '600', color: '#0369a1' }}>Total:</span>
+                        <span style={{ fontSize: '0.875rem', fontWeight: '700', color: '#0369a1' }}>${totalPrice.toFixed(2)}</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Submit Button for Cash */}
                 {form.payment_type === "cash" && (

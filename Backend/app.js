@@ -16,7 +16,11 @@ const chatRouter = require('./Routes/chatRoute');
 const orderRoute = require('./Routes/OrderRoute');
 const promotionRouter = require('./Routes/PromotionRoute');
 const contactRouter = require('./Routes/contactRoute');
+<<<<<<< Updated upstream
 const reportRouter = require('./Routes/reportRoute');
+=======
+const cartRouter = require('./Routes/cartRoute');
+>>>>>>> Stashed changes
 const bodyParser = require('body-parser');
 const ProductRouter = require("./Routes/ProductRoutes");
 
@@ -38,7 +42,11 @@ app.use("/orders",orderRoute);
 app.use("/Promotions", promotionRouter);
 app.use("/products", ProductRouter);
 app.use("/contact", contactRouter);
+<<<<<<< Updated upstream
 app.use('/reports', reportRouter);
+=======
+app.use("/cart", cartRouter);
+>>>>>>> Stashed changes
 
 
 //database connection link
