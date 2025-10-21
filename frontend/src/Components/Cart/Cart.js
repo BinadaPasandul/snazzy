@@ -29,17 +29,16 @@ const Cart = () => {
     loadCart();
   }, []);
 
-  // Save cart to backend whenever cart changes
+  // Save cart to backend 
   const saveCartToBackend = async (items) => {
     try {
-      // This will be handled by individual API calls (add, update, remove)
-      // No need to save entire cart on every change
+      // individual API calls
     } catch (error) {
       console.error('Error saving cart:', error);
     }
   };
 
-  // Calculate totals
+  // Calculate total
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
       const price = item.hasActivePromotion ? item.discountedPrice : item.pamount;
@@ -51,7 +50,7 @@ const Cart = () => {
     return calculateSubtotal();
   };
 
-  // Update quantity
+  // quantity
   const updateQuantity = async (itemId, newQuantity) => {
     if (newQuantity <= 0) {
       removeFromCart(itemId);
@@ -62,7 +61,7 @@ const Cart = () => {
       const response = await api.put(`/cart/item/${itemId}`, { quantity: newQuantity });
       if (response.data && response.data.cart) {
         setCartItems(response.data.cart.items || []);
-        // Dispatch custom event to update cart count in navbar
+        
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       }
     } catch (error) {
@@ -77,7 +76,7 @@ const Cart = () => {
       const response = await api.delete(`/cart/item/${itemId}`);
       if (response.data && response.data.cart) {
         setCartItems(response.data.cart.items || []);
-        // Dispatch custom event to update cart count in navbar
+        
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       }
     } catch (error) {
@@ -86,13 +85,13 @@ const Cart = () => {
     }
   };
 
-  // Clear entire cart
+  // Clear  cart
   const clearCart = async () => {
     try {
       const response = await api.delete('/cart/clear');
       if (response.data && response.data.cart) {
         setCartItems(response.data.cart.items || []);
-        // Dispatch custom event to update cart count in navbar
+        
         window.dispatchEvent(new CustomEvent('cartUpdated'));
       }
     } catch (error) {
@@ -108,7 +107,7 @@ const Cart = () => {
       return;
     }
     
-    // Navigate to checkout with all cart items
+    // Navigate to checkout
     navigate("/checkout", {
       state: {
         cartItems: cartItems,
@@ -117,7 +116,7 @@ const Cart = () => {
     });
   };
 
-  // Continue shopping
+  // Continue shopping button
   const continueShopping = () => {
     navigate("/items");
   };
