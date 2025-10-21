@@ -63,15 +63,14 @@ exports.handleRefund = async (req, res) => {
       refundRequest.adminResponse = response || 'Approved';
       await refundRequest.save();
 
-      // Delete the associated order when refund is approved
+      // Delete the order  refund eka approved
       try {
-        // Find order by payment_id since that's how they're linked
         const orderToDelete = await Order.findOne({ payment_id: refundRequest.paymentId._id });
         if (orderToDelete) {
           await Order.findByIdAndDelete(orderToDelete._id);
           console.log(`Order ${orderToDelete._id} deleted due to refund approval`);
           
-          // Update user loyalty points when order is deleted
+          // Updating loyalty points when order is deleted
           if (orderToDelete.userId) {
             const user = await Register.findById(orderToDelete.userId);
             if (user) {

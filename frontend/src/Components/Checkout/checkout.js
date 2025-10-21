@@ -380,7 +380,7 @@ function Checkout() {
     }
   };
 
-  // ✅ Check if all required fields are completed
+  //  Check if all required fields are completed
   const isFormComplete = form.customer_name && form.customer_address && form.size && form.product_id;
 
   return (

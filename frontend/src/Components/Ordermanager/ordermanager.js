@@ -44,7 +44,7 @@ function OrderManager() {
       
       const date = new Date(timestamp * 1000);
       
-      // Validate the date is reasonable (not too far in past or future)
+      // Validate the date 
       const now = new Date();
       const yearDiff = Math.abs(date.getFullYear() - now.getFullYear());
       
@@ -98,7 +98,7 @@ function OrderManager() {
   useEffect(() => {
     fetchOrders();
     
-    // Set up refresh to detect order deletions from refund approvals
+    //  detect order deletions from refund approvals
     const refreshInterval = setInterval(() => {
       fetchOrders();
     }, 30000); // Refresh every 30 seconds
@@ -265,7 +265,7 @@ function OrderManager() {
         return;
       }
 
-      // Create professional PDF
+      //  PDF creation
       console.log("Creating PDF document...");
       const doc = new jsPDF('landscape', 'mm', 'a4');
       const pageWidth = doc.internal.pageSize.width;
@@ -274,13 +274,13 @@ function OrderManager() {
       doc.setFillColor(31, 41, 55);
       doc.rect(0, 0, pageWidth, 35, "F");
       
-      
+      //report heading eka
       doc.setTextColor(255, 255, 255);
       doc.setFontSize(20);
       doc.setFont('helvetica', 'bold');
       doc.text("SNAZZY", 20, 15);
       
-      // Report title
+      // Report title eka
       doc.setFontSize(14);
       doc.setFont('helvetica', 'normal');
       doc.text("Orders Report", 20, 22);
@@ -296,7 +296,7 @@ function OrderManager() {
         minute: '2-digit' 
       })}`, pageWidth - 80, 15);
       
-      // Period indicator badge
+      // Period indicator
       const monthName = new Date(selYear, selMonth - 1).toLocaleString("default", { month: "long" });
       doc.setFillColor(59, 130, 246);
       doc.setDrawColor(59, 130, 246);
@@ -316,7 +316,7 @@ function OrderManager() {
         );
       }
 
-      // Calculate highlights with safe property access
+      // Calculate highlights
       const totalRevenue = filteredOrders.reduce((sum, order) => {
         const price = parseFloat(order?.total_price) || 0;
         return sum + price;
@@ -474,7 +474,7 @@ function OrderManager() {
 
       y += 55;
 
-      // Orders table with safe data handling
+      // Orders table
       const tableColumns = [
         "Order ID",
         "Date",
@@ -631,7 +631,7 @@ function OrderManager() {
         showHead: 'everyPage',
         didDrawPage: (data) => {
           try {
-            // Add page numbers with better styling
+            // page numbers
             doc.setFontSize(8);
             doc.setTextColor(128, 128, 128);
             const pageNum = doc.internal.getCurrentPageInfo().pageNumber;
@@ -641,7 +641,7 @@ function OrderManager() {
           }
         },
         didParseCell: (data) => {
-          // Style status column with colors
+          // status column eka
           if (data.column.index === 11) { // Status column
             const status = data.cell.text[0];
             const statusColors = {
@@ -655,7 +655,7 @@ function OrderManager() {
             data.cell.styles.fontStyle = 'bold';
           }
           
-          // Style price columns
+          // price column eka
           if ([6, 7, 8, 9].includes(data.column.index)) {
             if (data.cell.text[0] && data.cell.text[0].startsWith('$')) {
               data.cell.styles.fontStyle = 'normal';
@@ -666,7 +666,7 @@ function OrderManager() {
 
       console.log("Table generated successfully");
 
-      // Add summary at the bottom with safe access
+      // summary at the bottom 
       try {
         let finalY = 180; // Default position if we can't get the table end position
         if (doc.previousAutoTable && typeof doc.previousAutoTable.finalY === 'number') {
@@ -692,7 +692,7 @@ function OrderManager() {
         }
       } catch (summaryError) {
         console.error("Error adding summary:", summaryError);
-        // Continue without summary if it fails
+        
       }
 
       // Generate filename and save
