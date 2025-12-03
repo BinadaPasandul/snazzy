@@ -376,7 +376,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <p className="size-guide-text">
-                Size guide available
+                Size guide available here
               </p>
             </div>
           )}
